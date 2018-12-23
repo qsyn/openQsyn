@@ -1,4 +1,4 @@
-classdef qfttpl
+classdef qtpl
     %QFTTPL Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -7,7 +7,7 @@ classdef qfttpl
     end
     
     methods
-        function tpl = qfttpl(expression)
+        function tpl = qtpl(expression)
             
     end
     

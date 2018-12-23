@@ -1,4 +1,4 @@
-classdef qftexpression
+classdef qexpression
     %QFTEXPRESSION Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -8,7 +8,7 @@ classdef qftexpression
     end
     
     methods
-        function exp = qftexpression(A,B,op)
+        function exp = qexpression(A,B,op)
             if (isa(A,'qftpar')) && (isa(B,'qftpar'))
                 exp.expression = sprintf('%s %s %s',A.name,op,B.name);
                 exp.pars = [A ; B];

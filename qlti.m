@@ -1,4 +1,4 @@
-classdef qftlti < handle
+classdef qlti < handle
     %QFTTF Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -9,7 +9,7 @@ classdef qftlti < handle
     end
     
     methods
-        function G = qftlti(varargin)
+        function G = qlti(varargin)
             
             if nargin==1
                 G.num = varargin{1}.num;
@@ -24,7 +24,7 @@ classdef qftlti < handle
             end
 
         end
-        function qftlti2(Obj,A,B)
+        function qlti2(Obj,A,B)
             if isa(B,'lti') % Const * H(s)
                 H = tf(B);
                 [b,a]= tfdata(H);
