@@ -3,12 +3,19 @@ classdef qtpl
     %   Detailed explanation goes here
     
     properties
-        model   % parametric model
+        frequency
+        template
+        parameters
     end
     
     methods
-        function tpl = qtpl(expression)
+        function obj = qtpl(frequency,template,parameters)
+            %QTPL construct a qtpl object
             
+            obj.frequency = double(frequency);
+            obj.template = double(template);
+            obj.parameters = double(parameters); 
+        end  
     end
     
 end
