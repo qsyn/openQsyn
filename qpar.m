@@ -86,17 +86,21 @@ classdef qpar
             if nargin<2, n = obj.cases; end
             pspace = linspace(obj.lower,obj.upper,n);           
         end
-        function p = grid(obj,cases)
+        function p = grid(obj,rnd,cases)
             %GRID computes a gird of N vectors
             %%% this part adapted from NDGRID
             [N,M] = size(obj);
-            if M~=1, error('par.gird only accepts a column vector'); end
-            if nargin<2, cases = [obj.cases]; end
+            if M~=1, error('par.gird only accepts a column vector'); end            
+            if nargin<3, cases = [obj.cases]; end
+            if nargin<2, rnd=0; end
             
             p = zeros(N,prod(cases));
-            
             for k=1:N
-                a = linspace(obj(k),cases(k));
+                if rnd==0
+                    a = linspace(obj(k),cases(k));
+                else %rnd==1        
+                    a = obj(k).lower + (obj(k).lower+obj(k).upper)*rand(1,cases(k));
+                end
                 x = full(a);
                 s = ones(1,N);
                 s(k) = numel(x);
@@ -105,6 +109,19 @@ classdef qpar
                 s(k) = 1;
                 pk = repmat(x,s);
                 p(k,:) = reshape(pk,1,[]);
+            end
+                        
+        end
+        function p = sample(obj,N)
+            %RNDGRID generates N random samples of the parameter cases
+            %   generates a grid 
+            [n,m] = size(obj);
+            if m~=1, error('par.rndgird only accepts a column vector'); end
+            
+            p = zeros(n,N);
+            
+            for k=1:n
+                p(k,:) = obj(k).lower + (obj(k).lower+obj(k).upper)*rand(1,N);
             end
                         
         end

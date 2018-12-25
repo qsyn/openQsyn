@@ -39,24 +39,51 @@ classdef qplant < handle
         function obj = ctpl(obj,method,w,options)
             %CTPL computes the templates...
             
+            % TODO: add additional options...
+            switch method
+                case 'grid', obj=obj.cgrid(w,0);
+                case 'rndgrid', obj=obj.cgrid(w,1);
+                case 'random', obj=obj.cgrid(w,2);
+                otherwise, error('unrecognized method!')
+            end
+            
             
         end
-        function obj = cgrid(obj,w)
+        function obj = cgrid(obj,w,rnd)
             %CGRID computes tpl by the grid method
+            %   facilitates grid, random grid, and random sampling 
+            %   
+            %   for random and random grid the parameter set is random, yet
+            %   identical in every frequency.
             
             % TODO: add  unstructured uncertainty 
-            
-            disp('Calculating templates using the grid method ');
+            %       add  options to change cases 
+            if nargin<3, rnd=0; end
+            switch rnd
+                case 0
+                    method='grid'; 
+                    pgrid = grid(obj.pars,rnd);
+                case 1
+                    method='random grid'; 
+                    pgrid = grid(obj.pars,rnd);
+                case 2 
+                    method='random sampling';
+                    pgrid = sample(obj.pars,100); % correct usage: options.cases(=100)
+                otherwise, error('unavilable rnd option')
+            end
+                
+            fprintf('Calculating templates using the %s method \n',method)
             f = qplant2func(obj);
-            pgrid = grid(obj.pars);
+            
             C = num2cell(pgrid,2);
             C{end+1}=0;
-            col = distinguishable_colors(length(w));
+            col = distinguishable_colors(length(w)); % to remove
+            tpl = qtpl(length(w)); % pre-allocating 
             for k = 1:length(w)
                 fprintf('--> for w=%g [rad/s] \n',w(k));
                 C{end}=1j*w(k);
                 nyq = f(C{:});               % in complex form
-                tpl(k)=qtpl(w,c2n(nyq),pgrid);  
+                tpl(k)=qtpl(w(k),c2n(nyq),pgrid);  
                 scatter(real(c2n(nyq)),imag(c2n(nyq)),10,col(k,:)); hold on
             end 
             obj.templates = tpl;
