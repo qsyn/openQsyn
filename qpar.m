@@ -93,7 +93,7 @@ classdef qpar
             if M~=1, error('par.gird only accepts a column vector'); end            
             if nargin<3, cases = [obj.cases]; end
             if nargin<2, rnd=0; end
-            
+            if length(cases)==1 && N>1, cases=repmat(cases,1,N); end
             p = zeros(N,prod(cases));
             for k=1:N
                 if rnd==0

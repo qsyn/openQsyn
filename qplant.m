@@ -40,13 +40,68 @@ classdef qplant < handle
             %CTPL computes the templates...
             
             % TODO: add additional options...
+            if nargin<4, options=[]; end
+            
             switch method
                 case 'grid', obj=obj.cgrid(w,0);
                 case 'rndgrid', obj=obj.cgrid(w,1);
                 case 'random', obj=obj.cgrid(w,2);
+                case 'recgrid', obj=obj.adgrid(w,options);
+                case 'aedgrid', obj=obj.adedge(w,options);
                 otherwise, error('unrecognized method!')
             end
             
+        end
+        function obj = adgrid(obj,w,options)
+            %ADGRID computes template by the recursive grid method
+            
+            % TODO: add  unstructured uncertainty 
+            error('to do...')
+            
+        end
+        function obj = adedge(obj,w,options)
+            
+            
+            fprintf('Calculating templates by recurcive edge grid\n')
+            
+            Tacc=[5 2];
+            
+            npar=length(obj.pars);
+            qdist = ([obj.pars.upper]' - [obj.pars.lower]')./double([obj.pars.cases]'); 
+            indgrid = obj.idxgrid(npar);
+            qg = grid(obj.pars,0,2);
+            
+            f = obj.qplant2func();
+
+            %C = num2cell(qg,2);
+            %C{end+1} = 0;
+            c = qplant.pack(qg);
+            
+            Qpar = qg;
+            tpl = qtpl(length(w)); % pre-allocating 
+            col = distinguishable_colors(length(w));
+            for kw = 1:length(w)
+                fprintf('--> for w=%g [rad/s] \n',w(kw));
+                s = 1j*w(kw);
+                Tg = qplant.funcval(f,c,s);
+                T = [];
+                for k=1:npar
+                    ind0=find(~indgrid(k,:));
+                    ind1=find(indgrid(k,:));
+                    for l=1:length(ind0)
+                        Td=Tg(ind1(l))-Tg(ind0(l));
+                        Td=rem(real(Td)+540,360)-180+1j*imag(Td);
+                        qfix=max(qg(:,ind1(l))-qg(:,ind0(l)))/qdist(k);
+                        if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>=1 || qfix>1
+                            [T1,Q1]=obj.recedge(f,s,qg(:,ind0(l)),qg(:,ind1(l)),Tg(ind0(l)),Tg(ind1(l)),Tacc,qfix);                           
+                            T=[T T1];
+                            Qpar=[Qpar Q1];        
+                        end
+                    end
+                end
+                scatter(real(T),imag(T),5,col(kw,:)); hold on
+                tpl(kw) = qtpl(w(kw),T,Qpar);
+            end
             
         end
         function obj = cgrid(obj,w,rnd)
@@ -74,17 +129,17 @@ classdef qplant < handle
                 
             fprintf('Calculating templates using the %s method \n',method)
             f = qplant2func(obj);
+            pck = obj.pack(pgrid);
             
-            C = num2cell(pgrid,2);
-            C{end+1}=0;
             col = distinguishable_colors(length(w)); % to remove
             tpl = qtpl(length(w)); % pre-allocating 
             for k = 1:length(w)
                 fprintf('--> for w=%g [rad/s] \n',w(k));
-                C{end}=1j*w(k);
-                nyq = f(C{:});               % in complex form
-                tpl(k)=qtpl(w(k),c2n(nyq),pgrid);  
-                scatter(real(c2n(nyq)),imag(c2n(nyq)),10,col(k,:)); hold on
+                %C{end}=1j*w(k);
+                %nyq = f(C{:});               % in complex form
+                T = obj.funcval(f,pck,1j*w(k));
+                tpl(k)=qtpl(w(k),T,pgrid);  
+                scatter(real(T),imag(T),10,col(k,:)); hold on
             end 
             obj.templates = tpl;
         end
@@ -131,10 +186,70 @@ classdef qplant < handle
             end
             
         end
-        
-
-
-                
+        function idx = idxgrid(N)
+            %IDXGRID creates a grid of 0/1 
+            %subroutine for ADEDGE
+            j1=0:2^N-1;
+            idx=zeros(N,2^N);
+            for k=1:N
+                idx(k,:)=rem(fix(j1/2^(k-1)),2);
+            end
+        end
+        function c = pack(par)
+            c = num2cell(par,2);
+            c{end+1}=0;
+        end
+        function T = funcval(f,c,s)
+            c{end} = s;
+            nyq  = f(c{:});
+            T=c2n(nyq,'unwrap');
+        end
+        function [Tnew,Qpar] = recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist)
+            %RECEDGE    subroutine used by ADEDGE
+            %           [Tnew,Qpar]=recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist);
+            %
+            %   Adopted from Qsyn: Original Author: M Nordin
+            
+            %global prune_on
+            qbreak=abs(qmin-qmax);
+            qbreak=min(qbreak((qbreak~=0)));
+            if qbreak<1e-8
+                prune_on=0; % return value???
+                return
+            end
+            qnew=0.5*(qmin+qmax);
+            qdist=0.5*qdist;
+            
+            %avoid NaN from ~plant.m = xxxplant.m  peo 970318
+            %value = feval(trf,qnew,s);
+            c=qplant.pack(qnew);
+            Tcurr = qplant.funcval(trf,c,s);
+            if isnan(Tcurr) 
+                %value = feval(trf,qnew+eps*ones(size(qnew)),s); 
+                c=obj.pack(qnew+eps*ones(size(qnew)));
+                Tcurr = obj.funcval(trf,c,s);
+            end
+            
+            % Tcurr=c2n(feval(trf,qnew,s));
+            %Tcurr=c2n(value,-180);  %peo960705
+            Qpar=qnew;
+            Tnew=Tcurr;
+            Td=Tcurr-Tmin;
+            Td=rem(real(Td)+540,360)-180+1j*imag(Td);
+            %The wrapped distance
+            if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>1 || qdist>=1
+                [T1,Q1]=qplant.recedge(trf,s,qmin,qnew,Tmin,Tcurr,Tacc,qdist);
+                Tnew=[Tnew T1];
+                Qpar=[Qpar Q1];
+            end
+            Td=Tmax-Tcurr;
+            Td=rem(real(Td)+540,360)-180+1j*imag(Td);
+            if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>1 || qdist>=1
+                [T1,Q1]=qplant.recedge(trf,s,qnew,qmax,Tcurr,Tmax,Tacc,qdist);
+                Tnew=[T1 Tnew];
+                Qpar=[Q1 Qpar];
+            end
+        end
     end
         
 end
