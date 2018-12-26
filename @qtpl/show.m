@@ -38,11 +38,10 @@ function [varargout]=show(obj ,varargin)
 %               
 %   See also         HNGRID MGRID CTPL HZOOM
 
-% Authors: B. Cohen, P-O Gutman and M Nordin
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
-% all color has changed to 'black'
+% Adapted from QSYN SHOWTPL. 
+% Authors: B. Cohen, P-O Gutman and M Nordin, 1996
 % Version upgrade: A. & Y. Greenhut
-% Interface updates: Daniel Rubin, 18-April-2017
+% NEW OO Method: Daniel Rubin, 26-Dec-2018
 
 if nargin==0, disp('  h = show(qtpl,...)'), return; end
 %if ~isscalar(tpl), error('QTPL.SHOW does not support QTPL arrays. use ')
@@ -88,8 +87,6 @@ if length(w_op)>ncol
 end
 Lstyle=plotstyle.marker;
 
-
-%plot the templates in correct position
 if isempty(phandle)
     phandle = figure('Name','Templates on Nichols Chart','NumberTitle','off');
 end
@@ -111,7 +108,7 @@ for k=1:N
     text(real(tpl(1)),imag(tpl(1)),[num2str(w_op(k))]);
 end
 
-% pause(0.01); drawnow % remove this and shit happens 
+% pause(0.01); drawnow 
 % XLIM=xlim;
 % YLIM=ylim;
 % hngrid;

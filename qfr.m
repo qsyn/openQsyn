@@ -14,9 +14,13 @@ classdef qfr
             obj.frequency = frequecny;
             obj.nic = nresponse;
         end
-        
+        function [] = show(obj)
+            %NIC plots the on Nichols chart
+            plot(real(obj.nic),imag(obj.nic),'-k','linewidth',1.5)
+        end
         function [] = nichols(obj)
-            %NICHOLS plots a nichols chart
+            %NICHOLS plots a nichols chart, compatible to Control System
+            %Toolbox
             G = obj.frd();
             nichols(G,obj.frequency);
         end

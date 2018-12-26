@@ -7,7 +7,7 @@ classdef qplant < handle
         den
         pars
         templates
-        nom
+        nominal
         info
     end
     
@@ -33,8 +33,8 @@ classdef qplant < handle
            pnom = [obj.pars.nominal];
            C = num2cell(pnom);
            C{end+1}=1j*w;
-           nyq = f(C{:});               % in complex form
-           obj.nom=qfr(c2n(nyq),w) ;
+           nyq = f(C{:});                   
+           obj.nominal=qfr(c2n(nyq,'unwarp'),w) ;
         end  
         function obj = ctpl(obj,method,w,options)
             %CTPL computes the templates...
@@ -185,6 +185,89 @@ classdef qplant < handle
             end
             P = tf(NUM,DEN);
         end
+        function varargout = showtpl(obj,w,varargin)
+            %SHOWTPL plots the templates at given frequencies 
+            %This is basically a wrapper for qtpl.show to allow more
+            %conviniante access and allow the original Qsyn capabilities
+            %
+            %  	showtpl(QPLANT)     displays template QTPL 
+            %   
+            %
+            %   showtpl(QPLANT,W)   display only tempaltes at freqeuncies W       
+            %   
+            %   showtpl(TPLF,W,MOD) specify mode:
+            %   	'nom'(def):	The nominal plant is displayed and the
+            %                   templates are drawn correctly relative 
+            %               	their nominal points 
+            %       'point': 	The user clicks with his mouse on the Nichols
+            %                  	chart for the location of the nominal point 
+            %                   of the next template -- NOT IMPLEMENTED
+            %       'nonom':    plot templates in their position w/o nominal
+            %                   
+            %
+            %   showtpl(TPLF,W,PARAMETER,VALUE)   use parameter/value pairs to
+            %   specify additional properties:
+            %       PARAMETER='color'   VALUE = color array in RGB format
+            %       PARAMETER='marker'  VALUE = string for marker points
+            %      	PARAMETER='fill' 	VALUE = 1 | 0 (def)
+            %       PARAMETER='case'    VALUE = vector of indices specifing
+            %                                   plant case(s) to show 
+            %   QPLANT.showtpl(...)      alternative usage
+    
+            if nargin<3, opt = []; end
+            if nargin<2, w = []; end
+            
+            if isempty(opt), opt = 'nom'; end
+            
+            wtpl = [obj.templates.frequency];
+            if isempty(w), w = wtpl; end
+            
+
+            ishow = ismember(wtpl,w);
+            if all(~ishow)
+                error('w must be a subset of the avialble frequencies'); 
+            end              
+            
+            h = obj.templates(ishow).show(varargin{:});
+            
+            % plot nominal
+            if strcmp(opt,'nom')
+                if isempty(obj.nominal)
+                    disp('no nominal exists.');
+                else
+                    %plot(real(obj.nominal),imag(obj.nominal));
+                    obj.nominal.show();
+                end
+            elseif ~strcmp(opt,'nonom')
+                error('mode options: ''nom'' | ''nonom''')
+            end
+           
+            if nargout==1
+                varargout{1}=h;
+            end
+        end
+        function varargout =  bode(obj,par,w)
+            %BODE plant frequency domain simulation for user selected cases
+            %
+            %
+            %
+            
+            if nargin<3, w=[]; end
+            if nargin<2, par=[]; end
+            
+            if isemplty(w), w = obj.nom.frequency; end
+            
+            f = obj.qplant2func();
+            if isempty(par)
+                pgrid = grid(obj.pars,0);
+            else
+                pgrid = par;
+            end
+            
+            
+            
+        end
+            
     end
     
     methods(Static)

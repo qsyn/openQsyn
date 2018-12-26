@@ -12,6 +12,8 @@ P = qplant(num,den)
 w = [0.2 0.5 1 2 5 10 20 50];
 %cgrid(P,w,0)
 ctpl(P,'grid',w)
+cnom(P,logspace(-2,2,200));
+
 %%
 tic
 P.ctpl('aedgrid',w)
