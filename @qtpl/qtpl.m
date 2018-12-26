@@ -20,10 +20,6 @@ classdef qtpl
             obj.template = double(template);
             obj.parameters = double(parameters); 
         end  
-        function obj = replicate(obj)
-            
-        end
-        
     end
     
 end

@@ -43,23 +43,41 @@ classdef qplant < handle
             if nargin<4, options=[]; end
             
             switch method
-                case 'grid', obj=obj.cgrid(w,0);
-                case 'rndgrid', obj=obj.cgrid(w,1);
-                case 'random', obj=obj.cgrid(w,2);
-                case 'recgrid', obj=obj.adgrid(w,options);
-                case 'aedgrid', obj=obj.adedge(w,options);
+                case 'grid', tpl=obj.cgrid(w,0);
+                case 'rndgrid', tpl=obj.cgrid(w,1);
+                case 'random', tpl=obj.cgrid(w,2);
+                case 'recgrid', tpl=obj.adgrid(w,options);
+                case 'aedgrid', tpl=obj.adedge(w,options);
                 otherwise, error('unrecognized method!')
             end
             
+            if isempty(obj.templates)
+                obj.templates = tpl;
+            else 
+                % replacing existing freqeucies and inserting new ones in
+                % the right places (sorted by frequency)
+                w0 = [obj.templates.frequency];
+                w1 = [tpl.frequency];
+                w = unique([w0 w1]);
+                inew = ismember(w,w1);  
+                i0 = ismember(w(~inew),w0);
+                TPL = qtpl(length(w));
+                TPL(inew) = tpl;
+                TPL(~inew) = obj.templates(i0);
+                obj.templates = TPL;
+            end
+            
         end
-        function obj = adgrid(obj,w,options)
+        function tpl = adgrid(obj,w,options)
             %ADGRID computes template by the recursive grid method
             
             % TODO: add  unstructured uncertainty 
+            tpl = [];
             error('to do...')
             
+            
         end
-        function obj = adedge(obj,w,options)
+        function tpl = adedge(obj,w,options)
             
             
             fprintf('Calculating templates by recurcive edge grid\n')
@@ -100,11 +118,11 @@ classdef qplant < handle
                     end
                 end
                 scatter(real(T),imag(T),5,col(kw,:)); hold on
-                tpl(kw) = qtpl(w(kw),T,Qpar);
+                tpl(kw) = qtpl(w(kw),T.',Qpar);
             end
             
         end
-        function obj = cgrid(obj,w,rnd)
+        function tpl = cgrid(obj,w,rnd)
             %CGRID computes tpl by the grid method
             %   facilitates grid, random grid, and random sampling 
             %   
@@ -138,10 +156,9 @@ classdef qplant < handle
                 %C{end}=1j*w(k);
                 %nyq = f(C{:});               % in complex form
                 T = obj.funcval(f,pck,1j*w(k));
-                tpl(k)=qtpl(w(k),T,pgrid);  
+                tpl(k)=qtpl(w(k),T.',pgrid);  
                 scatter(real(T),imag(T),10,col(k,:)); hold on
             end 
-            obj.templates = tpl;
         end
         function h = qplant2func(obj)
             snum = obj.poly2str(obj.num);
