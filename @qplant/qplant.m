@@ -246,16 +246,26 @@ classdef qplant < handle
                 varargout{1}=h;
             end
         end
-        function varargout =  bode(obj,par,w)
-            %BODE plant frequency domain simulation for user selected cases
+        function bodcases(obj,par,w,opt)
+            %BODCASES plant frequency domain simulation for user selected
+            %cases on Bode plont
             %
+            %   bodcases(QPLANT)   plots bode for all cases given by the 
+            %   plant parameters
             %
+            %   bodcases(QPLANT,W)   specify the frequecnies
             %
-            
+            %   bodcases(QPLANT,W,OPT)   specify wihch part to plot: 
+            %                            'mag' | 'phase' | 'magphase' (def)
+            %
+            %   
+            %   BODCASES and NICCASES replace CASES in Qsyn
+            if nargin<4, opt=[]; end                    
             if nargin<3, w=[]; end
             if nargin<2, par=[]; end
             
-            if isemplty(w), w = obj.nom.frequency; end
+            if isempty(w), w = obj.nominal.frequency; end
+            w = reshape(w,[],1); % make sure w is a column vector.
             
             f = obj.qplant2func();
             if isempty(par)
@@ -264,7 +274,12 @@ classdef qplant < handle
                 pgrid = par;
             end
             
+            if isempty(opt), opt = 'magphase'; end
+            col = distinguishable_colors(size(pgrid,2));
             
+            p = qplant.pack(pgrid);
+            res =obj.funcval(f,p,w*1j); % response in Nichols format
+            qtpl.bodeplotter(res.',w,opt,col);
             
         end
             

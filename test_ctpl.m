@@ -14,6 +14,9 @@ w = [0.2 0.5 1 2 5 10 20 50];
 ctpl(P,'grid',w)
 cnom(P,logspace(-2,2,200));
 
+t1=P.templates(1);
+ta=P.templates;
+return
 %%
 tic
 P.ctpl('aedgrid',w)

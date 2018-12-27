@@ -1,5 +1,5 @@
 function [varargout] = bode(obj, w_op, varargin)
-%bodetpl  draws a Bode plot from template file
+%bodetpl  draws a Bode plot from template array
 %
 %   bode(QTPL)   draws the Bode plot of the template in tplf for
 %   frequencies given in the file
@@ -11,9 +11,9 @@ function [varargout] = bode(obj, w_op, varargin)
 %
 %   bode(QTPL,W,...,PARAMETER,VALUE)   parameter/value pairs to 
 %   specify additional properties:
-%       use PARAMETER='color' with VALUE a color array in RGB format. 
-%       use PARAMETER='case' with VALUE equals 'nom', 'unc' (def), or 'all' 
-%       use PARAMETER='show' with VALUE equals 'mag', 'phase', or 'both' (def)
+%       'color':    VALUE is a color array in RGB format. 
+%       'case'      VALUE either 'nom' | 'all' (def)
+%       'show'      VALUE either 'mag' | 'phase' | 'magphase' (def)
 %   
 %   h=bode(...)   returns the handle to the figure 
 %
@@ -41,17 +41,11 @@ function [varargout] = bode(obj, w_op, varargin)
 %   
 %   col             Color array in RGB format. if empty, colors are chosen
 %                   automatically.
-% 
-%   option          string 
-%                     'mag'   plot magnitude only
-%                     'phase' plot phase only 
-%                     empty   plot mag+phase
-%
 
 % -------------------------- manage inputs --------------------------------
 if nargin==0
-   disp('  [phandle]=bodetpl(tplf,w_op,phandle,col) ')
-   disp('  [mag,phase,w]=bodetpl(tplf,w_op)')
+   disp('  [phandle]=bode(qtpl,w_op,...) ')
+   disp('  [mag,phase,w]=bode(qtpl,w_op)')
    return
 end
 
@@ -82,16 +76,15 @@ if nargin>2
     end
 end
 
-    
 if ~(exist('w_op')==1),  w_op=[];  end
 if ~(exist('phandle')==1),  phandle=[];  end
 
 if ~(strcmp(CASE,'nom') ||  strcmp(CASE,'unc') || strcmp(CASE,'all'))
-    error('case must be either ''nom'', ''unc'', or ''all''.');
+    error('case must be either ''nom'' or ''all''.');
 end
 
 if ~(strcmp(opt,'both') ||  strcmp(opt,'mag') || strcmp(opt,'phase'))
-    error('show must be either ''mag'', ''unc'', or ''all''.');
+    error('show must be either ''mag'', ''phase'', or ''both''.');
 end
 
 if isnumeric(col)
@@ -106,7 +99,6 @@ ncol=size(col,1);
 if isempty(w_op), w_op=[obj.frequency]; end
 % -------------------------------------------------------------------------
 
-t_nom=zeros(1,length(w_op));
 % insert all tpl into a single array
 for k=1:length(w_op)
     tpl = obj(k).template(2:end);
@@ -123,12 +115,10 @@ for k=1:length(w_op)
         end
     end
     TPL(:,k)=tpl; % [w1 w2 ... wn]
-    t_nom(k) = obj(k).template(1);
 end
 
 if nargout==3 % get values and do not plot!    
-    if strcmp(CASE,'all'), TPL=[t_nom ; TPL]; end
-    if strcmp(CASE,'nom'), TPL=t_nom; end
+    if strcmp(CASE,'nom'), TPL=TPL(1,:); end
     varargout{1}=imag(TPL).';
     varargout{2}=real(TPL).';
     varargout{3}=w_op;
@@ -147,70 +137,11 @@ if length(tpl)>ncol
 end
 
 
-% magnitude
-if strcmp(opt,'both'), ha(1)=subplot(2,1,1); end
-if ~strcmp(opt,'phase')
-    if strcmp(CASE,'all') || strcmp(CASE,'unc')
-        for k=1:length(tpl)
-            semilogx(w_op,imag(TPL(k,:)),'Color',col(k,:),'Tag',num2str(k)); hold on
-        end  
-    end
-    if strcmp(CASE,'all') || strcmp(CASE,'nom')
-        [w_nom,t_nom]=gettpl(tplf,'nom');
-        semilogx(w_nom,imag(t_nom),'--k','linewidth',2);
-    end
-    xlim([w_op(1) w_op(end)])
-    ylabel('Mag [db]')
-    
-end
-
-% phase
-if strcmp(opt,'both'), ha(2)=subplot(2,1,2); end
-if ~strcmp(opt,'mag')
-    if strcmp(CASE,'all') || strcmp(CASE,'unc')
-        for k=1:length(tpl)
-            phase=real(TPL(k,:));
-            phase=unwrap(phase*pi/180)*180/pi;
-            if phase(1)>5, phase=phase-360; end
-            semilogx(w_op,phase,'Color',col(k,:),'Tag',num2str(k)); hold on
-        end
-    end
-    if strcmp(CASE,'all') || strcmp(CASE,'nom')
-        phase=real(t_nom);
-        phase=unwrap(phase*pi/180)*180/pi;
-        if phase(1)>5, phase=phase-360; end
-        semilogx(w_nom,real(t_nom),'--k','linewidth',2);
-    end
-    xlim([w_op(1) w_op(end)])
-    ylabel('Phase [deg]')
-end
-
-xlabel('Frequency [rad/s]')
-
-% if ~exist('ha'), ha=gca; end
-% title(ha(1),getfrom([tplf,'.tpl'],'IO'))
+obj.bodeplotter(TPL(2:end,:),w_op,opt,col); % plot all points in template
+obj.bodeplotter(TPL(1,:),w_op,opt,[0 0 0]); % plot the nominal case 
 
 if nargout==1
     varargout{1}=phandle;
 end
 
-
-dcm = datacursormode(gcf);
-set(dcm,'updatefcn',@datatipfunc)
 end
-
-% custom data cursor tip 
-function output_txt = datatipfunc(obj,event_obj)
-% Display the position of the data cursor
-% obj          Currently not used (empty)
-% event_obj    Handle to event object
-% output_txt   Data cursor text string (string or cell array of strings).
-
-pos = get(event_obj,'Position');
-dts = get(event_obj.Target,'Tag');
-output_txt = {['Freq: ',num2str(pos(1),4), '[rad/s]'],...
-              ['Mag: ',num2str(pos(2),4),' [db]'],...
-              ['par set: ',dts]
-              };
-end
-
