@@ -41,7 +41,7 @@ classdef qplant < handle
             
             % TODO: add additional options...
             if nargin<4, options=[]; end
-            
+                        
             switch method
                 case 'grid', tpl=obj.cgrid(w,0);
                 case 'rndgrid', tpl=obj.cgrid(w,1);
@@ -49,6 +49,13 @@ classdef qplant < handle
                 case 'recgrid', tpl=obj.adgrid(w,options);
                 case 'aedgrid', tpl=obj.adedge(w,options);
                 otherwise, error('unrecognized method!')
+            end
+
+            % add nominal point at beginning of each template
+            pnom = [obj.pars.nominal]';
+            tnom=cases(obj,pnom,w);
+            for k=1:length(w)
+                tpl(k)=add2tpl(tpl(k),tnom(k),pnom(:,1),'x');
             end
             
             if isempty(obj.templates)
@@ -66,6 +73,7 @@ classdef qplant < handle
                 TPL(~inew) = obj.templates(i0);
                 obj.templates = TPL;
             end
+          
             
         end
         function tpl = adgrid(obj,w,options)
@@ -118,7 +126,7 @@ classdef qplant < handle
                     end
                 end
                 scatter(real(T),imag(T),5,col(kw,:)); hold on
-                tpl(kw) = qtpl(w(kw),T.',Qpar);
+                tpl(kw) = qtpl(w(kw),[T.'],Qpar);
             end
             
         end
@@ -260,7 +268,24 @@ classdef qplant < handle
             %
             %   
             %   BODCASES and NICCASES replace CASES in Qsyn
+            
+            %   TODO: somthing with OPT
             if nargin<4, opt=[]; end                    
+            if nargin<3, w=[]; end
+            if nargin<2, par=[]; end
+            
+            if isempty(opt), opt = 'magphase'; end    
+            
+            [res,w] = cases(obj,par,w);
+            
+            col = distinguishable_colors(size(res,2));
+            qtpl.bodeplotter(res.',w,opt,col);           
+                
+        end
+        function varargout=cases(obj,par,w)
+            %CASES returns the template points for given parametric cases
+            %It does not plot anything!
+            
             if nargin<3, w=[]; end
             if nargin<2, par=[]; end
             
@@ -273,16 +298,15 @@ classdef qplant < handle
             else
                 pgrid = par;
             end
-            
-            if isempty(opt), opt = 'magphase'; end
-            col = distinguishable_colors(size(pgrid,2));
-            
             p = qplant.pack(pgrid);
-            res =obj.funcval(f,p,w*1j); % response in Nichols format
-            qtpl.bodeplotter(res.',w,opt,col);
             
+            varargout{1} = obj.funcval(f,p,w*1j); % response in Nichols format
+            if nargout==2
+                varargout{2} = w;
+            elseif nargout>2
+                error('to many outputs!')
+            end
         end
-            
     end
     
     methods(Static)
@@ -316,9 +340,13 @@ classdef qplant < handle
         end
         function T = funcval(f,c,s)
             c{end} = s;
+            %c = num2cell(par,2);
+            %c{end+1} = s;
             nyq  = f(c{:});
             T=c2n(nyq,'unwrap');
         end
+            
+            
         function [Tnew,Qpar] = recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist)
             %RECEDGE    subroutine used by ADEDGE
             %           [Tnew,Qpar]=recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist);

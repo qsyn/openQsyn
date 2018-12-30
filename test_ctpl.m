@@ -11,7 +11,9 @@ P = qplant(num,den)
 
 w = [0.2 0.5 1 2 5 10 20 50];
 %cgrid(P,w,0)
+tic
 ctpl(P,'grid',w)
+toc
 cnom(P,logspace(-2,2,200));
 
 t1=P.templates(1);

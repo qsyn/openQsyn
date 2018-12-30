@@ -105,7 +105,9 @@ for k=1:N
     end
     plot(real(tpl),imag(tpl),'Color',Lcolor,'LineStyle','none',...
         'Marker',Lstyle,'Markersize',4,'zdata',1:ntpl) 
-    text(real(tpl(1)),imag(tpl(1)),[num2str(w_op(k))]);
+    plot(real(tpl(1)),imag(tpl(1)),'s','Color',Lcolor)     
+    text(real(tpl(1)+1),imag(tpl(1))-1,[num2str(w_op(k))]);
+    
 end
 
 % pause(0.01); drawnow 
