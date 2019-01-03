@@ -12,9 +12,10 @@ classdef qplant < handle
     end
     
     methods
-        function obj = qplant(num,den)
-            %QPLANT Construct an instance of this class
+        function obj = qplant( num,den ) 
+            %QPLANT Construct an instance of the QPLANT class
             %   Detailed explanation goes here
+            %
             obj.num = num;
             obj.den = den;
             npar=[];

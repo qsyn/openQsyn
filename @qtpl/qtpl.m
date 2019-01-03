@@ -24,7 +24,6 @@ classdef qtpl
     
     methods(Static)
         h = bodeplotter(tpl,w,opt,col) 
-        
     end
     
 end
