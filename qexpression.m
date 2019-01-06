@@ -9,7 +9,10 @@ classdef qexpression
     
     methods
         function exp = qexpression(A,B,op)
-            if (isa(A,'qpar')) && (isa(B,'qpar'))
+            if ischar(A) && isa(B,'qpar')
+                exp.expression = A;
+                exp.pars = B;
+            elseif (isa(A,'qpar')) && (isa(B,'qpar'))
                 exp.expression = sprintf('%s %s %s',A.name,op,B.name);
                 exp.pars = unique(vertcat(A, B));
             elseif  (isa(A,'qexpression')) && (isa(B,'qpar'))
@@ -38,8 +41,14 @@ classdef qexpression
         function exp = plus(A,B)
             exp = qexpression(A,B,'+');
         end
+        function exp = uplus(A)
+            exp = qexpression([],A,'+');
+        end
         function exp = minus(A,B)
             exp = qexpression(A,B,'-');
+        end
+        function exp = uminus(A)
+            exp = qexpression([],A,'-');
         end
         function obj = mtimes(A,B)
             if isa(A,'lti')
@@ -51,7 +60,7 @@ classdef qexpression
             end
         end
         function exp = mrdivide(A,B)
-            exp = qxpression(A,B,'/');
+            exp = qexpression(A,B,'/');
         end
         function h = qexp2func(obj)
             args = sprintf('%s, ',obj.pars.name);

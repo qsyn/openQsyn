@@ -126,8 +126,12 @@ classdef qplant < handle
                         end
                     end
                 end
+                
+                
                 scatter(real(T),imag(T),5,col(kw,:)); hold on
-                tpl(kw) = qtpl(w(kw),[T.'],Qpar);
+                idx=boundary(real(T)',imag(T)',0.3); % Introduced in R2014b
+                scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
+                tpl(kw) = qtpl(w(kw),[T(idx).'],Qpar);
             end
             
         end
@@ -180,8 +184,7 @@ classdef qplant < handle
             h = str2func(s);
         end
         function P = tf(obj)
-            %TF convert Qplant to its NOMINAL transfer function.
-            
+            %TF converts Qplant to its NOMINAL transfer function.           
             if isnumeric(obj.num)
                 NUM = obj.num;
             else
@@ -346,8 +349,6 @@ classdef qplant < handle
             nyq  = f(c{:});
             T=c2n(nyq,'unwrap');
         end
-            
-            
         function [Tnew,Qpar] = recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist)
             %RECEDGE    subroutine used by ADEDGE
             %           [Tnew,Qpar]=recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist);

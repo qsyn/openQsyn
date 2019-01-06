@@ -9,12 +9,25 @@ classdef qpoly < matlab.mixin.CustomDisplay
     end
     
     methods
-
         function obj = qpoly(varargin)
-            %QPOLY Construct an instance of this class
-            %   Detailed explanation goes here
-            if nargin==0, error('qpoly requires at least one argument'); end
-            obj.a = cell(nargin);
+            %QPOLY Construct an instance of the QPOLY class
+            %   
+            % obj=QPOLY(a,b,c,...)   constructs a QPOLY object with
+            % coefficienct given by a,b,c,...
+            %
+            % obj=QPOLY(SYMDS,PARS)   constructs a QPOLY object from a
+            % symbolic expression SYMS containning the parameters in PARS
+           
+            if nargin<2, error('qpoly requires at least two argument'); end
+            
+            if isa(varargin{1},'sym') && isa(varargin{2},'qpar')
+                obj = qpoly.sym2qpoly(varargin{1},varargin{2});
+                return
+            elseif isa(varargin{1},'sym') && ~isa(varargin{2},'qpar')
+                error('if input 1 is a symbolic expression, input 2 must be a QPAR array');
+            end
+                
+            obj.a = cell(1,nargin);
             Pars = [];
             for k=1:nargin
                 switch class(varargin{k})
@@ -64,11 +77,9 @@ classdef qpoly < matlab.mixin.CustomDisplay
             s = s(2:end-2);
             h = str2func([argF s]);
         end
-
     end
     
-    methods (Access = protected)
-        
+    methods(Access = protected)
         function header = getHeader(obj)
             if ~isscalar(obj)
                 header = getHeader@matlab.mixin.CustomDisplay(obj);
@@ -98,8 +109,18 @@ classdef qpoly < matlab.mixin.CustomDisplay
 
                 propgrp = matlab.mixin.util.PropertyGroup(propList);
             end
+        end    
+    end
+    
+    methods(Static)
+        function p = sym2qpoly(S,pars)
+            c=coeffs(S,'s');
+            e = cell(1,length(c));
+            for k=1:length(c)
+                e{end-k+1} = qexpression(char(c(k)),pars);
+            end
+            p = [e{:}];
         end
-        
     end
 end
 

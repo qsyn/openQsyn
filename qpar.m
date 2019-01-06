@@ -50,12 +50,18 @@ classdef qpar
                 error('undefined method');
             end
         end
+        function obj = uplus(A)
+            obj = qexpression([],A,'+');
+        end
         function obj = minus(A,B)
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression') 
                 obj = qexpression(A,B,'-');
             else
                 error('undefined method');
             end
+        end
+        function obj = uminus(A)
+            obj = qexpression([],A,'-');
         end
         function obj = mtimes(A,B)
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression')
