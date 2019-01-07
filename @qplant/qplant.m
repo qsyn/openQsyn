@@ -174,6 +174,11 @@ classdef qplant < handle
             end 
         end
         function h = qplant2func(obj)
+            %QPLANT2FUNC return an handle to a function object f@(p1,p2,...pn,s) 
+            %with p1,...,pn corresponding to uncertain parameters.
+            %
+            %Used by: FUNCVAL, CASES, CTPL, CNOM and their subroutines
+            
             snum = obj.poly2str(obj.num);
             sden = obj.poly2str(obj.den);
             
@@ -273,7 +278,7 @@ classdef qplant < handle
             %   
             %   BODCASES and NICCASES replace CASES in Qsyn
             
-            %   TODO: somthing with OPT
+            %   TODO: something with OPT
             if nargin<4, opt=[]; end                    
             if nargin<3, w=[]; end
             if nargin<2, par=[]; end
@@ -315,6 +320,7 @@ classdef qplant < handle
     
     methods(Static)
         function s = poly2str(p)
+            %POLY2STR converts a polynom to a string
             if isa(p,'qpoly')
                 fnum = qpoly2func(p);
                 snum = func2str(fnum);
@@ -339,10 +345,15 @@ classdef qplant < handle
             end
         end
         function c = pack(par)
+            %PACK returns a cell array containning all parameters in PAR 
+            %and leaves one additional spot empty
             c = num2cell(par,2);
             c{end+1}=0;
         end
         function T = funcval(f,c,s)
+            %FUNCVAL return the value of the plant, represented by a 
+            %function handle F created by QPLANT2FUNC, for given parameter 
+            %case C and for S. The output is in unwrapped Nihols format.
             c{end} = s;
             %c = num2cell(par,2);
             %c{end+1} = s;

@@ -19,12 +19,18 @@ it = ismember([obj.tpl.frequency],w);
 tpl = obj.tpl(it);
 
 bnd.name = spcname;
+bnd.w = w;  
 
 fprintf('Calculating bounds for %s \n',spcname);
 bnd.c = cbnd1(tpl,spcfunc,spec);
 
-bnd.w = w;  
-obj.bnd = bnd;    % single bound! in future must be changed to bounds from multiple specs.
+if isempty(obj.bnd)
+    obj.bnd = bnd; 
+elseif any(strcmp({obj.bnd.name},spcname))
+    obj.bnd(strcmp({obj.bnd.name},spcname)) = bnd;
+else
+    obj.bnd(end+1) = bnd;
+end
 
 
 end
@@ -37,13 +43,20 @@ function c = cbnd1(tpls,spcfunc,spec)
 gphase0=-360:10:0;
 gmag0=-50:5:50;
 
-spcval = [spec.upper spec.lower];
+w = [tpls.frequency]';
+upper = interp1(spec.frequency,spec.upper,w);
+if isempty(spec.lower)
+    lower = [];
+else
+    lower = interp1(spec.frequency,spec.lower,w);
+end
+spcval = [upper lower];
 
 c = cell(length(tpls),1);
 for k=1:length(tpls)
-    fprintf('--> w(%i) \n',k);
+    fprintf('--> w(%i) = %g [rad/s]\n',k,w(k));
     tpl = tpls(k).template;   
-    c0 = qdesign.makebnd(tpl,spcfunc,spcval(k),gphase0,gmag0);   
+    c0 = qdesign.makebnd(tpl,spcfunc,spcval(k,:),gphase0,gmag0);   
     
     % refined grid
     gphase = floor(( max(min(real(c0))-2,-360) ) : 2 : ( min(max(real(c0))+2,0) ));
@@ -55,7 +68,7 @@ for k=1:length(tpls)
     %gphase = repmat(real(c0),1,20) + repmat(repmat([-2 -1  0  1  2],1,4),1,length(c0));
     %gmag = repmat(imag(c0),1,20) + repmat([-2*ones(1,4) -1*ones(1,4) 0*ones(1,4) 1*ones(1,4) 2*ones(1,4)],1,length(c0));
     
-    c{k} = qdesign.makebnd(tpl,spcfunc,spcval(k),gphase,gmag);   
+    c{k} = qdesign.makebnd(tpl,spcfunc,spcval(k,:),gphase,gmag);   
 end
 
 end
