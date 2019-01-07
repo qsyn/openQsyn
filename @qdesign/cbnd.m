@@ -46,15 +46,14 @@ for k=1:length(tpls)
     c0 = qdesign.makebnd(tpl,spcfunc,spcval(k),gphase0,gmag0);   
     
     % refined grid
-    %gphase = floor(( max(min(real(c0))-2,-360) ) : 1 : ( min(max(real(c0))+2,0) ));
-    %gmag = floor(( min(imag(c0))-2 ) : 1 : ( max(imag(c0))+2 ));
-    bphase  = floor([max(min(real(c0))-2,-360) min(max(real(c0))+2,0)]);
-    bmag = floor([min(imag(c0))-2 max(imag(c0))+2]);
-    for g = length(c0)+2
-        
-        gphase = 
-        
-    end
+    gphase = floor(( max(min(real(c0))-2,-360) ) : 2 : ( min(max(real(c0))+2,0) ));
+    gmag = floor(( min(imag(c0))-2 ) : 2 : ( max(imag(c0))+2 ));
+    %bphase  = floor([max(min(real(c0))-2,-360) min(max(real(c0))+2,0)]);
+    %bmag = floor([min(imag(c0))-2 max(imag(c0))+2]);
+    
+    % refined grid around the initial points
+    %gphase = repmat(real(c0),1,20) + repmat(repmat([-2 -1  0  1  2],1,4),1,length(c0));
+    %gmag = repmat(imag(c0),1,20) + repmat([-2*ones(1,4) -1*ones(1,4) 0*ones(1,4) 1*ones(1,4) 2*ones(1,4)],1,length(c0));
     
     c{k} = qdesign.makebnd(tpl,spcfunc,spcval(k),gphase,gmag);   
 end
