@@ -78,6 +78,14 @@ classdef qexpression
             val = fh(obj.pars.nominal);
             %end
         end
+        function val = expcase(obj,par)
+            %EXPCASE return the QEXPRESSION value for a given parameter
+            %case
+            fh =  qexp2func(obj);
+            PAR = num2cell(par);
+            val = fh(PAR{:});
+            %end
+        end
         function obj = horzcat(varargin)
             obj = qpoly(varargin{:});
         end

@@ -19,6 +19,25 @@ classdef qdesign  < handle
             disp(['You now have a QFT loop desgin object. ',... 
                  'Compute bounds using CBND'])
         end
+        function h = loopnic(obj,C)
+            %LOOPNIC plots the open-loop on a Nichols chart
+            
+            % defaults
+            linecolor = 'k'; 
+            t_color = distinguishable_colors(length(obj.tpl)); 
+            hold on
+            
+            Lnom = series(obj.nom,C);
+            h = Lnom.show('color',linecolor);
+            
+            for k=1:length(obj.tpl)
+                tk = qfr(obj.tpl(k).template(1),obj.tpl(k).frequency);
+                Ltpl = series(tk,C);
+                h(end+1) = show(Ltpl,'marker','square',...
+                     'markeredgecolor','k','markerfacecolor',t_color(k,:));
+            end
+            
+        end
     end
     
     methods(Static)

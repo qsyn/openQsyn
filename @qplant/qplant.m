@@ -188,17 +188,36 @@ classdef qplant < handle
          
             h = str2func(s);
         end
-        function P = tf(obj)
-            %TF converts Qplant to its NOMINAL transfer function.           
+        function P = tf(obj,par)
+            %TF converts Qplant to a transfer function
+            %
+            %   P = TF(QPLANT)   returns the transfer function for the 
+            %   nominal case
+            % 
+            %   P = TF(QPLANT,PAR)   returns the transfer function for the
+            %   case given by vector of parameters PAR
+            if nargin<2, par = []; end
+            if ~isempty(par) && length(par)~=length(obj.pars)
+                error('Number of input parameters must be same as in qplant object')
+            end
+            
             if isnumeric(obj.num)
                 NUM = obj.num;
-            else
+            elseif isempty(par)
                 NUM = obj.num.nom;
+            else
+                ip = ismember(obj.pars,obj.num.pars);
+                npar = par(ip);
+                NUM = obj.num.polycase(npar);
             end
             if isnumeric(obj.den)
                 DEN = obj.den;
-            else
+            elseif isempty(par)
                 DEN = obj.den.nom;
+            else
+                ip = ismember(obj.pars,obj.den.pars);
+                dpar = par(ip);
+                DEN = obj.den.polycase(dpar);
             end
             P = tf(NUM,DEN);
         end
@@ -315,6 +334,28 @@ classdef qplant < handle
             elseif nargout>2
                 error('to many outputs!')
             end
+        end
+        function step(obj,pars,tfinal)
+            %STEP computes step response for plant cases
+            if nargin<3, tfinal=[]; end
+            if nargin<2, pars=[]; end
+            
+            if isempty(pars)
+                pgrid = grid(obj.pars,0);
+            else
+                pgrid = pars;
+            end
+
+            for k=1:size(pgrid,2)
+                Pk = tf(obj,pgrid(:,k));
+                [y,t]=step(Pk,tfinal);
+                plot(t,y);
+                hold on
+            end
+            xlabel('Time [s]');
+            ylabel('Amplitude');
+            axis tight
+            hold off           
         end
     end
     

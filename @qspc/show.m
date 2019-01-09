@@ -1,5 +1,5 @@
 function [phandle_new]=show(obj,plot_op,linespec,phandle)
-%SHOWSPC    displays a single specification
+%SHOWSPC    displays a single specification 
 %               
 %[phandle]=showspc(spcfile,spec,plot_op,color,phandle)
 %

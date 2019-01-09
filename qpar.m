@@ -94,7 +94,17 @@ classdef qpar
         end
         function p = grid(obj,rnd,cases)
             %GRID computes a gird of N vectors
-            %%% this part adapted from NDGRID
+            % 
+            %   p = grid(obj,rnd,cases)
+            %   
+            %   Inputs 
+            % 
+            %   rnd     boolian scalar to specify if grid is random. def
+            %           option is 0 (not random). 
+            %
+            %   cases   intiger specifing the number of cases 
+            %
+            %%% Adapted from NDGRID
             [N,M] = size(obj);
             if M~=1, error('par.gird only accepts a column vector'); end            
             if nargin<3, cases = [obj.cases]; end
@@ -130,6 +140,14 @@ classdef qpar
                 p(k,:) = obj(k).lower + (obj(k).lower+obj(k).upper)*rand(1,N);
             end
                         
+        end
+        function I = ismember(A,B)
+            %ISMEMBER returns a vector of logical indices positive for
+            %every element of parameter set A that is a member of parameter
+            %set B.
+            Anames = {A(:).name};
+            Bnames = {B(:).name};
+            I = ismember(Anames,Bnames);
         end
     end
 

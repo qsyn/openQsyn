@@ -56,6 +56,24 @@ classdef qpoly < matlab.mixin.CustomDisplay
                 end
             end     
         end
+        function val = polycase(obj,par)
+            %POLYCASE returns the polynom coeffiecients for a given
+            %parameter case
+            if nargin<2, par=[]; end
+            
+            val = zeros(1,length(obj.a));
+            for k=1:length(obj.a)
+                if isnumeric(obj.a{k})
+                    val(k) = obj.a{k};
+                elseif isempty(par)
+                    val(k) = obj.a{k}.nom;
+                else
+                    ip = ismember(obj.pars,obj.a{k}.pars);
+                    par1 = par(ip);
+                    val(k) = obj.a{k}.expcase(par1);
+                end
+            end     
+        end
         function h = qpoly2func(obj)
             s = '';
             for k=1:obj.n+1
