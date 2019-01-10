@@ -2,7 +2,6 @@ function [varargout]=show(obj ,varargin)
 %SHOW    displays a template object on Nichols chart 
 %     
 %  	show(QTPL)   displays template QTPL 
-%   QTPL.show    alternative usage  
 %
 %   show(TPLf,FHAND)    draws the Nichols chart in figure with handle FHAND   
 %
@@ -16,10 +15,11 @@ function [varargout]=show(obj ,varargin)
 %
 %   H=showtpl(...)      returns ahandle to the figure 
 %
+%   QTPL.show(...)      alternative usage  
 %
-%   Remarks:            During the execution of the display under the
-%                   'point' option, pressing  the left button gives the next point and 
-%                   pressing the right button terminates showtpl
+%   Remarks:        During the execution of the display under the 'point' 
+%                   option, pressing  the left button gives the next point 
+%                   and pressing the right button terminates showtpl
 % 
 %                   If  phandle is a figure with no axes (e.g. after
 %                   you have opened a new figure with the command
@@ -50,7 +50,7 @@ phandle=[];
 IDX=[]; % defaults
 
 col_array = ['m','c','r','g','b','y']'; %def. color changing array 
-plotstyle=struct('fill',0,'marker','.','color',col_array); % default settings
+plotstyle=struct('fill',0,'marker','.','markersize',4,'color',col_array); % default settings
 
 if nargin>1
     k=1;
@@ -64,6 +64,7 @@ if nargin>1
             switch PARAMETER
                 case 'color', plotstyle.color=varargin{k+1};
                 case 'marker', plotstyle.marker=varargin{k+1};
+                case 'markersize', plotstyle.markersize=varargin{k+1};
                 case 'fill', plotstyle.fill=varargin{k+1};
                 case 'case', IDX=varargin{k+1};
                 otherwise, error('unknown parameter %s',PARAMETER);
@@ -104,7 +105,7 @@ for k=1:N
         patch(real(tpl),imag(tpl),Lcolor,'erasemode','xor');
     end
     plot(real(tpl),imag(tpl),'Color',Lcolor,'LineStyle','none',...
-        'Marker',Lstyle,'Markersize',4,'zdata',1:ntpl) 
+        'Marker',Lstyle,'Markersize',plotstyle.markersize,'zdata',1:ntpl) 
     plot(real(tpl(1)),imag(tpl(1)),'s','Color',Lcolor)     
     text(real(tpl(1)+1),imag(tpl(1))-1,num2str(w_op(k)));   
 end

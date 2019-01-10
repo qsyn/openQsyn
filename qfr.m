@@ -58,6 +58,13 @@ classdef qfr
                    error('seconf input must be an QFR object, LTI, or a double')
            end
         end
+        function t = freqresp(obj,w)
+            %FREQRESP returns the frequency resposne at selected frequency
+            %If w is not in obj.frequency, FREQRES interpolates
+                        
+            t = interp1(obj.frequency,obj.nic,w);
+            
+        end
     end
     
     methods(Static)

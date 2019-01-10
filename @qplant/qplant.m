@@ -38,7 +38,24 @@ classdef qplant < handle
            obj.nominal=qfr(c2n(nyq,'unwarp'),w) ;
         end  
         function obj = ctpl(obj,method,w,options)
-            %CTPL computes the templates...
+            %CTPL computes the templates for given qplant object
+            %
+            %   obj = ctpl(obj,method,w,options)
+            %
+            %   Inputs
+            %
+            %   obj     qplant object
+            %
+            %   method  template computation method. one of the following:
+            %               'grid'      uniform grid over parameter
+            %               'rngrid'    random grid over the parameters
+            %               'random'    random sample points 
+            %               'recgrid'   recurcive grid (TO DO)
+            %               'aedgrid'   recurcive edge grid
+            % 
+            %   w       frequency vector
+            %
+            %   options CURRENTLY NO USAGE
             
             % TODO: add additional options...
             if nargin<4, options=[]; end
@@ -91,7 +108,8 @@ classdef qplant < handle
             
             fprintf('Calculating templates by recurcive edge grid\n')
             
-            Tacc=[5 2];
+            plot_on = 0; % to be given as option in future
+            Tacc=[5 2];  % to be given as option in future
             
             npar=length(obj.pars);
             qdist = ([obj.pars.upper]' - [obj.pars.lower]')./double([obj.pars.cases]'); 
@@ -126,12 +144,13 @@ classdef qplant < handle
                         end
                     end
                 end
-                
-                
-                scatter(real(T),imag(T),5,col(kw,:)); hold on
-                idx=boundary(real(T)',imag(T)',0.3); % Introduced in R2014b
-                scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
-                tpl(kw) = qtpl(w(kw),[T(idx).'],Qpar);
+              
+                idx=boundary(real(T)',imag(T)',0.3); % replaces PRUNE (introduced in R2014b)
+                if plot_on
+                    %scatter(real(T),imag(T),5,col(kw,:)); hold on
+                    %scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
+                end
+                tpl(kw) = qtpl(w(kw),[T(idx).'],Qpar(:,idx));
             end
             
         end
@@ -231,40 +250,54 @@ classdef qplant < handle
             %
             %   showtpl(QPLANT,W)   display only tempaltes at freqeuncies W       
             %   
-            %   showtpl(TPLF,W,MOD) specify mode:
-            %   	'nom'(def):	The nominal plant is displayed and the
-            %                   templates are drawn correctly relative 
-            %               	their nominal points 
-            %       'point': 	The user clicks with his mouse on the Nichols
-            %                  	chart for the location of the nominal point 
-            %                   of the next template -- NOT IMPLEMENTED
-            %       'nonom':    plot templates in their position w/o nominal
-            %                   
+            %   showtpl(TPLF,W,FHAND)    draws in figure with handle FHAND   
             %
             %   showtpl(TPLF,W,PARAMETER,VALUE)   use parameter/value pairs to
             %   specify additional properties:
-            %       PARAMETER='color'   VALUE = color array in RGB format
-            %       PARAMETER='marker'  VALUE = string for marker points
-            %      	PARAMETER='fill' 	VALUE = 1 | 0 (def)
-            %       PARAMETER='case'    VALUE = vector of indices specifing
-            %                                   plant case(s) to show 
-            %   QPLANT.showtpl(...)      alternative usage
-    
-            if nargin<3, opt = []; end
-            if nargin<2, w = []; end
+            %       'mode'    string specifing the mode
+            %       'color'   color array in RGB format
+            %       'marker'  string for marker points
+            %      	'fill' 	  boolian scalar 1 | 0 (def)
+            %       'case'    vector of indices specifying case(s) to show 
+            %
+            %   QPLANT.showtpl(...)     alternative usage
+            %
+            %   Avilable modes:
+            %       'nom'(def)	The nominal plant is displayed and the
+            %                   templates are drawn correctly relative 
+            %               	their nominal points 
+            %       'point' 	The user clicks with his mouse on the Nichols
+            %                  	chart for the location of the nominal point 
+            %                   of the next template --> NOT IMPLEMENTED!!!
+            %       'nonom'     plot templates in their position w/o nominal
             
-            if isempty(opt), opt = 'nom'; end
+            %%% Input handling
+            if nargin<2, w = []; end           
             
             wtpl = [obj.templates.frequency];
             if isempty(w), w = wtpl; end
-            
-
+                       
             ishow = ismember(wtpl,w);
             if all(~ishow)
                 error('w must be a subset of the avialble frequencies'); 
             end              
+            opt = 'nom';
+            if nargin>2
+                k=0;
+                if ishandle(varargin{1}), k=1; end
+                imode = strcmp({varargin{(1+k):2:end}},'mode');
+                if any(imode)
+                     opt = varargin{2*find(imode)+k};
+                     idx = true(1,length(varargin));
+                     idx(k+[2*find(imode)-1:2*find(imode)]) = false(1,2);
+                     ARG = {varargin{idx}};
+                else
+                    ARG = varargin;
+                end
+            end
             
-            h = obj.templates(ishow).show(varargin{:});
+            %%% Main 
+            h = obj.templates(ishow).show(ARG{:});
             
             % plot nominal
             if strcmp(opt,'nom')

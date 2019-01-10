@@ -20,6 +20,26 @@ classdef qtpl
             obj.template = double(template);
             obj.parameters = double(parameters); 
         end  
+        function [ T ] = plus( A,B )
+            %PLUS adds two qtpl arrays
+            %
+            %   [ T ] = plus( A,B )   performs an addition between qtpl objects A and
+            %   B, returns output as a qtpl object T.
+            %
+            %   Note that the plus opperation is performed in Nichols form (deg+i*db),
+            %   i.e., for siso transfer functions A,B: plus(A,B) = A(s)*B(s).
+            T = tplop(A,B,'+');
+        end
+        function [ T ] = minus( A,B )
+            %PLUS substruct two qtpl arrays
+            %
+            %   [ T ] = minus( A,B )   performs a substraction between qtpl
+            %   objects A and B, returns output as a qtpl object T.
+            %
+            %   Note that the plus opperation is performed in Nichols form (deg+i*db),
+            %   i.e., for siso transfer functions A,B: minu(A,B) = A(s)/B(s).
+            T = tplop(A,B,'-');
+        end
     end
     
     methods(Static)
