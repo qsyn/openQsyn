@@ -40,10 +40,38 @@ classdef qtpl
             %   i.e., for siso transfer functions A,B: minu(A,B) = A(s)/B(s).
             T = tplop(A,B,'-');
         end
+        function [tpl,par] = get(obj,n,w)
+           %GET returns required tpl and par 
+           
+           if ~all(mod(n,1)==0 & n>0)
+               error('second argument must be a vector of positive integers')
+           end
+           
+           if nargin<3
+               w=[]; 
+           elseif ~(isscalar(w) & isnumeric(w))
+               error('third input must be a numeric scalar')
+           end
+               
+           if length(obj)>1 && isempty(w)
+               error('for an array of template a third argument (frequency) is required');
+           elseif length(obj)>1 
+               Freq = [obj.frequency];
+               T = obj(Freq==w);
+               if isempty(T), error('requested frequency is not in template'); end
+           else
+               T = obj;
+           end
+           
+           tpl = T.template(n);
+           par = T.parameters(n);
+           
+        end
     end
     
     methods(Static)
         h = bodeplotter(tpl,w,opt,col) 
+        T = tplfile_import(filename)
     end
     
 end
