@@ -23,3 +23,4 @@ tic
 des.cbnd('odsrs')
 toc
 %scatter(real(bnd.c{1}),imag(bnd.c{1}))
+des.cbnd('rsrs')

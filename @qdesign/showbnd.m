@@ -1,4 +1,4 @@
-function [varargout]=showbnd(qdes,bndname,phandle,w,colors)
+function [varargout]=showbnd(qdes,bndname,fhandle,w,colors)
 %SHOWBND    plots bounds from a QDESIGN object for selected frequencies, on
 %Nichols chart
 %
@@ -6,11 +6,11 @@ function [varargout]=showbnd(qdes,bndname,phandle,w,colors)
 %            showbnd2(qdesign,bndname,phandle)
 %            showbnd2(qdesign,bndname,phandle,w)
 %            showbnd2(qdesign,bndname,phandle,w,colors)
-%            phandle = showbnd2(qdesign,bndname,phandle,w,colors)
+%            fhandle = showbnd2(qdesign,bndname,phandle,w,colors)
 %   
 %   Output:
 % 
-%   phandle     handle to the figure  
+%   fhandle     handle to the figure  
 %
 %   Inputs:
 %
@@ -34,29 +34,32 @@ if nargin==0
 	return
 end
 
+if nargin<5, colors=[]; end
+if nargin<4, w=[]; end
+if nargin<3, fhandle=[]; end
 if nargin<2, error('Not enough input arguments!'); end
-if ~exist('phandle'), phandle=[]; end
-if ~exist('w'), w=[]; end
-if ~exist('colors'), colors=[]; end
 
 %defaults
-if isempty(phandle)
-    phandle = figure('Name',[bndname,' bounds'],'NumberTitle','off');
+if isempty(fhandle)
+    fhandle = figure('Name',[bndname,' bounds'],'NumberTitle','off');
     wrap_on=0;
     %hngrid; % WHY NOT??? (Daniel R 19-June-2016)
 else
-    figure(phandle)
+    figure(fhandle)
+    hold on
     wrap_on=1;
     axis([get(gca,'xlim') get(gca,'ylim')]);  %POGutman 2004-12-01
 end
 hold on;
 
-names = [qdes.bnd.name];
+names = {qdes.bnd.name};
 bnd = qdes.bnd(strcmp(names,bndname));
+if isempty(bnd), error('BNDNAME was not found'); end
 
 if isempty(w), w=bnd.w; end    
 
-col_array = ['m','c','r','g','b','y']'; %def. color changing array 
+%col_array = ['m','c','r','g','b','y']'; %def. color changing array 
+col_array = distinguishable_colors(length(w)); 
 %%% plot options transfered as a structure
 plotstyle=struct('fill',0,'marker','.','color',col_array,'width',1.5); % default settings
 if ~isempty(colors), plotstyle.color=colors; end
@@ -66,9 +69,11 @@ if length(w)>ncol
     plotstyle.color=repmat(plotstyle.color,ceil(length(w)/ncol),1);
 end
 
+[~,I] = ismember(w,bnd.w);
+
 % Main Loop
 for k=1:length(w)
-    bound=bnd.c{k};
+    bound=bnd.c{I(k)};
     if isempty(bound(~isnan(bound))); return; end
     %The bound is not empty
     if wrap_on
@@ -102,9 +107,9 @@ for k=1:length(w)
     ngrid
     xlabel('Phase [deg]')
     ylabel('Magnitude [db]')
-
+    axis tight
     if nargout>0
-        varargout{1}=h1;
+        varargout{1} = fhandle;
     end
     
 end

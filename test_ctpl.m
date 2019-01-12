@@ -25,6 +25,6 @@ P.ctpl('aedgrid',w)
 toc
 %%
 tic
-ctpl('ex1',[],'grid');
+ctpl('ex1',[],'aedgrid');
 toc
 %showtpl('ex1',5)

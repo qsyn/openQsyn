@@ -30,12 +30,19 @@ classdef qfr
             G = obj.frd();
             bode(G,obj.frequency);
         end
+        function [] = bodeplot(obj,varargin)
+            %BODEPLOT plots a bode plot with additional options
+            G = obj.frd();
+            opt = bodeoptions(varargin{:});
+            bodemag(G,obj.frequency,opt);
+        end
         function G = frd(obj)
             %FRD converts qfr to frd object
             
             response = n2c(obj.nic);
             G = frd(response,obj.frequency);    
         end 
+        
         function G = series(A,B)
            %SERIES conection of QFR object with another QFR or LTI object
            w = A.frequency;

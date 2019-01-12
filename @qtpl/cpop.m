@@ -52,6 +52,8 @@ for k = 1:N
         case '-', t = t1 - t2;
         case '*', t = t1.*t2;
         case '/', t = t1./t2;
+        case 'sens', t = 1./(1 + t1.*t2);           
+        case 'comp', t = t1.*t2./(1 + t1.*t2);  % complementry sensitivity
         otherwise, error('undefined operation'); 
     end
     

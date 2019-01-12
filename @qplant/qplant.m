@@ -390,6 +390,15 @@ classdef qplant < handle
             axis tight
             hold off           
         end
+        function [tpl,par] = gettpl(obj,idx,w)
+            %GETTPL get tpl point(s) from a plant 
+            Freq = [obj.templates.frequency];
+            T = obj.templates(Freq==w);
+            if isempty(T), error('requested frequency is not in template'); end
+            
+            [tpl,par] = get(T,idx);
+            
+        end
     end
     
     methods(Static)

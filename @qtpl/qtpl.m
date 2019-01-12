@@ -40,10 +40,20 @@ classdef qtpl
             %   i.e., for siso transfer functions A,B: minu(A,B) = A(s)/B(s).
             T = tplop(A,B,'-');
         end
-        function [tpl,par] = get(obj,n,w)
+        function [ T ] = sens(A,B)
+            %SENS compute template of the sensitivinty trnasfer function 
+            if nargin<2, B = 1; end
+            T = A.cpop(B,'sens');
+        end
+        function [ T ] = comp(A,B)
+            %COMP compute template of the comp. sensitivinty trnasfer function 
+            if nargin<2, B = 1; end
+            T = A.cpop(B,'comp');
+        end
+        function [tpl,par] = get(obj,idx,w)
            %GET returns required tpl and par 
            
-           if ~all(mod(n,1)==0 & n>0)
+           if ~all(mod(idx,1)==0 & idx>0)
                error('second argument must be a vector of positive integers')
            end
            
@@ -63,8 +73,8 @@ classdef qtpl
                T = obj;
            end
            
-           tpl = T.template(n);
-           par = T.parameters(n);
+           tpl = T.template(idx);
+           par = T.parameters(idx);
            
         end
     end
