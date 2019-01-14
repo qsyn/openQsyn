@@ -145,7 +145,7 @@ classdef qplant < handle
                     end
                 end
               
-                idx=boundary(real(T)',imag(T)',0.3); % replaces PRUNE (introduced in R2014b)
+                idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
                 if plot_on
                     %scatter(real(T),imag(T),5,col(kw,:)); hold on
                     %scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
@@ -294,6 +294,8 @@ classdef qplant < handle
                 else
                     ARG = varargin;
                 end
+            else
+                ARG = {};
             end
             
             %%% Main 
@@ -305,7 +307,7 @@ classdef qplant < handle
                     disp('no nominal exists.');
                 else
                     %plot(real(obj.nominal),imag(obj.nominal));
-                    obj.nominal.show();
+                    obj.nominal.show('k');
                 end
             elseif ~strcmp(opt,'nonom')
                 error('mode options: ''nom'' | ''nonom''')
@@ -322,7 +324,7 @@ classdef qplant < handle
             %   bodcases(QPLANT)   plots bode for all cases given by the 
             %   plant parameters
             %
-            %   bodcases(QPLANT,W)   specify the frequecnies
+            %   bodcases(QPLANT,W,PAR)   specify frequency and cases set
             %
             %   bodcases(QPLANT,W,OPT)   specify wihch part to plot: 
             %                            'mag' | 'phase' | 'magphase' (def)
