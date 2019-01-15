@@ -52,7 +52,7 @@ classdef qspc
     
     methods (Static)
         obj = rsrs( Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n )
-
+        [spec_w,spec_t,tab] = spc_rs31(spc_tab,w,dt,plt,n)
         
         
     end

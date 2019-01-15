@@ -57,9 +57,11 @@ bnd = qdes.bnd(strcmp(names,bndname));
 if isempty(bnd), error('BNDNAME was not found'); end
 
 if isempty(w), w=bnd.w; end    
+[~,I] = ismember(w,bnd.w);
 
 %col_array = ['m','c','r','g','b','y']'; %def. color changing array 
-col_array = distinguishable_colors(length(w)); 
+%col_array = distinguishable_colors(length(w)); 
+col_array = qdes.col(I,:);
 %%% plot options transfered as a structure
 plotstyle=struct('fill',0,'marker','.','color',col_array,'width',1.5); % default settings
 if ~isempty(colors), plotstyle.color=colors; end
@@ -69,7 +71,6 @@ if length(w)>ncol
     plotstyle.color=repmat(plotstyle.color,ceil(length(w)/ncol),1);
 end
 
-[~,I] = ismember(w,bnd.w);
 
 % Main Loop
 for k=1:length(w)

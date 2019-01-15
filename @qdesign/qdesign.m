@@ -3,10 +3,11 @@ classdef qdesign  < handle
     %required for SISO QFT loop shaping design
     
     properties
-        tpl
-        nom
-        spc
-        bnd
+        tpl         % templates (qtpl array)
+        nom         % nominal case (qfr)
+        spc         % specifications (qspc array)
+        bnd         % bounds (struct)
+        col         % color for each frequency (rgb array)
     end
     
     methods
@@ -16,6 +17,7 @@ classdef qdesign  < handle
             obj.tpl = plant.templates;
             obj.nom = plant.nominal;
             obj.spc = specs;
+            obj.col = lines(length(obj.tpl)); % preserves color for each freq
             disp(['You now have a QFT loop desgin object. ',... 
                  'Compute bounds using CBND'])
         end
@@ -65,7 +67,8 @@ classdef qdesign  < handle
             
             % defaults
             linecolor = 'k'; 
-            t_color = distinguishable_colors(length(obj.tpl)); 
+            %t_color = distinguishable_colors(length(obj.tpl)); 
+            t_color = obj.col;
             hold on
             
             Lnom = series(obj.nom,C);
