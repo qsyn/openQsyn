@@ -5,6 +5,7 @@ classdef qplant < handle
     properties
         num
         den
+        delay
         pars
         templates
         nominal
@@ -18,13 +19,44 @@ classdef qplant < handle
             %
             obj.num = num;
             obj.den = den;
-            npar=[];
-            dpar=[];
-            if isa(num,'qpoly'), npar = num.pars; end
-            if isa(den,'qpoly'), dpar = den.pars; end
+            if isa(num,'qpoly') || isa(num,'qexpression') 
+                npar = num.pars; 
+            elseif isa(num,'qpar')
+                npar = num;
+            elseif isnumeric(num) && isrow(num)
+                npar = [];
+            else
+                error('unsupported object for num')
+            end
+            if isa(den,'qpoly') || isa(den,'qexpression') 
+                dpar = den.pars; 
+            elseif isa(den,'qpar')
+                dpar = den; 
+            elseif isnumeric(den) && isrow(den)
+                dpar = [];
+            else
+                error('unsupported object for den')
+            end
             obj.pars = unique(vertcat(npar,dpar));
             
             obj.info=sprintf('generated from [num,den] data on: %s',datetime);
+        end
+        function obj = adelay(obj,del)
+            %ADELAY adds a delay to an existing plant without delay
+            if ~isempty(obj.delay), error('plant already have a delay'); end
+            if isa(del,'qexpression')
+                obj.delay = del;
+                obj.pars = unique(vertcat(obj.pars ,del.pars));
+            elseif isa(del,'qpar')
+                obj.delay = del;
+                obj.pars = unique(vertcat(obj.pars ,del));
+            elseif isnumeric(num) && isscalar(num)
+                obj.delay = del;
+            else
+                error('unsupported object for num')
+            end
+                
+            
         end
         function obj = cnom(obj,w)
             %CPNOM computes the nominal transfer function
@@ -181,7 +213,8 @@ classdef qplant < handle
             f = qplant2func(obj);
             pck = obj.pack(pgrid);
             
-            col = distinguishable_colors(length(w)); % to remove
+            %col = distinguishable_colors(length(w)); % to remove
+            col = lines(length(w));
             tpl = qtpl(length(w)); % pre-allocating 
             for k = 1:length(w)
                 fprintf('--> for w=%g [rad/s] \n',w(k));
@@ -198,12 +231,39 @@ classdef qplant < handle
             %
             %Used by: FUNCVAL, CASES, CTPL, CNOM and their subroutines
             
-            snum = obj.poly2str(obj.num);
-            sden = obj.poly2str(obj.den);
+            p = obj.num;
+            if isa(p,'qpoly') || ( isnumeric(p) && isrow(p) )
+                snum = obj.poly2str(p);
+            elseif isa(p,'qexpression')
+                snum = p.expression;
+            elseif isa(p,'qpar')
+                snum = p.name;
+            end
+            
+            p = obj.den;
+            if isa(p,'qpoly') || ( isnumeric(p) && isrow(p) )
+                sden = obj.poly2str(p);
+            elseif isa(p,'qexpression')
+                sden = p.expression;
+            elseif isa(p,'qpar')
+                sden = p.name;
+            end
+                         
+            if isempty(obj.delay)
+                sdel = '';
+            elseif isa(obj.delay,'qexpression')
+               sdel = sprintf('.*exp(-s.*%s)',obj.delay.expression);
+            elseif isa(obj.delay,'qpar')
+               sdel = sprintf('.*exp(-s.*%s)',obj.delay.name);
+            elseif isnumeric(obj.delay) && isscalar(obj.delay)
+                sdel = sprintf('.*exp(-s.*%g)',obj.delay);
+            else
+                error('what kind of a delay is that?!')
+            end
             
             args = sprintf('%s, ',obj.pars.name);
             argF = sprintf('@(%s, s) ',args(1:end-2));
-            s = sprintf('%s (%s)./(%s)',argF,snum,sden);
+            s = sprintf('%s (%s)./(%s)%s',argF,snum,sden,sdel);
          
             h = str2func(s);
         end
@@ -397,8 +457,12 @@ classdef qplant < handle
             Freq = [obj.templates.frequency];
             T = obj.templates(Freq==w);
             if isempty(T), error('requested frequency is not in template'); end
-            
-            [tpl,par] = get(T,idx);
+            if isempty(idx)
+                tpl = T.template;
+                par = T.parameters;
+            else
+                [tpl,par] = get(T,idx);
+            end
             
         end
     end
@@ -413,8 +477,10 @@ classdef qplant < handle
                 s = snum(inum+1:end);
             else % is polynom
                 s ='';
-                for k=length(p):-1:1
-                    s = sprintf('%s %g*s.^%i + ',s,p(k),k-1);
+                o = length(p)-1;    % highest order
+                for k=1:(o+1)
+                    s = sprintf('%s %g*s.^%i + ',s,p(k),o);
+                    o=o-1;
                 end
                 s = s(1:end-2);
             end
@@ -438,13 +504,13 @@ classdef qplant < handle
         function T = funcval(f,c,s)
             %FUNCVAL return the value of the plant, represented by a 
             %function handle F created by QPLANT2FUNC, for given parameter 
-            %case C and for S. The output is in unwrapped Nihols format.
+            %case C and for S. The output is in unwrapped Nichols format.
             c{end} = s;
             %c = num2cell(par,2);
             %c{end+1} = s;
             nyq  = f(c{:});
             T=c2n(nyq,'unwrap');
-        end
+         end
         function [Tnew,Qpar] = recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist)
             %RECEDGE    subroutine used by ADEDGE
             %           [Tnew,Qpar]=recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist);
