@@ -3,13 +3,15 @@ classdef qplant < handle
     %   Detailed explanation goes here
     
     properties
-        num
-        den
-        delay
-        pars
-        templates
-        nominal
-        info
+        num             % num  (qpoly array)
+        den             % den (qpoly array)
+        delay           % delay (string)
+        pars            % uncertain parameters (qpar array)
+        unstruct        % unstructed uncertainty
+        uncint          % uuncertain integrator/diffrentiator
+        templates       % template (qtpl array)
+        nominal         % nominal case (qfr)
+        info            % string
     end
     
     methods
@@ -57,6 +59,24 @@ classdef qplant < handle
             end
                 
             
+        end
+        function obj = auncint(obj,pow)
+            %Auncint adds uncertain integrators/diffrentiators
+            
+            if ~(isnumeric(pow) && isvector(pow) && all(mod(pow,1)==0))
+                error('second input argument must be a vector of integers')
+            end
+            pow0=unique([0 pow]);
+            uncint_par = qpar('uncint_par',0,pow0,'disc');
+            
+            if isempty(obj.uncint)
+                obj.pars = vertcat(obj.pars, uncint_par);
+            else
+                idx = strcmp({obj.pars.name},'uncint_par');
+                obj.pars(idx) = uncint_par;
+            end
+            obj.uncint = pow;
+
         end
         function obj = cnom(obj,w)
             %CPNOM computes the nominal transfer function
@@ -108,6 +128,14 @@ classdef qplant < handle
                 tpl(k)=add2tpl(tpl(k),tnom(k),pnom(:,1),'x');
             end
             
+            % adds uncetin poles/zeros
+            if any(strcmp({obj.pars.name},'uncint_par'))
+                %tplop('A+B',t_,c2n((j*w_tpl(i)).^n_dif(1:(length(n_dif)-1)),'unwrap'));
+                idx = strcmp({obj.pars.name},'uncint_par');
+                t_uncint = c2n( (1j*w).^obj.pars(idx).discrete );
+                tpl = cpop(tpl,t_uncint,'+');
+            end
+            
             if isempty(obj.templates)
                 obj.templates = tpl;
             else 
@@ -123,7 +151,7 @@ classdef qplant < handle
                 TPL(~inew) = obj.templates(i0);
                 obj.templates = TPL;
             end
-          
+                      
             
         end
         function tpl = adgrid(obj,w,options)
@@ -136,17 +164,19 @@ classdef qplant < handle
             
         end
         function tpl = adedge(obj,w,options)
-            
+            %ADEGDE copmputes templates via the recurcive edge method
             
             fprintf('Calculating templates by recurcive edge grid\n')
             
             plot_on = 0; % to be given as option in future
             Tacc=[5 2];  % to be given as option in future
             
-            npar=length(obj.pars);
-            qdist = ([obj.pars.upper]' - [obj.pars.lower]')./double([obj.pars.cases]'); 
+            idx = ~strcmp({obj.pars.name},'uncint_par');
+            pars = obj.pars(idx);
+            npar=length(pars);
+            qdist = ([pars.upper]' - [pars.lower]')./double([pars.cases]'); 
             indgrid = obj.idxgrid(npar);
-            qg = grid(obj.pars,0,2);
+            qg = grid(pars,0,2);
             
             f = obj.qplant2func();
 
@@ -196,16 +226,17 @@ classdef qplant < handle
             % TODO: add  unstructured uncertainty 
             %       add  options to change cases 
             if nargin<3, rnd=0; end
+            idx = ~strcmp({obj.pars.name},'uncint_par');
             switch rnd
                 case 0
                     method='grid'; 
-                    pgrid = grid(obj.pars,rnd);
+                    pgrid = grid(obj.pars(idx),rnd);
                 case 1
                     method='random grid'; 
-                    pgrid = grid(obj.pars,rnd);
+                    pgrid = grid(obj.pars(idx),rnd);
                 case 2 
                     method='random sampling';
-                    pgrid = sample(obj.pars,100); % correct usage: options.cases(=100)
+                    pgrid = sample(obj.pars(idx),100); % correct usage: options.cases(=100)
                 otherwise, error('unavilable rnd option')
             end
                 
@@ -261,9 +292,15 @@ classdef qplant < handle
                 error('what kind of a delay is that?!')
             end
             
+            if isempty(obj.uncint)
+                sint = '';
+            else
+                sint = sprintf('(s.^uncint_par).*');
+            end
+            
             args = sprintf('%s, ',obj.pars.name);
             argF = sprintf('@(%s, s) ',args(1:end-2));
-            s = sprintf('%s (%s)./(%s)%s',argF,snum,sden,sdel);
+            s = sprintf('%s %s(%s)./(%s)%s',argF,sint,snum,sden,sdel);
          
             h = str2func(s);
         end

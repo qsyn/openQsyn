@@ -8,14 +8,34 @@ classdef qpar
         lower       % lower bound
         upper       % upper bound
         cases       % number of cases
+        discrete    % discrete values
     end
     
     methods
         function par = qpar(name,nom,lbnd,ubnd,cases)
             %QPAR Construct an instance of this class
-            %   Detailed explanation goes here
-
-            if nargin==4 
+            %   
+            %   Usage: 
+            %
+            %   par = qpar(name,nom,lbnd,ubnd)   defines a qpar object with
+            %   specifiey name, nominal value, lower bound and upper bound
+            %
+            %   par = qpar(name,nom,lbnd,ubnd,cases)    also specify number
+            %   of cases (def=3)
+            %
+            %  par = qpar(name,nom,vals,'disc')   defines a discrete qpar
+            %  
+            %
+            %
+            
+            if nargin==4 && ~strcmp(ubnd,'disc')
+                error('unexceptable argumetns to qpar')
+            elseif nargin==4 && strcmp(ubnd,'disc')
+                par.discrete=lbnd;
+                cases=length(lbnd);
+                ubnd=lbnd(end);
+                lbnd=lbnd(1);
+            elseif nargin==4
                 cases = 3;
                 disp('3 cases are selected as default');
             elseif nargin~=5
@@ -112,9 +132,11 @@ classdef qpar
             if length(cases)==1 && N>1, cases=repmat(cases,1,N); end
             p = zeros(N,prod(cases));
             for k=1:N
-                if rnd==0
+                if ~isempty(obj(k).discrete)
+                    a = obj(k).discrete;
+                elseif rnd==0
                     a = linspace(obj(k),cases(k));
-                else %rnd==1        
+                else %rnd==1
                     a = obj(k).lower + (obj(k).lower+obj(k).upper)*rand(1,cases(k));
                 end
                 x = full(a);
@@ -132,7 +154,7 @@ classdef qpar
             %RNDGRID generates N random samples of the parameter cases
             %   generates a grid 
             [n,m] = size(obj);
-            if m~=1, error('par.rndgird only accepts a column vector'); end
+            if m~=1, error('par.sample only accepts a column vector'); end
             
             p = zeros(n,N);
             
