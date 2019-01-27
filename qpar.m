@@ -28,14 +28,13 @@ classdef qpar
             %
             %
             
-            if nargin==4 && ~strcmp(ubnd,'disc')
-                error('unexceptable argumetns to qpar')
-            elseif nargin==4 && strcmp(ubnd,'disc')
+            
+            if nargin==4 && strcmp(ubnd,'disc')
                 par.discrete=lbnd;
                 cases=length(lbnd);
                 ubnd=lbnd(end);
                 lbnd=lbnd(1);
-            elseif nargin==4
+            elseif nargin==4 && isnumeric(ubnd)
                 cases = 3;
                 disp('3 cases are selected as default');
             elseif nargin~=5
