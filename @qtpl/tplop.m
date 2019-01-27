@@ -60,8 +60,10 @@ for k = 1:N
         idx = 1:length(tpl1(k).template);
     end
     
-    p1 =  repmat(tpl1(k).parameters,length(tpl2(k).parameters),1);
-    p2 =  repmat(tpl2(k).parameters,length(tpl1(k).parameters),1);
+    n1 = max(1,length(tpl1(k).parameters));     % exclude 0 length
+    n2 = max(1,length(tpl2(k).parameters));     % exclude 0 length
+    p1 =  repmat(tpl1(k).parameters,n2,1);
+    p2 =  repmat(tpl2(k).parameters,n1,1);
     p = [p1 p2];
     
     T(k).parameters = p(:,idx);

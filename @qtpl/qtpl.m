@@ -74,8 +74,24 @@ classdef qtpl
            end
            
            tpl = T.template(idx);
-           par = T.parameters(idx);
+           par = T.parameters(:,idx);
            
+        end
+        function table(obj,idx,w)
+            %DISP Displays the magnitude and paramerters in command window
+            
+            [tpl,par] = get(obj,idx,w);
+            scases = sprintf('i_%i ',idx);
+            ccases = split(scases(1:end-1)); % ignore 1 extra space at end
+            
+            spars = sprintf('par%i ',1:size(obj(1).parameters,1));
+            cpars = split(spars(1:end-1)); % ignore 1 extra space at end
+            
+            data = [real(tpl).' ; imag(tpl).' ; par];
+            partab = array2table(data,'VariableNames',ccases,...
+                'RowNames',{'deg', 'dB',cpars{:}});    
+
+            disp(partab)
         end
     end
     

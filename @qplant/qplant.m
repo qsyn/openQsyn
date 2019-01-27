@@ -104,6 +104,7 @@ classdef qplant < handle
             %               'random'    random sample points 
             %               'recgrid'   recurcive grid (TO DO)
             %               'aedgrid'   recurcive edge grid
+            %               'cases'     explicitly given parameter cases 
             % 
             %   w       frequency vector
             %
@@ -118,6 +119,7 @@ classdef qplant < handle
                 case 'random', tpl=obj.cgrid(w,2);
                 case 'recgrid', tpl=obj.adgrid(w,options);
                 case 'aedgrid', tpl=obj.adedge(w,options);
+                case 'cases', tpl=obj.cases2tpl(options,w);
                 otherwise, error('unrecognized method!')
             end
 
@@ -125,7 +127,7 @@ classdef qplant < handle
             pnom = [obj.pars.nominal]';
             tnom=cases(obj,pnom,w);
             for k=1:length(w)
-                tpl(k)=add2tpl(tpl(k),tnom(k),pnom(:,1),'x');
+                tpl(k)=add2tpl(tpl(k),tnom(k),pnom,'x');
             end
             
             % adds uncetin poles/zeros
@@ -166,25 +168,26 @@ classdef qplant < handle
         function tpl = adedge(obj,w,options)
             %ADEGDE copmputes templates via the recurcive edge method
             
+            %BUG: the parameters retuerned do no match the actual response
+            
             fprintf('Calculating templates by recurcive edge grid\n')
             
             plot_on = 0; % to be given as option in future
             Tacc=[5 2];  % to be given as option in future
             
             idx = ~strcmp({obj.pars.name},'uncint_par');
-            pars = obj.pars(idx);
-            npar=length(pars);
-            qdist = ([pars.upper]' - [pars.lower]')./double([pars.cases]'); 
+            Pars = obj.pars(idx);
+            npar=length(Pars);
+            qdist = ([Pars.upper]' - [Pars.lower]')./double([Pars.cases]'); 
             indgrid = obj.idxgrid(npar);
-            qg = grid(pars,0,2);
+            qg = grid(Pars,0,2);
             
             f = obj.qplant2func();
 
             %C = num2cell(qg,2);
             %C{end+1} = 0;
             c = qplant.pack(qg);
-            
-            Qpar = qg;
+
             tpl = qtpl(length(w)); % pre-allocating 
             col = distinguishable_colors(length(w));
             for kw = 1:length(w)
@@ -192,6 +195,7 @@ classdef qplant < handle
                 s = 1j*w(kw);
                 Tg = qplant.funcval(f,c,s);
                 T = [];
+                Qpar = qg;
                 for k=1:npar
                     ind0=find(~indgrid(k,:));
                     ind1=find(indgrid(k,:));
@@ -206,11 +210,15 @@ classdef qplant < handle
                         end
                     end
                 end
-              
-                idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
+                prune_on = 1;
+                if prune_on
+                    idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
+                else
+                    idx=1:length(T);
+                end
                 if plot_on
-                    %scatter(real(T),imag(T),5,col(kw,:)); hold on
-                    %scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
+                    scatter(real(T),imag(T),5,col(kw,:)); hold on
+                    scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
                 end
                 tpl(kw) = qtpl(w(kw),[T(idx).'],Qpar(:,idx));
             end
@@ -245,7 +253,7 @@ classdef qplant < handle
             pck = obj.pack(pgrid);
             
             %col = distinguishable_colors(length(w)); % to remove
-            col = lines(length(w));
+            %col = lines(length(w));
             tpl = qtpl(length(w)); % pre-allocating 
             for k = 1:length(w)
                 fprintf('--> for w=%g [rad/s] \n',w(k));
@@ -253,8 +261,22 @@ classdef qplant < handle
                 %nyq = f(C{:});               % in complex form
                 T = obj.funcval(f,pck,1j*w(k));
                 tpl(k)=qtpl(w(k),T.',pgrid);  
-                scatter(real(T),imag(T),10,col(k,:)); hold on
+                %scatter(real(T),imag(T),10,col(k,:)); hold on
             end 
+        end
+        function tpl = cases2tpl(obj,par,w)
+            %CASES2TPL creates templates based on given by parameter cases
+            %           
+            if size(par,1) ~= length(obj.pars)
+                error('par must have %i raws', length(obj.pars));
+            end
+            p = obj.pack(par);
+            f = obj.qplant2func();
+            tpl = qtpl(length(w)); % pre-allocating 
+            for k=1:length(w)
+                T = obj.funcval(f,p,1j*w(k));
+                tpl(k)=qtpl(w(k),T.',par); 
+            end          
         end
         function h = qplant2func(obj)
             %QPLANT2FUNC return an handle to a function object f@(p1,p2,...pn,s) 
@@ -438,7 +460,8 @@ classdef qplant < handle
             
             [res,w] = cases(obj,par,w);
             
-            col = distinguishable_colors(size(res,2));
+            %col = distinguishable_colors(size(res,2));
+            col = lines(size(res,2));
             qtpl.bodeplotter(res.',w,opt,col);           
                 
         end
@@ -455,6 +478,8 @@ classdef qplant < handle
             f = obj.qplant2func();
             if isempty(par)
                 pgrid = grid(obj.pars,0);
+            elseif size(par,1) ~= length(obj.pars)
+                error('par must have %i raws', length(obj.pars));
             else
                 pgrid = par;
             end
@@ -464,7 +489,7 @@ classdef qplant < handle
             if nargout==2
                 varargout{2} = w;
             elseif nargout>2
-                error('to many outputs!')
+                error('too many outputs!')
             end
         end
         function step(obj,pars,tfinal)

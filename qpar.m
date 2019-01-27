@@ -23,7 +23,7 @@ classdef qpar
             %   par = qpar(name,nom,lbnd,ubnd,cases)    also specify number
             %   of cases (def=3)
             %
-            %  par = qpar(name,nom,vals,'disc')   defines a discrete qpar
+            %   par = qpar(name,nom,vals,'disc')   defines a discrete qpar
             %  
             %
             %
@@ -50,17 +50,19 @@ classdef qpar
             if any(size(ubnd)~=1), error('upper bound must be a numeric scalar'); end
             if any(size(lbnd)~=1), error('lower bound must be a numeric scalar'); end
             if any(size(nom)~=1), error('nominal value must be a numeric scalar'); end
-            
-            % check bounds
-            if (nom > ubnd) || (nom <lbnd), error('nominal value must be between bounds'); end
+
                        
             % assign properties    
-            par.name = char(name);
+            par.name = name;
             par.nominal = double(nom);
             par.lower = double(lbnd);
             par.upper = double(ubnd);
             par.cases = int32(cases);
             
+            % check bounds
+            if (par.nominal > par.upper) || (par.nominal <par.lower)
+                warning('nominal value is not between bounds') 
+            end
         end
         function obj = plus(A,B)
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression')
