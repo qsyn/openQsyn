@@ -1,6 +1,6 @@
 classdef qdesign  < handle
-    %QLD is a class for QFT Loop Design -- A class that host all methods
-    %required for SISO QFT loop shaping design
+    %QDESIGN is a class for QFT Loop Design -- A class that host all 
+    %methods required for SISO QFT loop shaping design
     
     properties
         tpl         % templates (qtpl array)

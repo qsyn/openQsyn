@@ -192,7 +192,7 @@ classdef qplant < handle
             c = qplant.pack(qg);
 
             tpl = qtpl(length(w)); % pre-allocating 
-            col = distinguishable_colors(length(w));
+            %col = distinguishable_colors(length(w));
             for kw = 1:length(w)
                 fprintf('--> for w=%g [rad/s] \n',w(kw));
                 s = 1j*w(kw);
@@ -207,7 +207,10 @@ classdef qplant < handle
                         Td=rem(real(Td)+540,360)-180+1j*imag(Td);
                         qfix=max(qg(:,ind1(l))-qg(:,ind0(l)))/qdist(k);
                         if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>=1 || qfix>1
-                            [T1,Q1]=obj.recedge(f,s,qg(:,ind0(l)),qg(:,ind1(l)),Tg(ind0(l)),Tg(ind1(l)),Tacc,qfix);                           
+                            [T1,Q1]=obj.recedge(f,s,qg(:,ind0(l)),qg(:,ind1(l)),Tg(ind0(l)),Tg(ind1(l)),Tacc,qfix);     
+                            if any(obj.cases(Q1,w(kw))-T1)
+                                disp('fuck!')
+                            end
                             T=[T T1];
                             Qpar=[Qpar Q1];        
                         end
@@ -473,6 +476,16 @@ classdef qplant < handle
         function varargout=cases(obj,par,w)
             %CASES returns the template points for given parametric cases
             %It does not plot anything!
+            %
+            %  Usage:
+            %  [T,w] = CASES(obj,par,w)   computes a template T in nichols
+            %  foramt for given parameters par, and frequencies w
+            %  
+            %  Inputs:
+            %  par      array with each column a different parameter case;
+            %           default is th eenite grid
+            %  w        vector of frequencies; default is the frequency
+            %           vector of nominal case
             
             if nargin<3, w=[]; end
             if nargin<2, par=[]; end
@@ -579,35 +592,34 @@ classdef qplant < handle
             T=c2n(nyq,'unwrap');
          end
         function [Tnew,Qpar] = recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist)
-            %RECEDGE    subroutine used by ADEDGE
-            %           [Tnew,Qpar]=recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist);
+            %RECEDGE subroutine used by ADEDGE
+            %   [Tnew,Qpar]=recedge(trf,s,qmin,qmax,Tmin,Tmax,Tacc,qdist);
             %
-            %   Adopted from Qsyn: Original Author: M Nordin
+            %   Adapted from Qsyn: Original Author: M Nordin
             
             %global prune_on
             qbreak=abs(qmin-qmax);
             qbreak=min(qbreak((qbreak~=0)));
             if qbreak<1e-8
-                prune_on=0; % return value???
+                %prune_on=0 % return value???
                 return
             end
             qnew=0.5*(qmin+qmax);
             qdist=0.5*qdist;
             
             %avoid NaN from ~plant.m = xxxplant.m  peo 970318
-            %value = feval(trf,qnew,s);
             c=qplant.pack(qnew);
             Tcurr = qplant.funcval(trf,c,s);
             if isnan(Tcurr) 
-                %value = feval(trf,qnew+eps*ones(size(qnew)),s); 
-                c=obj.pack(qnew+eps*ones(size(qnew)));
-                Tcurr = obj.funcval(trf,c,s);
+                %c=obj.pack(qnew+eps*ones(size(qnew)));
+                qnew = qnew+eps*ones(size(qnew));
+                c=obj.pack(qnew);
+                Tcurr = qplant.funcval(trf,c,s);
             end
             
-            % Tcurr=c2n(feval(trf,qnew,s));
-            %Tcurr=c2n(value,-180);  %peo960705
             Qpar=qnew;
             Tnew=Tcurr;
+            
             Td=Tcurr-Tmin;
             Td=rem(real(Td)+540,360)-180+1j*imag(Td);
             %The wrapped distance

@@ -1,10 +1,12 @@
 classdef qpar
-    %QPAR Summary of this class goes here
-    %   Detailed explanation goes here
-    
+%QPAR class defines a single uncertain parameter in oqft. 
+%
+%  par = QPAR(name,nom,lbnd,ubnd)   defines a qpar object with specified 
+%  name, nominal value, lower bound, and upper bound. 
+
     properties
-        name        % name
-        nominal     % Nominal value
+        name        % parameter name
+        nominal     % nominal value
         lower       % lower bound
         upper       % upper bound
         cases       % number of cases
@@ -23,11 +25,7 @@ classdef qpar
             %   par = qpar(name,nom,lbnd,ubnd,cases)    also specify number
             %   of cases (def=3)
             %
-            %   par = qpar(name,nom,vals,'disc')   defines a discrete qpar
-            %  
-            %
-            %
-            
+            %   par = qpar(name,nom,vals,'disc')   defines a discrete qpar            
             
             if nargin==4 && strcmp(ubnd,'disc')
                 par.discrete=lbnd;
@@ -65,6 +63,7 @@ classdef qpar
             end
         end
         function obj = plus(A,B)
+            %PLUS adds qpar elements 
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression')
                 obj = qexpression(A,B,'+');
             else
@@ -72,9 +71,11 @@ classdef qpar
             end
         end
         function obj = uplus(A)
+            %UPLUS unary plus
             obj = qexpression([],A,'+');
         end
         function obj = minus(A,B)
+            %MINUS substruct qpar elements 
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression') 
                 obj = qexpression(A,B,'-');
             else
@@ -82,9 +83,11 @@ classdef qpar
             end
         end
         function obj = uminus(A)
+            %UMINUS unary minus
             obj = qexpression([],A,'-');
         end
         function obj = mtimes(A,B)
+            %MTIMES multiply qpar elements
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression')
                 obj = qexpression(A,B,'*');
             else
@@ -92,6 +95,7 @@ classdef qpar
             end
         end
         function obj = mrdivide(A,B)
+            %MRDIVIDE divides qpar elements
             if isnumeric(B) || isa(B,'qpar') ||  isa(B,'qexpression')
                 obj = qexpression(A,B,'/');
             else
@@ -99,22 +103,26 @@ classdef qpar
             end
         end
         function obj = unique(par)
+            %Unique values in array
             names = {par.name};
             [~,ia] = unique(names);
             obj = par(ia);
         end      
         function obj = horzcat(varargin)
+            %HORZCAT concatenate arrays horizontally
             obj = qpoly(varargin{:});
         end
         function val = nom(par)
+            %NOM returns nominal value
             val = par.nominal;
         end
         function pspace = linspace(obj,n)
+            %LINSPACE parameter space
             if nargin<2, n = obj.cases; end
             pspace = linspace(obj.lower,obj.upper,n);           
         end
         function p = grid(obj,rnd,cases)
-            %GRID computes a gird of N vectors
+            %GRID computes a gird of N parameters
             % 
             %   p = grid(obj,rnd,cases)
             %   
@@ -152,7 +160,7 @@ classdef qpar
                         
         end
         function p = sample(obj,N)
-            %RNDGRID generates N random samples of the parameter cases
+            %SAMPLE generates N random samples of the parameter cases
             %   generates a grid 
             [n,m] = size(obj);
             if m~=1, error('par.sample only accepts a column vector'); end
@@ -165,9 +173,9 @@ classdef qpar
                         
         end
         function I = ismember(A,B)
-            %ISMEMBER returns a vector of logical indices positive for
-            %every element of parameter set A that is a member of parameter
-            %set B.
+            %ISMEMBER true for set member.
+            %  returns a vector of logical indices positive for every element
+            %  of parameter set A that is a member of parameter set B.
             Anames = {A(:).name};
             Bnames = {B(:).name};
             I = ismember(Anames,Bnames);
