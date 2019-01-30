@@ -14,7 +14,7 @@ elseif strcmp(opt,'x')
     obj.template = [tpl ; obj.template];
     obj.parameters = [par obj.parameters];
 else
-    error('options: ''a'' (append to end) | ''i'' (insert at start)')
+    error('options: ''a'' (append to end) | ''x'' (insert at start)')
 end
 
 

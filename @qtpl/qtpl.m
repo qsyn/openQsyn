@@ -93,11 +93,25 @@ classdef qtpl
 
             disp(partab)
         end
+        function obj = unwrap(obj)
+            %UNWRAP unwrap phase in qtpl
+            %
+            N = length(obj);
+            nom = get(obj,1);
+            unom = unwrap(nom*pi/180)*180/pi + 1i*imag(nom);
+            for k=1:N
+                nomPhase = real(unom(k));
+                meanPhase = mean(real(obj(k).template(2:end)));
+                r = round((nomPhase - meanPhase)/360);
+                obj(k).template(2:end) = obj(k).template(2:end)+r*360;
+            end
+            
+        end
     end
     
     methods(Static)
         h = bodeplotter(tpl,w,opt,col) 
-        T = tplfile_import(filename)
+        T = tplfile_import(filename,varargin)
     end
     
 end

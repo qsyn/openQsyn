@@ -1,21 +1,23 @@
 function [varargout]=show(obj ,varargin)
 %SHOW    displays a template object on Nichols chart 
 %     
-%  	show(QTPL)   displays template QTPL 
+%   show(QTPL)   displays template QTPL 
 %
 %   show(TPLf,FHAND)    draws the Nichols chart in figure with handle FHAND   
 %
-%   show(TPLF,PARAMETER,VALUE)   use parameter/value pairs to
-%   specify additional properties:
-%       use PARAMETER='color'   with VALUE a color array in RGB format
-%       use PARAMETER='marker'  with VALUE a string for marker points 
-%       use PARAMETER='fill'    with VALUE equals 1 (filled) or zero (def) 
-%       use PARAMETER='case'    with VALUE a vector of indices specifing
-%                               plant case(s) to show
+%   show(TPLF,PARAMETER,VALUE)   use parameter/value pairs to specify
+%   additional properties.
 %
 %   H=showtpl(...)      returns ahandle to the figure 
 %
 %   QTPL.show(...)      alternative usage  
+%
+%   Additional Properties:
+%       'color'     color array in RGB format
+%       'marker'    string for marker style (def='.')
+%       'fill'      fills thmpleates with color, 1 (filled) | zero (def) 
+%       'case'      vector of indices specifing plant case(s) to show
+%       'nommark'   marker for nominal point (def='s')
 %
 %   Remarks:        During the execution of the display under the 'point' 
 %                   option, pressing  the left button gives the next point 
@@ -33,7 +35,7 @@ function [varargout]=show(obj ,varargin)
 %                   current figure toolbar, that also lets you zoomout
 %                   beyond the borders of the original picture.
 % 
-%   Examples:       TODO!!
+%   Examples        TODO!!
 % 
 %               
 %   See also         HNGRID MGRID CTPL HZOOM
@@ -57,7 +59,7 @@ col_array =	[0,      0.4470, 0.7410
           	 0.4660, 0.6740, 0.1880
           	 0.3010, 0.7450, 0.9330
           	 0.6350, 0.0780, 0.1840];
-plotstyle=struct('fill',0,'marker','.','markersize',4,'color',col_array); % default settings
+plotstyle=struct('fill',0,'marker','.','markersize',4,'nommark','s','color',col_array); % default settings
 
 if nargin>1
     k=1;
@@ -72,6 +74,7 @@ if nargin>1
                 case 'color', plotstyle.color=varargin{k+1};
                 case 'marker', plotstyle.marker=varargin{k+1};
                 case 'markersize', plotstyle.markersize=varargin{k+1};
+                case 'nommark', plotstyle.nommark=varargin{k+1};
                 case 'fill', plotstyle.fill=varargin{k+1};
                 case 'case', IDX=varargin{k+1};
                 otherwise, error('unknown parameter %s',PARAMETER);
@@ -113,7 +116,9 @@ for k=1:N
     end
     plot(real(tpl),imag(tpl),'Color',Lcolor,'LineStyle','none',...
         'Marker',Lstyle,'Markersize',plotstyle.markersize,'zdata',1:ntpl) 
-    plot(real(tpl(1)),imag(tpl(1)),'s','Color',Lcolor)     
+    if ~isempty(plotstyle.nommark)
+        plot(real(tpl(1)),imag(tpl(1)),plotstyle.nommark,'Color',Lcolor)
+    end
     text(real(tpl(1)+1),imag(tpl(1))-1,num2str(w_op(k)));   
 end
 
