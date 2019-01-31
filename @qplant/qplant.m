@@ -128,6 +128,7 @@ classdef qplant < handle
             tnom=cases(obj,pnom,w);
             for k=1:length(w)
                 tpl(k)=add2tpl(tpl(k),tnom(k),pnom,'x');
+                tpl(k).unwrap;
             end
             
             % adds uncetin poles/zeros
@@ -168,7 +169,9 @@ classdef qplant < handle
         function tpl = adedge(obj,w,options)
             %ADEGDE copmputes templates via the recurcive edge method
             
-            %BUG: the parameters retuerned do no match the actual response
+            %fixed: the parameters retuerned do no match the actual response
+            
+            %todo: set prune method by OPTIONS
             
             fprintf('Calculating templates by recurcive edge grid\n')
             
@@ -195,8 +198,7 @@ classdef qplant < handle
                 s = 1j*w(kw);
                 Tg = qplant.funcval(f,c,s);
                 T = [];
-                %Qpar = []; %
-                Qpar = qg;
+                Qpar = []; %Qpar = qg;
                 for k=1:npar
                     ind0=find(~indgrid(k,:));
                     ind1=find(indgrid(k,:));
@@ -214,9 +216,11 @@ classdef qplant < handle
                         end
                     end
                 end
+                T = unwrap(real(T)*pi/180)*180/pi + 1i*imag(T); % unwrap again
                 prune_on = 1;
                 if prune_on
                     idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
+                    %[~,idx] = prune(T,[2 2]);
                 else
                     idx=1:length(T);
                 end
@@ -224,7 +228,7 @@ classdef qplant < handle
                     scatter(real(T),imag(T),5,col(kw,:)); hold on
                     scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
                 end
-                tpl(kw) = qtpl(w(kw),[T(idx).'],Qpar(:,idx));
+                tpl(kw) = qtpl(w(kw),T(idx).',Qpar(:,idx));
             end
             
         end

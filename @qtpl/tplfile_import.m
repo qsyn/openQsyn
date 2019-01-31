@@ -1,25 +1,63 @@
-function [ T ] = tplfile_import(filename)
+function [ T ] = tplfile_import(filename,varargin)
 %TPLFILE_IMPORT imports templates from existing Qsyn *.tpl file
 %
-%   [ T ] = tplfile_import(FILENAME)    import tpl from FILENAME.tpl into a 
+%   [ T ] = tplfile_import(filename,w)   imports tpl from FILENAME.tpl into 
 %   qtpl object T
+%
+%   Inputs:
+%   filename    char array of the tpl file name w/o the *.tpl extension
+%   w           vector of frequencies to import (def=all)
+%
 
-S=load([filename,'.tpl'],'-mat');
+p = inputParser;
+addRequired(p,'filename',...
+    @(x) validateattributes(x,{'char'},{'nonempty'}));
+addOptional(p,'w',[],...
+    @(x) validateattributes(x,{'double'},{'positive','vector'}))
+parse(p,filename,varargin{:})
+w = p.Results.w;
 
-N = size(S.w_tpl,1);
-T = qtpl(N);
+S=load([p.Results.filename,'.tpl'],'-mat');
 
-inom = ismember(S.w_nom,S.w_tpl(:,1)); % get nominal point at each frequency
-nom = S.nom(inom);
-par_nom = S.par_nom.';
+if isempty(p.Results.w)
+    N = size(S.w_tpl,1);
+    idx = 1:N;
+elseif all(ismember(w,S.w_tpl(:,1)))
+    N = length(p.Results.w);
+    [~,idx] = ismember(w,S.w_tpl(:,1));
+else
+    error('at least one of specified frequencies not found in tplfile')
+end
 
-for n=1:N
-    
-    k = S.w_tpl(n,2);
+T = qtpl(N); % pre-allocation
+
+nom = [];
+if isfield(S, 'w_nom')
+    %inom = ismember(S.w_nom,S.w_tpl(:,1)); % get nominal point at each frequency
+    %nom = S.nom(inom);
+    [isnom,inom]=ismember(S.w_tpl(idx,1),S.w_nom);
+end
+
+par_nom = [];
+if isfield(S, 'par_nom')
+    par_nom = S.par_nom.';
+end
+
+for n=1:N    
+    k = S.w_tpl(idx(n),2);
     T(n).frequency = S.w_tpl(k,1);
-    T(n).parameters = [par_nom S.(sprintf('par_%i',k))];
-    T(n).template = [nom(n) ; S.(sprintf('t_w%i',k))];
-    
+    if isnom(n)
+        nom = S.nom(inom(n));
+    else
+        nom=[];
+    end
+    tpl = [nom ; S.(sprintf('t_w%i',k))];
+    T(n).template = unwrap(real(tpl)*pi/180)*180/pi + 1i*imag(tpl); %unwrap
+    if isfield(S,sprintf('par_%i',k))
+        T(n).parameters = [par_nom S.(sprintf('par_%i',k))];
+    else
+        T(n).parameters = [par_nom nan(size(S.(sprintf('t_w%i',k))))];
+    end
 end
 
 
