@@ -1,5 +1,5 @@
 classdef qdesign  < handle
-    %QDESIGN is a class for QFT Loop Design -- A class that host all 
+    %QDESIGN is a class for QFT Loop Design -- A class that hosts all 
     %methods required for SISO QFT loop shaping design
     
     properties
@@ -12,8 +12,15 @@ classdef qdesign  < handle
     
     methods
         function obj = qdesign(plant,specs)
-            %QLD Construct an instance of the QLD class
-            %   Detailed explanation goes here
+            %QLD Construct an instance of the QDESIGN class
+            %   
+            %Usage: 
+            %
+            %    obj = QDESIGN(plant,specs)    constract a QDESIGN object
+            %    from given qplant and qspc
+            %
+            %Part of the Open Qsyn toolbox. 
+            
             obj.tpl = plant.templates;
             obj.nom = plant.nominal;
             obj.spc = specs;
