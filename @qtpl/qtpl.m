@@ -6,19 +6,42 @@ classdef qtpl
         frequency
         template
         parameters
+        parNames
     end
     
     methods
-        function obj = qtpl(frequency,template,parameters)
+        function obj = qtpl(frequency,template,varargin)
             %QTPL construct a qtpl object
+            %
+            % Usage
+            %
+            % obj = QTPL(frequency,template)   constructs a qtpl object for
+            % given frequency with given points
+            %
+            % obj = QTPL(frequency,template,parameter)   also specifies parameter
+            % corresponding to the template points 
+            %
+            % obj = QTPL(frequency,template,parameter,parNames)   also specifies  
+            % parameter names
+
             if nargin==0, return; end
             if nargin==1 % build an empty array of length given by input 1
                 obj(frequency,1) = obj;
                 return
             end
-            obj.frequency = double(frequency);
-            obj.template = double(template);
-            obj.parameters = double(parameters); 
+            
+            p = inputParser;
+            addRequired(p,'frequency',@(x)validateattributes(x,{'numeric'},{'scalar','positive','real'}));
+            addRequired(p,'template',@(x)validateattributes(x,{'numeric'},{'nonempty'}));
+            addOptional(p,'parameters',[],@(x)validateattributes(x,{'numeric'},{'2d','real'}));
+            addOptional(p,'parNames',{},@(x)validateattributes(x,{'cell'},{'vector'}));
+            parse(p,frequency,template,varargin{:});
+            
+            obj.frequency = p.Results.frequency;
+            obj.template = p.Results.template;
+            obj.parameters = p.Results.parameters; 
+            obj.parNames = p.Results.parNames; 
+            
         end  
         function [ T ] = plus( A,B )
             %PLUS adds two qtpl arrays

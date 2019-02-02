@@ -1,8 +1,8 @@
 classdef qplant < handle
     %QPLANT Summary of this class goes here
     %   Detailed explanation goes here
-    
-    properties
+
+    properties (SetAccess = 'protected')
         num             % num  (qpoly array)
         den             % den (qpoly array)
         delay           % delay (string)
@@ -11,8 +11,13 @@ classdef qplant < handle
         uncint          % uuncertain integrator/diffrentiator
         templates       % template (qtpl array)
         nominal         % nominal case (qfr)
+    end
+    
+    properties
         info            % string
     end
+    
+
     
     methods
         function obj = qplant( num,den ) 
@@ -78,6 +83,16 @@ classdef qplant < handle
             obj.uncint = pow;
 
         end
+        function obj = aunstruc(obj,w,absval)
+            %AUNSTRUCT addds plant unsturcured uncertainty 
+            p= inputParser;
+            addRequired(p,'w',@(x)validateattributes(x,{'numeric'},{'nonempty','vector','positive','real'}));
+            addRequired(p,'absval',@(x)validateattributes(x,{'numeric'},{'nonempty','vector','nonnegative'}));
+            parse(p,w,absval);
+            w = reshape(p.Results.w,[],1);
+            absval = reshape(p.Results.absval,[],1);
+            obj.unstruct = [w absval];
+        end
         function obj = cnom(obj,w)
             %CPNOM computes the nominal transfer function
             %   Detailed explanation goes here
@@ -137,7 +152,13 @@ classdef qplant < handle
                 idx = strcmp({obj.pars.name},'uncint_par');
                 t_uncint = c2n( (1j*w).^obj.pars(idx).discrete );
                 tpl = cpop(tpl,t_uncint,'+');
+            end 
+            
+            % adds unstructured uncertainty
+            if ~isempty(obj.unstruct)
+                tpl = addunstruct(obj,tpl);
             end
+                
             
             if isempty(obj.templates)
                 obj.templates = tpl;
@@ -192,7 +213,6 @@ classdef qplant < handle
             c = qplant.pack(qg);
 
             tpl = qtpl(length(w)); % pre-allocating 
-            %col = distinguishable_colors(length(w));
             for kw = 1:length(w)
                 fprintf('--> for w=%g [rad/s] \n',w(kw));
                 s = 1j*w(kw);
@@ -208,9 +228,6 @@ classdef qplant < handle
                         qfix=max(qg(:,ind1(l))-qg(:,ind0(l)))/qdist(k);
                         if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>=1 || qfix>1
                             [T1,Q1]=obj.recedge(f,s,qg(:,ind0(l)),qg(:,ind1(l)),Tg(ind0(l)),Tg(ind1(l)),Tacc,qfix);     
-                            if any(obj.cases(Q1,w(kw))-T1)
-                                disp('fuck!')
-                            end
                             T=[T T1];
                             Qpar=[Qpar Q1];        
                         end
@@ -225,6 +242,7 @@ classdef qplant < handle
                     idx=1:length(T);
                 end
                 if plot_on
+                    col = lines(length(w));
                     scatter(real(T),imag(T),5,col(kw,:)); hold on
                     scatter(real(T(idx)),imag(T(idx)),10,col(kw,:),'marker','o');
                 end
@@ -271,6 +289,23 @@ classdef qplant < handle
                 tpl(k)=qtpl(w(k),T.',pgrid);  
                 %scatter(real(T),imag(T),10,col(k,:)); hold on
             end 
+        end
+        function tpl = addunstruct(obj,tpl_in)
+            %CUNSTRUCT adds unstructured uncertainty into template
+            w = obj.unstruct(:,1);
+            absmag = obj.unstruct(:,2); % magintude (abs)
+            tpl = qtpl(length(w));
+            a = linspace(0,2*pi,7).';
+            a = a(1:end-1);
+            for k=1:length(w)
+                if absmag(k) > 0 
+                    circ = absmag(k)*(cos(a) + 1j*sin(sin(a))); % cirlce in complex plain
+                    tpl(k) = cpop(tpl_in(k),circ,'+');
+                else
+                    tpl(k) = tpl_in(k);
+                end
+            end
+            
         end
         function tpl = cases2tpl(obj,par,w)
             %CASES2TPL creates templates based on given by parameter cases
