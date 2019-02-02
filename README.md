@@ -1,8 +1,10 @@
 # openQsyn
 A modern open source toolbox for QFT control synthesis
 
-**Quantitative Feedback Theory (QFT)** is a frequency domain robust control design technique, introduced by [Isaac Horowitz](https://en.wikipedia.org/wiki/Isaac_Horowitz).
+**Quantitative Feedback Theory (QFT)** is a frequency domain robust control design technique, introduced by [Isaac Horowitz](https://en.wikipedia.org/wiki/Isaac_Horowitz). 
 If you were looking for Quantum Field Theory you are in the wrong place!
+
+The goal of this project is to provide a modern and completely free open source toolbox to aid QFT control synthesis. It will replace the vary capable, yet obsolete, Qsyn toolbox, developed by Prof. Per-Olof Gutman in the 90s. The development is supported by Prof. Gutman himself, and all resued code is done with his premission. 
 
 ## How to use
 
