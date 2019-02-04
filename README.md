@@ -15,7 +15,7 @@ The goal of this project is to provide a modern and completely free open source 
 3. Run `oqsyn` to initiate the toolbox
 
 ### Demo 
-A quick introductory example is found in the live script exmaple.mlx 
+A quick introductory example is found in the live script `exmaple.mlx` 
 This exmaple will guide you through the steps of SISO design: definning a new plant, defining specifications, computaing templates and bounds, designing a feedback compensator and a pre-filter. 
 
 ## Status

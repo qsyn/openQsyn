@@ -1,5 +1,4 @@
 function [obj] = rsrs( Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n )
-
 %RSRS    Reference Step Response Specification Calculation
 %
 %[spec_w,spec_t,tab]=rsrs(spcfile,specname,Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n)
@@ -93,8 +92,6 @@ function [obj] = rsrs( Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n )
 %
 
 % Author: M Nordin
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
-% 188 195
 % Version Upgrade: A. & Y. Greenhut
 % OO Version: Daniel Rubin, 7-Jan-2019
 
