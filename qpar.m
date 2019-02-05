@@ -1,8 +1,11 @@
 classdef qpar
-%QPAR class defines a single uncertain parameter in oqft. 
+%QPAR class defines a single uncertain parameter in qpenQsyn. 
 %
-%  par = QPAR(name,nom,lbnd,ubnd)   defines a qpar object with specified 
-%  name, nominal value, lower bound, and upper bound. 
+%   par = QPAR(name,nom,lbnd,ubnd)   defines a qpar object with specified 
+%   name, nominal value, lower bound, and upper bound.
+%
+%For a list QPAR methods type: methods qspc
+%For help on a specific methods type: help qpar/<method>
 
     properties
         name        % parameter name
@@ -11,6 +14,7 @@ classdef qpar
         upper       % upper bound
         cases       % number of cases
         discrete    % discrete values
+        description % user can insert here whatever he likes.
     end
     
     methods

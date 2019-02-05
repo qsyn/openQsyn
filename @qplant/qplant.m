@@ -508,6 +508,7 @@ classdef qplant < handle
             qtpl.bodeplotter(res.',w,opt,col);           
                 
         end
+        %todo: niccases
         function varargout=cases(obj,par,w)
             %CASES returns the template points for given parametric cases
             %It does not plot anything!
@@ -518,7 +519,7 @@ classdef qplant < handle
             %  
             %  Inputs:
             %  par      array with each column a different parameter case;
-            %           default is th eenite grid
+            %           default is the eniter grid
             %  w        vector of frequencies; default is the frequency
             %           vector of nominal case
             
