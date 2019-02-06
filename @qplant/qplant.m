@@ -46,7 +46,9 @@ classdef qplant < handle
             end
             obj.pars = unique(vertcat(npar,dpar));
             
-            obj.info=sprintf('generated from [num,den] data on: %s',datetime);
+            %obj.info=sprintf('generated from [num,den] data on: %s',datetime);%cannot work on older version
+            obj.info=sprintf('generated from [num,den] data on: %s',datestr(datetime));
+            
         end
         function obj = adelay(obj,del)
             %ADELAY adds a delay to an existing plant without delay
@@ -621,9 +623,15 @@ classdef qplant < handle
             %FUNCVAL return the value of the plant, represented by a 
             %function handle F created by QPLANT2FUNC, for given parameter 
             %case C and for S. The output is in unwrapped Nichols format.
+            
             c{end} = s;
-            %c = num2cell(par,2);
-            %c{end+1} = s;
+            
+            %this part is not needed for Matlab 2016a or later
+            for k=1:length(c)-1
+                c{k} = repmat(c{k},[size(s,1) 1]);
+            end
+            c{end} = repmat(s,[1 size(c{1},2)]);
+            
             nyq  = f(c{:});
             T=c2n(nyq,'unwrap');
          end

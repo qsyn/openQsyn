@@ -34,7 +34,9 @@ but it can already be used for SISO QFT design for plants with parametric
 uncertainty, unstructuerd uncertainty, and uncertain delay. 
 Feel free to open issues in order to report bugs or suggests new features. 
 Just check the issues section and the below to-do list first :). 
-Currently Matlab 2017a (or later) with Control Systems Toolbox is required. 
+
+The toolbox is regulary tested on Matlab 2015b,2017a,2017b. 
+For complete functionality the Control Systems Toolbox is required. 
 
 ### To-Do list:
 - qplant:

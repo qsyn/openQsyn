@@ -65,7 +65,8 @@ classdef qexpression
         function h = qexp2func(obj)
             args = sprintf('%s, ',obj.pars.name);
             argF = sprintf('@(%s)  ',args(1:end-2));
-            exp = replace(obj.expression,{'*','/','^'},{'.*','./','.^'});
+            %exp = replace(obj.expression,{'*','/','^'},{'.*','./','.^'}); %introduced on 2016b
+            exp = strrep(strrep(strrep(obj.expression, '*', '.*'),'/','./'),'^','.^');
             h = str2func([argF exp]);
         end
         function val = nom(obj)
