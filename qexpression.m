@@ -1,7 +1,19 @@
 classdef qexpression
-    %QFTEXPRESSION Summary of this class goes here
-    %   Detailed explanation goes here
-    
+%QEXPRESSION class represents mathmatical expressions of qpar objects
+%
+%   In general a QEXPRESSION object can be created explicitly as follows 
+%       exp = QEXPRESSION(A,B,op)   
+%   where either A or B, or both A and B are qpar objects. the op is a
+%   string describing the operation, for e.g. op='*'.
+%   
+%   Alternatively, a QEXPRESSION object may be created implicity by, e.g.
+%       exp = A*B
+%   where A, B, or both are either qpar objects or qexpression objects
+%
+%   A QEXPRESSION may be composed of a combination of one or more qpar
+%   objects and real numerical scalrs.
+
+
     properties
         expression
         pars

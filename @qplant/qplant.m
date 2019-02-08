@@ -1,6 +1,35 @@
 classdef qplant < handle
-    %QPLANT Summary of this class goes here
-    %   Detailed explanation goes here
+%QPLANT class for plant description and related operations
+%
+%   This class contains the plant description and all methods related to
+%   the plant: 
+%   - freqeuncy response for uncertain cases
+%   - time domain simulations for uncertain cases
+%   - extraction of parameters and properties    
+%   - template computation
+%
+%Construction: 
+%   P = QPLANT(num,den)     constructs a qplant object P from numerator and
+%   denominator data - both are qpoly objects. 
+%
+%Adding a delay: 
+%   P.adelay(h)     adds a delay h to the plant. the delay may be a constant
+%   scalar or uncertain element (qpar or qexpression)
+%
+%Adding unstructured uncertainty:
+%   P.aunstruc(w,m) adds an unstructured uncertainty given by a vector of 
+%   absolute magnitudes corrsponding to given frequency vectors 
+%
+%Plotting a Bode plot:
+%   P.bodecases(w,par)   plots a Bode plot for frequencies in w and
+%   parameter cases given in the matrix par.
+%
+%Computing templates
+%   P.ctpl(method,w)    computes tmeplate according to specified method at
+%   given frequencies w
+%
+%For a list QPLANT methods type: methods qplant
+%For help on a specific methods type: help qplant/<method>
 
     properties (SetAccess = 'protected')
         num             % num  (qpoly array)
@@ -481,36 +510,6 @@ classdef qplant < handle
                 varargout{1}=h;
             end
         end
-        function bodcases(obj,par,w,opt)
-            %BODCASES plant frequency domain simulation for user selected
-            %cases on Bode plont
-            %
-            %   bodcases(QPLANT)   plots bode for all cases given by the 
-            %   plant parameters
-            %
-            %   bodcases(QPLANT,W,PAR)   specify frequency and cases set
-            %
-            %   bodcases(QPLANT,W,OPT)   specify wihch part to plot: 
-            %                            'mag' | 'phase' | 'magphase' (def)
-            %
-            %   
-            %   BODCASES and NICCASES replace CASES in Qsyn
-            
-            %   TODO: something with OPT
-            if nargin<4, opt=[]; end                    
-            if nargin<3, w=[]; end
-            if nargin<2, par=[]; end
-            
-            if isempty(opt), opt = 'magphase'; end    
-            
-            [res,w] = cases(obj,par,w);
-            
-            %col = distinguishable_colors(size(res,2));
-            col = lines(size(res,2));
-            qtpl.bodeplotter(res.',w,opt,col);           
-                
-        end
-        %todo: niccases
         function varargout=cases(obj,par,w)
             %CASES returns the template points for given parametric cases
             %It does not plot anything!
@@ -522,13 +521,18 @@ classdef qplant < handle
             %  Inputs:
             %  par      array with each column a different parameter case;
             %           default is the eniter grid
-            %  w        vector of frequencies; default is the frequency
-            %           vector of nominal case
-            
+            %  w        frequency vector; default is the frequency vector 
+            %           of nominal case (if avialble) or logspace(-2,2,50)
+           
             if nargin<3, w=[]; end
             if nargin<2, par=[]; end
             
-            if isempty(w), w = obj.nominal.frequency; end
+            if isempty(w) && isempty(obj.nominal)
+                w = logspace(-2,2,50);
+            elseif isempty(w) 
+                w = obj.nominal.frequency;
+            end
+            
             w = reshape(w,[],1); % make sure w is a column vector.
             
             f = obj.qplant2func();

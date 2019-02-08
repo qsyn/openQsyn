@@ -1,8 +1,8 @@
 classdef qsys
-%QSYS is a class used to decribe a system composed of at least one qplant
-%It may include additional blocks such as LTI objects and additional qplant
-%objects
-
+    %QSYS is a class used to decribe a system composed of at least one qplant
+    %It may include additional blocks such as LTI objects and additional qplant
+    %objects
+    
     properties
         blocks          % cell array containing all blocks
         connections     % describe connections between blocks
@@ -15,7 +15,7 @@ classdef qsys
             %   Detailed explanation goes here
             p = inputParser;
             valB = @(x) validateattributes(x,{'cell','qplant'},{'nonempty'});
-               % || validateattributes(x,{'qplant'},{'scalar'});
+            % || validateattributes(x,{'qplant'},{'scalar'});
             valC = @(x) validateattributes(x,{'char'},{'nonempty'});
             addRequired(p,'blocks',valB);
             addRequired(p,'connections',valC);
@@ -29,7 +29,7 @@ classdef qsys
             
             nq=0; %qplant counter
             for k=1:length(obj.blocks)
-                blk = obj.blocks{k};                
+                blk = obj.blocks{k};
                 if isa(blk,'qplant')
                     nq = nq+1;
                 elseif ~any([isa(blk,'qfr') isa(blk,'lti') (isnumeric(blk) && isreal(blk))])
@@ -40,33 +40,139 @@ classdef qsys
                 error('qsys requires at least 1 block element to be a qplant object')
             end
             obj.nqplant = nq;
-        end      
-        function bodcases(obj,par,w,opt)
-            %BODCASES system frequency domain simulation for user selected
-            %cases on Bode plot
+        end
+        function bodcases(obj,varargin)
+            %BODCASES system frequency response for selected cases on Bode plot
             %
-            %   BODCASES(sys)   plots bode for all cases given by the 
-            %   parameters of the plants in the qsys object sys
+            %   BODCASES(sys)   plots Bode for all cases given by the
+            %   parameters in all plants found within the system
             %
-            %   BODCASES(QPLANT,W,PAR)   specify frequency and cases set
+            %   BODCASES(sys,par,w)   specify frequency and cases set
             %
-            %   BODCASES(QPLANT,W,OPT)   specify wihch part to plot: 
-            %                            'mag' | 'phase' | 'magphase' (def)
+            %   BODCASES(sys,par,w,parameter,value)   specify additional options
+            %   using parameter/value pairs
             %
-            %   
+            %   qplant.BODCASES(...)    alternative usage
+            %
+            %
+            %   Inputs (Optional):
+            %       par     array with each column a different parameter case;
+            %               default is the eniter grid
+            %       w       frequency vector. default is the frequency vector of
+            %               nominal case, if available, or logspace(-2,2,50)
+            %
+            %   Additional Options:
+            %       color       specifiy color: RGB array
+            %       shownom     show nominal in bold dashed line: 0 (def) | 1
+            %       showmag     show magnitude plot: 0 | 1 (def)
+            %       shophase    show phase plot: 0 | 1 (def)
+            %
+            %   See also: qplant/bodcases
             
-            % TO DO: something with OPT
+            % parse inputs
+            p = inputParser;
+            addOptional(p,'par',[],@(x) validateattributes(x,{'numeric'},{'2d'},1))
+            addOptional(p,'w',[],@(x) validateattributes(x,{'numeric'},{'positive'},1))
+            addParameter(p,'color',[],@(x) validateattributes(x,{'numeric'},{'ncols', 3}))
+            addParameter(p,'showmag',1,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}))
+            addParameter(p,'showphase',1,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}))
+            addParameter(p,'shownom',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}))
+            parse(p,varargin{:})
             
-            if nargin<4, opt=[]; end                    
-            if nargin<3, w=[]; end
-            if nargin<2, par=[]; end    
-            if isempty(opt), opt = 'magphase'; end    
+            par = p.Results.par;
+            w = p.Results.w;
+            col = p.Results.color;
+            shownom = p.Results.shownom;
             
-            [res,w] = cases(obj,par,w);
-            col = lines(size(res,2));
-            qtpl.bodeplotter(res.',w,opt,col);           
-                
-        end 
+            if p.Results.showmag && p.Results.showphase
+                opt = 'magphase';
+            elseif p.Results.showmag
+                opt = 'mag';
+            else
+                opt = 'phase';
+            end
+            
+            [res,w] = cases(obj,par,w);     % compute cases
+            N = size(res,2);
+            if isempty(col)                 % pick colors
+                col = lines(size(res,2));
+            elseif size(col,1) < N
+                col = repmat(col,ceil(N/size(col,1)),1);
+            end
+            
+            linespec = struct('width',1,'style','-');
+            bodeplotter(res.',w,opt,col,linespec);   % plot the Bode for all cases
+            
+            if  shownom
+                linespec.width = 3;
+                linespec.style = '--';
+                nompar = obj.pars.nom;
+                nomres = cases(obj,nompar,w);
+                bodeplotter(nomres.',w,opt,[0 0 0],linespec); % plot the Bode for nominal case
+            end
+            
+        end
+        function niccases(obj,varargin)
+            %NICCASES system frequency response for selected cases on Nichols chart
+            %
+            %   NICCASES(sys)   plots Nichols chart for all cases given by the
+            %   plant parameters
+            %
+            %   NICCASES(sys,par,w)   specify frequency and cases set
+            %
+            %   NICCASES(sys,par,w,parameter,value)   specify additional options
+            %   using parameter/value pairs
+            %
+            %   qplant.NICCASES(...)    alternative usage
+            %
+            %
+            %   Inputs (Optional):
+            %       par     array with each column a different parameter case;
+            %               default is the eniter grid
+            %       w       frequency vector. default is the frequency vector of
+            %               nominal case, if available, or logspace(-2,2,50)
+            %
+            %   Additional Options:
+            %       color       RGB array
+            %       shownom     show nominal in bold dashed line 0 (def) | 1
+            %
+            %   See also: qplant/niccases
+            
+            p = inputParser;
+            addOptional(p,'par',[],@(x) validateattributes(x,{'numeric'},{'2d'},1))
+            addOptional(p,'w',[],@(x) validateattributes(x,{'numeric'},{'positive'},1))
+            addParameter(p,'color',[],@(x) validateattributes(x,{'numeric'},{'ncols', 3}))
+            addParameter(p,'shownom',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}))
+            parse(p,varargin{:})
+            
+            par = p.Results.par;
+            w = p.Results.w;
+            col = p.Results.color;
+            shownom = p.Results.shownom;
+            
+            [res,w] = cases(obj,par,w);     % compute cases
+            N = size(res,2);
+            if isempty(col)                 % pick colors
+                col = lines(size(res,2));
+            elseif size(col,1) < N
+                col = repmat(col,ceil(N/size(col,1)),1);
+            end
+                       
+            linespec = struct('width',1,'style','-');
+            nicholsplotter(res.',-w,col,linespec);  % plot the Bode for all cases.
+                                                    % the (-w) is to get the frequency
+                                                    % data tip dispalyed right.
+            
+            if  shownom
+                hold on
+                linespec.width = 3;
+                linespec.style = '--';
+                nompar = obj.pars.nom;
+                nomres = cases(obj,nompar,w);
+                nicholsplotter(nomres.',w,[0 0 0],linespec);   % plot the Nichols for nominal case
+            end
+            
+        end
         function varargout = cases(obj,par,w)
             %CASES returns the template points for given parametric cases
             %It does not plot anything!
@@ -74,7 +180,7 @@ classdef qsys
             %  Usage:
             %  [T,w] = CASES(obj,par,w)   computes a template T in nichols
             %  foramt for given parameters par, and frequencies w
-            %  
+            %
             %  Inputs:
             %  par      array with each column a different parameter case;
             %           default is the eniter grid. for multiple qplant
@@ -93,15 +199,15 @@ classdef qsys
             T = cell(obj.nqplant,1);
             kp=0;
             for k=1:N
-               blk = obj.blocks{k};
-               if isa(blk,'qplant')
-                   kp = kp+1;
-                   T{k} = blk.cases(par{kp},w);
-               elseif isnumeric(blk)
-                   T{k} = blk;
-               else
-                   T{k} = freqresp(blk,w);
-               end
+                blk = obj.blocks{k};
+                if isa(blk,'qplant')
+                    kp = kp+1;
+                    T{k} = blk.cases(par{kp},w);
+                elseif isnumeric(blk)
+                    T{k} = blk;
+                else
+                    T{k} = freqresp(blk,w);
+                end
             end
             f = qsys2func(obj);
             varargout{1} = c2n(f(T),-180);
@@ -110,7 +216,7 @@ classdef qsys
             elseif nargout>2
                 error('too many outputs!')
             end
-
+            
         end
         function f = qsys2func(obj)
             %QSYS2FUNC creates function handle according to coonection

@@ -133,7 +133,7 @@ classdef qtpl
     end
     
     methods(Static)
-        h = bodeplotter(tpl,w,opt,col) 
+        %h = bodeplotter(tpl,w,opt,col)  % moved to utilities
         T = tplfile_import(filename,varargin)
     end
     

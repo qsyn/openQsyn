@@ -116,9 +116,9 @@ classdef qpar
             %HORZCAT concatenate arrays horizontally
             obj = qpoly(varargin{:});
         end
-        function val = nom(par)
+        function val = nom(obj)
             %NOM returns nominal value
-            val = par.nominal;
+           val = [obj.nominal].';
         end
         function pspace = linspace(obj,n)
             %LINSPACE parameter space

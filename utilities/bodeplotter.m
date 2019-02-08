@@ -1,24 +1,19 @@
-function ha = bodeplotter(tpl,w,opt,col)
+function ha = bodeplotter(tpl,w,opt,col,linespec)
 %BODEPLOTTER does the main bode ploting
 %Subroutine to qtpl.bode and qplant.bodcases
 %
 %   Inputs
 % 
-%   TPL     the template points 
-%   w       frequencies 
-%   opt     how to plot
-%   col     colors RGB array
+%   TPL         the template points 
+%   w           frequencies 
+%   opt         how to plot
+%   col         colors RGB array
+%   linspec     line plotting specs
 
-
-N = size(tpl,1);
-if N==1
-    linewidth=2;
-    linestyle='--';
-else
-    linewidth=1;
-    linestyle='-';
+if nargin<5
+    linespec = struct('width',1,'style','-'); % def linespace
 end
-
+N = size(tpl,1);
 
 % magnitude
 if strcmp(opt,'magphase')
@@ -28,7 +23,7 @@ end
 if ~strcmp(opt,'phase')
     for k=1:N
         semilogx(w,imag(tpl(k,:)),'Color',col(k,:),'Tag',num2str(k),...
-            'linewidth',linewidth,'linestyle',linestyle);
+            'linewidth',linespec.width,'linestyle',linespec.style);
         hold on
     end
     %if strcmp(CASE,'all') || strcmp(CASE,'nom')
@@ -53,7 +48,7 @@ if ~strcmp(opt,'mag')
         %    phase=phase-360;
         %end
         semilogx(w,phase,'Color',col(k,:),'Tag',num2str(k),...
-             'linewidth',linewidth,'linestyle',linestyle); 
+             'linewidth',linespec.width,'linestyle',linespec.style); 
          hold on
     end
     %if strcmp(CASE,'all') || strcmp(CASE,'nom')

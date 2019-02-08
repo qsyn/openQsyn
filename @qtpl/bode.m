@@ -50,9 +50,9 @@ if nargin==0
 end
 
 % default options 
-opt='both';
+opt='magphase';
 CASE='unc';
-col = distinguishable_colors(8);
+col = lines(7); %distinguishable_colors(8);
 
 if nargin>2
     k=1;
@@ -83,8 +83,8 @@ if ~(strcmp(CASE,'nom') ||  strcmp(CASE,'unc') || strcmp(CASE,'all'))
     error('case must be either ''nom'' or ''all''.');
 end
 
-if ~(strcmp(opt,'both') ||  strcmp(opt,'mag') || strcmp(opt,'phase'))
-    error('show must be either ''mag'', ''phase'', or ''both''.');
+if ~(strcmp(opt,'magphase') ||  strcmp(opt,'mag') || strcmp(opt,'phase'))
+    error('show must be either ''mag'', ''phase'', or ''magphase''.');
 end
 
 if isnumeric(col)
@@ -136,9 +136,8 @@ if length(tpl)>ncol
     col=repmat(col,ceil(length(tpl)/ncol),1);
 end
 
-
-obj.bodeplotter(TPL(2:end,:),w_op,opt,col); % plot all points in template
-obj.bodeplotter(TPL(1,:),w_op,opt,[0 0 0]); % plot the nominal case 
+bodeplotter(TPL(2:end,:),w_op,opt,col); % plot all points in template
+bodeplotter(TPL(1,:),w_op,opt,[0 0 0],struct('width',2,'style','--')); % plot the nominal case 
 
 if nargout==1
     varargout{1}=phandle;
