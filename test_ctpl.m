@@ -21,7 +21,7 @@ ta=P.templates;
 return
 %%
 tic
-P.ctpl('aedgrid',w)
+P.ctpl('recgrid',w)
 toc
 %%
 ctpl('ex1rff',[],'rff');
