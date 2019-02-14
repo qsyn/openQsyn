@@ -126,7 +126,7 @@ classdef qpar
             pspace = linspace(obj.lower,obj.upper,n);           
         end
         function p = grid(obj,rnd,cases)
-            %GRID computes a gird of N parameters
+            %GRID computes a grid of N parameters
             % 
             %   p = grid(obj,rnd,cases)
             %   

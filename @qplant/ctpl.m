@@ -19,7 +19,7 @@ function obj = ctpl(obj,method,w,varargin)
 %               'aedgrid'   recurcive edge grid
 %               'cases'     explicitly given parameter cases
 %
-%       w       frequency vector
+%       w       frequency vector in rad/s
 %
 %   Additional Options:
 %

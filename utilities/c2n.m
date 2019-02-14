@@ -57,42 +57,37 @@ function [y]=c2n(x,op)
 %
 %   See also: Matlab function UNWRAP, N2C
 %
-%
-%
-
 
 % Author: B Cohen, M Nordin, P-O Gutman 
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
 % Version upgrade: A. & Y. Greenhut
 
-
-if nargin==0 ,
+if nargin==0
    disp('  [y]=c2n(x,op)')
-   return;
-end;
+   return
+end
 
 y=[];
-if isempty(x);return;end;																						
+if isempty(x); return; end																						
 
 % Defaults
-if ~(exist('op')==1), op='wrap'; end; %J
+if ~(exist('op')==1), op='wrap'; end %J
 
-if strcmp(op,'wrap'),
-   y=rem(angle(x)*180*(1/pi)+10*360,360)-360+20*log10(abs(x))*j;
+if strcmp(op,'wrap')
+   y=rem(angle(x)*180*(1/pi)+10*360,360)-360+20*log10(abs(x))*1j;
    return;
-else,
+else
    index1 = find(~isnan(x));
    %ax1 = unwrap(angle(x(index1)));
-   ax1 = unwrap(angle(x(index1)),[],2);
+   ax1 = unwrap(angle(x(index1)),[],1);
    ax = zeros(size(x));
    ax(index1) = ax1;
 
    y=ax*(180/pi)+20*log10(abs(x))*1j;
-   if ~isstr(op),
+   if ~isstr(op)
       n_r=ceil((real(y(1,1))-(op+180))/360);
       y=y-(n_r)*360;
-   end;
-end;
+   end
+end
 
         
         

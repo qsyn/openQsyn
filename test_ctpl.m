@@ -26,3 +26,14 @@ toc
 %%
 ctpl('ex1rff',[],'rff');
 %showtpl('ex1',5)
+
+%%
+tic
+cases('ex1','all',[],1)
+toc
+
+%%
+%%
+tic
+bodcases(P)
+toc

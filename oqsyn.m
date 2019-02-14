@@ -9,7 +9,10 @@ function oqsyn()
 
 fprintf('Open Qsyn toolbox is now initiated \n\n')
 
-% all it does is to add utilities to path
-addpath('utilities')
+% all it does is to add utilities and doc to the path
+fullpath=mfilename('fullpath');
+homepath=fullpath(1:end-5);
+addpath([homepath,'utilities'])
+addpath([homepath,'doc'])
 
 end
