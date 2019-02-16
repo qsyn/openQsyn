@@ -29,7 +29,7 @@ classdef qpoly < matlab.mixin.CustomDisplay
             % obj=QPOLY(a,b,c,...)   constructs a QPOLY object with
             % coefficienct given by a,b,c,...
             %
-            % obj=QPOLY(SYMDS,PARS)   constructs a QPOLY object from a
+            % obj=QPOLY(SYMS,PARS)   constructs a QPOLY object from a
             % symbolic expression SYMS containning the parameters in PARS
            
             if nargin<2, error('qpoly requires at least two argument'); end
@@ -71,7 +71,7 @@ classdef qpoly < matlab.mixin.CustomDisplay
                 end
             end     
         end
-        function val = polycase(obj,par)
+        function val = cases(obj,par)
             %POLYCASE returns the polynom coeffiecients for a given
             %parameter case
             if nargin<2, par=[]; end
@@ -85,7 +85,7 @@ classdef qpoly < matlab.mixin.CustomDisplay
                 else
                     ip = ismember(obj.pars,obj.a{k}.pars);
                     par1 = par(ip);
-                    val(k) = obj.a{k}.expcase(par1);
+                    val(k) = obj.a{k}.cases(par1);
                 end
             end     
         end
@@ -112,6 +112,15 @@ classdef qpoly < matlab.mixin.CustomDisplay
             argF = sprintf('@(%s,s) ',args(1:end-2));
             s = s(2:end-2);
             h = str2func([argF s]);
+        end
+        function varargout = coeffs(obj)
+           %COEFFS returns the qpoly coefficients
+           %
+           %    [an,...,a1,a0] = coeffs(p)  returns all coefficeints by order
+           % 
+           for k=1:nargout
+               varargout{k} = obj.a{k};
+           end
         end
     end
     

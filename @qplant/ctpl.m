@@ -26,6 +26,7 @@ function obj = ctpl(obj,method,w,varargin)
 %       plotOn      plots during the computation. 0 (def) | 1.
 %       accuracy    set accurcy for computation as [deg_accuracy , dB_accuracy]
 %                   for recgrid and aedgrid methods. def = [5 3].
+%       union       unite new tpls with existing ones. 0 (def) | 1
 %       
 %   
 
@@ -36,13 +37,16 @@ p = inputParser;
 addRequired(p,'method',@(x) validateattributes(x,{'char'},{'nonempty'}));
 addRequired(p,'w',@(x) validateattributes(x,{'numeric'},{'vector','positive','real'}));
 addParameter(p,'plotOn',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
+addParameter(p,'union',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
 addParameter(p,'accuracy',[5 3],@(x) validateattributes(x,{'numeric'},{'size',[1 2],'positive','real'}));
 parse(p,method,w,varargin{:})
+
 
 method = p.Results.method;
 w = p.Results.w;
 options.plot_on = p.Results.plotOn;
 options.Tacc = p.Results.accuracy;
+
 
 % compute based on given method:
 switch method
@@ -76,6 +80,10 @@ if ~isempty(obj.unstruct)
     tpl = addunstruct(obj,tpl);
 end
 
+% if union is on
+if p.Results.union 
+    tpl = union(tpl,obj.templates);
+end
 
 if isempty(obj.templates)
     obj.templates = tpl;
@@ -86,7 +94,7 @@ else
     w1 = [tpl.frequency];
     w = unique([w0 w1]);
     inew = ismember(w,w1);
-    i0 = ismember(w(~inew),w0);
+    [~,i0] = ismember(w(~inew),w0);
     TPL = qtpl(length(w));
     TPL(inew) = tpl;
     TPL(~inew) = obj.templates(i0);

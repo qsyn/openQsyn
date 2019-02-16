@@ -13,6 +13,6 @@ fprintf('Open Qsyn toolbox is now initiated \n\n')
 fullpath=mfilename('fullpath');
 homepath=fullpath(1:end-5);
 addpath([homepath,'utilities'])
-addpath([homepath,'doc'])
+addpath(genpath([homepath,'doc']))
 
 end

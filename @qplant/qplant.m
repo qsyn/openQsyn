@@ -38,12 +38,12 @@ classdef qplant < handle
         delay           % delay (string)
         unstruct        % unstructed uncertainty
         uncint          % uuncertain integrator/diffrentiator
-        templates       % template (qtpl array)
-        nominal         % nominal case (qfr)
     end
     
     properties
         info            % string
+        templates       % template (qtpl array)
+        nominal         % nominal case (qfr)
     end
     
     
@@ -185,10 +185,10 @@ classdef qplant < handle
             switch rnd
                 case 0
                     method='grid';
-                    pgrid = grid(obj.pars(idx),rnd);
+                    pgrid = grid(obj.pars(idx),[],rnd);
                 case 1
                     method='random grid';
-                    pgrid = grid(obj.pars(idx),rnd);
+                    pgrid = grid(obj.pars(idx),[],rnd);
                 case 2
                     method='random sampling';
                     pgrid = sample(obj.pars(idx),100); % correct usage: options.cases(=100)
@@ -258,7 +258,7 @@ classdef qplant < handle
             if isa(p,'qpoly') || ( isnumeric(p) && isrow(p) )
                 snum = obj.poly2str(p);
             elseif isa(p,'qexpression')
-                snum = p.expression;
+                snum = strrep(strrep(strrep(p.expression, '*', '.*'),'/','./'),'^','.^');
             elseif isa(p,'qpar')
                 snum = p.name;
             end
@@ -267,7 +267,7 @@ classdef qplant < handle
             if isa(p,'qpoly') || ( isnumeric(p) && isrow(p) )
                 sden = obj.poly2str(p);
             elseif isa(p,'qexpression')
-                sden = p.expression;
+                sden = strrep(strrep(strrep(p.expression, '*', '.*'),'/','./'),'^','.^');
             elseif isa(p,'qpar')
                 sden = p.name;
             end

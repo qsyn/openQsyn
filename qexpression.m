@@ -91,13 +91,16 @@ classdef qexpression
             val = fh(obj.pars.nominal);
             %end
         end
-        function val = expcase(obj,par)
-            %EXPCASE return the QEXPRESSION value for a given parameter
-            %case
+        function val = cases(obj,par)
+            %CASES return the QEXPRESSION value for a given parameter case
+            
+            if nargin<2, par=[]; end
+            if isempty(par), par = obj.pars.grid(); end
+            
             fh =  qexp2func(obj);
-            PAR = num2cell(par);
+            npars = length(obj.pars);
+            PAR = mat2cell(par,ones(npars,1));
             val = fh(PAR{:});
-            %end
         end
         function obj = horzcat(varargin)
             obj = qpoly(varargin{:});

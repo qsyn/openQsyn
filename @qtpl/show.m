@@ -128,6 +128,10 @@ end
 % hngrid;
 % axis([XLIM YLIM]);
 
+box on
+xlabel('Phase [deg]')
+ylabel('Magnitude [dB]')
+
 dcm = datacursormode(gcf);
 set(dcm,'updatefcn',@datatipfunc)
 

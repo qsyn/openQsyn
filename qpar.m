@@ -1,4 +1,4 @@
-classdef qpar
+classdef qpar  < matlab.mixin.CustomDisplay
 %QPAR class defines a single uncertain parameter in qpenQsyn. 
 %
 %   par = QPAR(name,nom,lbnd,ubnd)   defines a qpar object with specified 
@@ -125,23 +125,24 @@ classdef qpar
             if nargin<2, n = obj.cases; end
             pspace = linspace(obj.lower,obj.upper,n);           
         end
-        function p = grid(obj,rnd,cases)
+        function p = grid(obj,cases,rnd)
             %GRID computes a grid of N parameters
             % 
             %   p = grid(obj,rnd,cases)
             %   
             %   Inputs 
+            %
+            %   cases   intiger specifing the number of cases 
             % 
             %   rnd     boolian scalar to specify if grid is random. def
             %           option is 0 (not random). 
             %
-            %   cases   intiger specifing the number of cases 
-            %
             %%% Adapted from NDGRID
             [N,M] = size(obj);
-            if M~=1, error('par.gird only accepts a column vector'); end            
-            if nargin<3, cases = [obj.cases]; end
-            if nargin<2, rnd=0; end
+            if M~=1, error('par.gird only accepts a column vector'); end    
+            if nargin<3, rnd=0; end
+            if nargin<2, cases = []; end
+            if isempty(cases), cases=[obj.cases]; end
             if length(cases)==1 && N>1, cases=repmat(cases,1,N); end
             p = zeros(N,prod(cases));
             for k=1:N
@@ -178,12 +179,27 @@ classdef qpar
         end
         function I = ismember(A,B)
             %ISMEMBER true for set member.
-            %  returns a vector of logical indices positive for every element
-            %  of parameter set A that is a member of parameter set B.
+            %
+            %  ISMEMBER(A,B)    returns a vector of logical indices positive 
+            %  forevery element of parameter set A that is a member of 
+            %  parameter set B.
             Anames = {A(:).name};
             Bnames = {B(:).name};
             I = ismember(Anames,Bnames);
         end
+    end
+    
+    methods(Access = protected)
+        function propgrp = getPropertyGroups(obj)
+            propgrp = getPropertyGroups@matlab.mixin.CustomDisplay(obj);
+            if ~isempty([obj.discrete])
+                S =  propgrp.PropertyList;
+                S = rmfield(S,'lower');
+                S = rmfield(S,'upper');
+                S = rmfield(S,'nominal');
+                propgrp = matlab.mixin.util.PropertyGroup(S);
+            end
+        end    
     end
 
 end
