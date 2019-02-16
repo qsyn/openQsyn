@@ -1,0 +1,384 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Modeling of uncertain plants</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-02-16"><meta name="DC.source" content="doc_modeling.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Modeling of uncertain plants</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#2">Modeling uncertain parameters</a></li><li><a href="#9">Creating uncertain arithmetic expressions</a></li><li><a href="#13">Creating an uncertain polynomial</a></li><li><a href="#16">Creating the plant</a></li></ul></div><h2 id="1">Overview</h2><p>The first stage in QFT design is to define the uncertain plant. <b>Open Qsyn</b> facilitates plant modeling using these classes:</p><div><ul><li><a href="matlab:doc('qpar')">qpar</a> describes a single uncertain parameter</li><li><a href="matlab:doc('qexpression')">qexpression</a> describes an aritmatic expression composed of one or more qpar elements</li><li><a href="matlab:doc('qpoly')">qpoly</a>  describes an uncertain polynom --composed of qpars and qexpressions</li><li><a href="matlab:doc('qplant')">qplant</a> describes an uncertain plant</li></ul></div><h2 id="2">Modeling uncertain parameters</h2><p>Uncertain parameters are modeled using <a href="matlab:doc('qpar')">qpar</a> objects. a <a href="matlab:doc('qpar')">qpar</a> object is constructed as follows</p><pre class="language-matlab">a = qpar(name,nominal_val,lower_bound,upper_bound,cases)
+</pre><p>where name is a string; nominal_val, lower_bound, upper_bound are scalar numbers describing the nominl value, lower bound, and upper bound, respectively; cases is an optional input agrument which specifies the number of uncertain cases, i.e. the number of grid points.</p><p><b>Exmaple</b>: constarct an uncertain parameter <span class="MathJax_Preview"><img src="doc_modeling_eq02724542671846692596.png" alt="$a \in [0,2]$"></span><script type="math/tex">a \in [0,2]</script> with nominal value 1.</p><pre class="codeinput">a = qpar(<span class="string">'A'</span>,1,0,2)
+</pre><pre class="codeoutput">3 cases are selected as default
+
+a = 
+
+  qpar with properties:
+
+           name: 'A'
+        nominal: 1
+          lower: 0
+          upper: 2
+          cases: 3
+       discrete: []
+    description: []
+
+</pre><p>as 'cases' was not specified, the qpar element is crearted with the default value of cases, which is 3. Note also that the name, in this exmaple <tt>A</tt>, may be different from the parameter in which the element is stored, in this exmaple <tt>a</tt>.</p><p>One can add a description to a parameter by utilizing the <tt>description</tt> property, for e.g.</p><pre class="codeinput">a.description = <span class="string">'an exmaple parameter'</span>;
+</pre><p>Elements of qpar class can be grouped into qpar array by <b>vertical</b> concatenation. Hence, qpar array are all column vectors. Horizontal concatenation serves a specific role which will be discussed later.</p><p><b>Example</b>: crate a qpar array</p><pre class="codeinput">b = qpar(<span class="string">'B'</span>,0.2,0.1,0.2,4);
+parArray = [a ; b]
+</pre><pre class="codeoutput">
+parArray = 
+
+  2&times;1 qpar array with properties:
+
+    name
+    nominal
+    lower
+    upper
+    cases
+    discrete
+    description
+
+</pre><p>One can generate random smaples of a qpar object or array using <tt>sample()</tt>, or generate a grid using <tt>grid()</tt>. These functions produces values which are in the uncertanty range of tha pearmeter(s).</p><pre class="codeinput">asmap = sample(a,5)
+absamp = sample(parArray,5)
+pargrid = grid(parArray)
+</pre><pre class="codeoutput">
+asmap =
+
+    1.8468    0.8604    0.3696    1.8098    1.9595
+
+
+absamp =
+
+    0.8777    0.2222    0.5161    0.8174    1.1898
+    0.1787    0.2809    0.3134    0.1665    0.1352
+
+
+pargrid =
+
+  Columns 1 through 7
+
+         0    1.0000    2.0000         0    1.0000    2.0000         0
+    0.1000    0.1000    0.1000    0.1333    0.1333    0.1333    0.1667
+
+  Columns 8 through 12
+
+    1.0000    2.0000         0    1.0000    2.0000
+    0.1667    0.1667    0.2000    0.2000    0.2000
+
+</pre><p>Note that <tt>sample</tt> and <tt>gird</tt> are <b>methods</b> of the <tt>qexpression</tt> class. Class methods are functions which can take class objects as inputs. To list all methods of a specific object type <tt>methods(object)</tt>:</p><pre class="codeinput">methods(a)
+</pre><pre class="codeoutput">
+Methods for class qpar:
+
+grid      linspace  mtimes    qpar      unique    
+horzcat   minus     nom       sample    uplus     
+ismember  mrdivide  plus      uminus    
+
+</pre><p>T oget help on a specific function type <tt>help object.method</tt>, or <tt>help object/method</tt>.</p><pre class="codeinput">help <span class="string">a.ismember</span>
+</pre><pre class="codeoutput">--- help for qpar/ismember ---
+
+ ISMEMBER true for set member.
+ 
+   ISMEMBER(A,B)    returns a vector of logical indices positive 
+   forevery element of parameter set A that is a member of 
+   parameter set B.
+
+</pre><h2 id="9">Creating uncertain arithmetic expressions</h2><p><tt>qpar</tt>  elements can be combined with other <tt>qpar</tt> elements and numericals to create uncertain arithmetic expressions. Allowed arithmetic expressions are <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>.</p><p><b>Exmaple</b>:</p><pre class="codeinput">ab = a*b
+</pre><pre class="codeoutput">
+ab = 
+
+  qexpression with properties:
+
+    expression: 'A * B'
+          pars: [2&times;1 qpar]
+
+</pre><p>the <tt>*</tt> opetation created a <a href="matlab:doc('qexpression')">qexpression</a>  elements. A qexpression stores the parametric description along with a list of all envolded qpar objects in a qpar array.</p><p>To accsess the array use <tt>qexpression.pars</tt>. For exmaple:</p><pre class="codeinput">ab.pars(1)
+</pre><pre class="codeoutput">
+ans = 
+
+  qpar with properties:
+
+           name: 'A'
+        nominal: 1
+          lower: 0
+          upper: 2
+          cases: 3
+       discrete: []
+    description: 'an exmaple parameter'
+
+</pre><p>Alternatively, a <tt>qexpression</tt> can be generated explicity using the syntex <tt>expr = qexpression(A,B,operation)</tt>. Hence the following is identical to the previous example</p><pre class="codeinput">ab2 = qexpression(a,b,<span class="string">'*'</span>)
+</pre><pre class="codeoutput">
+ab2 = 
+
+  qexpression with properties:
+
+    expression: 'A * B'
+          pars: [2&times;1 qpar]
+
+</pre><p>One can compute the qexpression values at different parameter cases using <tt>cases()</tt>, which by default compute values on a uniform grid of the parameters space, with number of grid points defined by the <tt>cases</tt> property in each <tt>qpar</tt>.</p><pre class="codeinput">cases(ab)
+</pre><pre class="codeoutput">
+ans =
+
+  Columns 1 through 7
+
+         0    0.1000    0.2000         0    0.1333    0.2667         0
+
+  Columns 8 through 12
+
+    0.1667    0.3333         0    0.2000    0.4000
+
+</pre><h2 id="13">Creating an uncertain polynomial</h2><p>An uncertain polinomial is represented by a <a href="matlab:doc('qpoly')">qpoly</a> object. Each coefficient in such polynomial is either a <tt>qpar</tt>, a <tt>qexpression</tt>, or a real scalar. A <tt>qexpression</tt> is generated by horizolnal concatenation of elements</p><pre class="codeinput">p1 = [1 a]
+</pre><pre class="codeoutput">
+p1 = 
+
+qpoly with coefficients
+
+    s1: 1
+    s0: 'A'
+
+</pre><p>Alternatively, it can be generated explicitly using the syntex <tt>p = qpoly(an,...,a1,a0)</tt>. Hence the following is identical to the previous example</p><pre class="codeinput">p2 = qpoly(1,a)
+</pre><pre class="codeoutput">
+p2 = 
+
+qpoly with coefficients
+
+    s1: 1
+    s0: 'A'
+
+</pre><p>Again, values at different parameter cases are computed using <tt>cases()</tt>. To retrive the coefficients, one can use the method <tt>coeffs()</tt></p><pre class="codeinput">[a1,a0]=coeffs(p1)
+</pre><pre class="codeoutput">
+a1 =
+
+     1
+
+
+a0 = 
+
+  qpar with properties:
+
+           name: 'A'
+        nominal: 1
+          lower: 0
+          upper: 2
+          cases: 3
+       discrete: []
+    description: 'an exmaple parameter'
+
+</pre><h2 id="16">Creating the plant</h2><p>Finally, an uncertaon plant, or <a href="matlab:doc('qplant')">qplant</a>, is generated by</p><pre class="language-matlab">P = qplant(num,den)
+</pre><p>with num,den two qpoly objects which represents the plant transfer function numerator and denumerator.</p><p><b>Example</b>: create the plant</p><p><span class="MathJax_Preview"><img src="doc_modeling_eq00518769561525013906.png" alt="$$ P(s) = \frac{1+a}{1+b}, ~~ a \in [0,2], ~~ b \in [0.1,0.2]$$"></span><script type="math/tex"> P(s) = \frac{1+a}{1+b}, ~~ a \in [0,2], ~~ b \in [0.1,0.2]</script></p><pre class="codeinput">num = [1 a];
+den = [1 b];
+P = qplant(num,den)
+</pre><pre class="codeoutput">
+P = 
+
+  qplant with properties:
+
+          num: [1&times;1 qpoly]
+          den: [1&times;1 qpoly]
+         pars: [2&times;1 qpar]
+        delay: []
+     unstruct: []
+       uncint: []
+    templates: []
+      nominal: []
+         info: 'generated from [num,den] data on: 16-Feb-2019 12:59:14'
+
+</pre><p>The plant <tt>P</tt> is a <tt>qplant</tt> objects which includes the num,den qpoly object as properties, as well as a <tt>pars</tt> property which stores the qpar array of qpar objects in both qpolys.</p><p>A plant object allows for time as well a frequency domain simulations with the methods such as <tt>step</tt>, <tt>niccases</tt>, and <tt>bodcases</tt> (stands for Nichols-cases and Bode-cases, respectively). For example, a Bode plot of a uniform grid of 8 points for each parametr is done by</p><pre class="codeinput">pargrid=grid(P.pars,8);
+bodcases(P,pargrid)
+</pre><img vspace="5" hspace="5" src="doc_modeling_01.png" alt=""> <p>This is the time to move forward to <a href="matlab:web('doc_ctpl.html')">Step 2: Template Computation</a></p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Modeling of uncertain plants
+%% Overview 
+% The first stage in QFT design is to define the uncertain plant. 
+% *Open Qsyn* facilitates plant modeling using these classes:
+%
+% * <matlab:doc('qpar') qpar> describes a single uncertain parameter
+% * <matlab:doc('qexpression') qexpression> describes an aritmatic expression composed of one or more qpar elements 
+% * <matlab:doc('qpoly') qpoly>  describes an uncertain polynom REPLACE_WITH_DASH_DASHcomposed of qpars and qexpressions 
+% * <matlab:doc('qplant') qplant> describes an uncertain plant
+
+%% Modeling uncertain parameters
+% Uncertain parameters are modeled using <matlab:doc('qpar') qpar> objects. 
+% a <matlab:doc('qpar') qpar> object is constructed as follows
+%
+%   a = qpar(name,nominal_val,lower_bound,upper_bound,cases)
+%
+% where name is a string; nominal_val, lower_bound, upper_bound are scalar
+% numbers describing the nominl value, lower bound, and upper bound, respectively; 
+% cases is an optional input agrument which specifies the number of uncertain 
+% cases, i.e. the number of grid points.
+
+%%
+% *Exmaple*: constarct an uncertain parameter $a \in [0,2]$ with nominal 
+% value 1. 
+a = qpar('A',1,0,2)
+%%
+% as 'cases' was not specified, the qpar element is crearted with the 
+% default value of cases, which is 3. 
+% Note also that the name, in this exmaple |A|, may be different from the parameter in which 
+% the element is stored, in this exmaple |a|.
+%
+% One can add a description to a parameter by utilizing the |description| 
+% property, for e.g. 
+a.description = 'an exmaple parameter';
+
+%%
+% Elements of qpar class can be grouped into qpar array by *vertical* concatenation.
+% Hence, qpar array are all column vectors. Horizontal concatenation serves
+% a specific role which will be discussed later. 
+%
+% *Example*: crate a qpar array 
+b = qpar('B',0.2,0.1,0.2,4);
+parArray = [a ; b]
+%%
+% One can generate random smaples of a qpar object or array using |sample()|,
+% or generate a grid using |grid()|. These functions produces values which
+% are in the uncertanty range of tha pearmeter(s).
+asmap = sample(a,5)
+absamp = sample(parArray,5)
+pargrid = grid(parArray)
+%%
+% Note that |sample| and |gird| are *methods* of the |qexpression| class. 
+% Class methods are functions which can take class objects as inputs. To 
+% list all methods of a specific object type |methods(object)|:
+methods(a)
+%%
+% T oget help on a specific function type |help object.method|, or 
+% |help object/method|.
+help a.ismember
+%% Creating uncertain arithmetic expressions
+% |qpar|  elements can be combined with other |qpar| elements and
+% numericals to create uncertain arithmetic expressions. Allowed arithmetic
+% expressions are |+|, |-|, |*|, |/|.
+%
+% *Exmaple*:
+ab = a*b 
+%%
+% the |*| opetation created a <matlab:doc('qexpression') qexpression>  elements. 
+% A qexpression stores the parametric description along with a list of all 
+% envolded qpar objects in a qpar array. 
+%
+% To accsess the array use |qexpression.pars|. For exmaple:
+ab.pars(1)
+%%
+% Alternatively, a |qexpression| can be generated explicity using the
+% syntex |expr = qexpression(A,B,operation)|. Hence the following is
+% identical to the previous example
+ab2 = qexpression(a,b,'*')
+%%
+% One can compute the qexpression values at different parameter cases using
+% |cases()|, which by default compute values on a uniform grid of the
+% parameters space, with number of grid points defined by the |cases|
+% property in each |qpar|. 
+cases(ab)
+
+%% Creating an uncertain polynomial 
+% An uncertain polinomial is represented by a <matlab:doc('qpoly') qpoly>
+% object. Each coefficient in such polynomial is either a |qpar|, a
+% |qexpression|, or a real scalar. 
+% A |qexpression| is generated by horizolnal concatenation of elements
+p1 = [1 a]
+%%
+% Alternatively, it can be generated explicitly using the syntex
+% |p = qpoly(an,...,a1,a0)|. Hence the following is
+% identical to the previous example
+p2 = qpoly(1,a)
+%%
+% Again, values at different parameter cases are computed using |cases()|. 
+% To retrive the coefficients, one can use the method |coeffs()|
+[a1,a0]=coeffs(p1)
+
+%% Creating the plant
+% Finally, an uncertaon plant, or <matlab:doc('qplant') qplant>, is
+% generated by 
+%
+%   P = qplant(num,den)
+%
+% with num,den two qpoly objects which represents the plant transfer function
+% numerator and denumerator. 
+
+%%
+% *Example*: create the plant 
+%
+% $$ P(s) = \frac{1+a}{1+b}, ~~ a \in [0,2], ~~ b \in [0.1,0.2]$$ 
+% 
+num = [1 a];
+den = [1 b];
+P = qplant(num,den)
+%%
+% The plant |P| is a |qplant| objects which includes the num,den qpoly
+% object as properties, as well as a |pars| property which stores the qpar
+% array of qpar objects in both qpolys. 
+%
+% A plant object allows for time as well a frequency domain simulations
+% with the methods such as |step|, |niccases|, and |bodcases| (stands for 
+% Nichols-cases and Bode-cases, respectively). For example, a Bode plot of
+% a uniform grid of 8 points for each parametr is done by
+pargrid=grid(P.pars,8);
+bodcases(P,pargrid)
+
+%%
+% This is the time to move forward to 
+% <matlab:web('doc_ctpl.html') Step 2: Template Computation>  
+
+##### SOURCE END #####
+--></body></html>

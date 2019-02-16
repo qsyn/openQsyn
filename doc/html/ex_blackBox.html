@@ -1,0 +1,212 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Exmaple: Black box</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-02-14"><meta name="DC.source" content="ex_blackBox.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Exmaple: Black box</h1><!--introduction--><!--/introduction--><p>Black-Box is a speciel type of qplant that allows for arbitrary plant definitions. In this exmaple we use blakc box qplant to define a descrete-time plant. The descrete-time plant is obtained by Zero-Order Hold translation,</p><p><span class="MathJax_Preview"><img src="ex_blackBox_eq13124478330897172678.png" alt="$$ A(s)P(s) \rightarrow P(z). $$"></span><script type="math/tex"> A(s)P(s) \rightarrow P(z). </script></p><p>The continuos-time plant is given as</p><p><span class="MathJax_Preview"><img src="ex_blackBox_eq05982979308752586731.png" alt="$$ P(s) = \frac{s+a}{1 + s \zeta s /\omega_n + s^2/\omega_n^2},  $$"></span><script type="math/tex"> P(s) = \frac{s+a}{1 + s \zeta s /\omega_n + s^2/\omega_n^2},  </script></p><p>with <span class="MathJax_Preview"><img src="ex_blackBox_eq11690946063553646581.png" alt="$$ k \in [2,5], ~~ a \in [1,3], ~~ \zeta \in [0.1,0.6], ~~ \omega_n \in [4,8]. $$"></span><script type="math/tex"> k \in [2,5], ~~ a \in [1,3], ~~ \zeta \in [0.1,0.6], ~~ \omega_n \in [4,8]. </script></p><p>The anti aliasing filter is given as</p><p><span class="MathJax_Preview"><img src="ex_blackBox_eq11744119746404722906.png" alt="$$ A(s) = \frac{1}{1+2\cdot 0.7 s /100 + s^2/10000}. $$"></span><script type="math/tex"> A(s) = \frac{1}{1+2\cdot 0.7 s /100 + s^2/10000}. </script></p><p>The descrete plant model is defined by a dedicaated custom made m-file named <tt>explant</tt>:</p><pre class="codeinput">f = @explant;
+</pre><pre class="language-matlab">------------------------------------------------------------------------
+<span class="keyword">function</span> Pz = explant(k,a,zet,wn,s)
+</pre><pre class="language-matlab">Ts = 0.02;
+z = exp(Ts*s);                              <span class="comment">% approximate z</span>
+num = k*[1 a];
+den = conv([1/(wn*wn) 2*zet/wn 1],[1/10000 2*0.7/100 1]);
+Pz = c2d(tf(num,den),Ts,<span class="string">'zoh'</span>);             <span class="comment">% convert by ZOH</span>
+[dnum, dden] = tfdata(Pz);                  <span class="comment">% cell object are returned</span>
+y = polyval(dnum{1},z)./polyval(dden{1},z);
+</pre><pre class="language-matlab"><span class="keyword">end</span>
+------------------------------------------------------------------------
+</pre><p>Define the uncertain parameters as qpar array. Note that a qapr array must be a column vector (horizontal concatenation produces a qpoly object!)</p><pre class="codeinput"><span class="comment">% uncertain parameters</span>
+k=qpar(<span class="string">'k'</span>,2,2,5,8);
+a=qpar(<span class="string">'a'</span>,3,1,3,8);
+z=qpar(<span class="string">'z'</span>,0.6,0.3,0.6,8);
+wn=qpar(<span class="string">'wn'</span>,4,4,8,8);
+pars=[k ; a ; z ; wn];
+</pre><p>The blacl box plant is now defined as</p><pre class="codeinput">Pblack = qblackbox(f,pars)
+</pre><pre class="codeoutput">
+Pblack = 
+
+  qblackbox with properties:
+
+           er: []
+          num: []
+          den: []
+     blackBox: @explant
+         pars: [4&times;1 qpar]
+        delay: []
+     unstruct: []
+       uncint: []
+    templates: []
+      nominal: []
+         info: 'generated from BalckBox func handle on: 14-Feb-2019 15:28:02'
+
+</pre><p>Usage is same as a dum/den qplant. We can plot the nyquist plot for selected cases,</p><pre class="codeinput">parcases = [2 1 0.3 4 ; 5 3 0.6 8 ; 3 2 0.5 6].';
+Pblack.niccases(parcases,logspace(-2,2,30))
+</pre><img vspace="5" hspace="5" src="ex_blackBox_01.png" alt=""> <p>compute the nominal case and templates</p><pre class="codeinput">Pblack.cnom(logspace(-2,2,200))
+w = [0.2 0.5 1 2 5 10 20 50];
+Pblack.ctpl(<span class="string">'grid'</span>,w);
+Pblack.showtpl;
+</pre><pre class="codeoutput">
+ans = 
+
+  qblackbox with properties:
+
+           er: []
+          num: []
+          den: []
+     blackBox: @explant
+         pars: [4&times;1 qpar]
+        delay: []
+     unstruct: []
+       uncint: []
+    templates: []
+      nominal: [1&times;1 qfr]
+         info: 'generated from BalckBox func handle on: 14-Feb-2019 15:28:02'
+
+Calculating templates using the grid method 
+--&gt; for w=0.2 [rad/s] 
+--&gt; for w=0.5 [rad/s] 
+--&gt; for w=1 [rad/s] 
+--&gt; for w=2 [rad/s] 
+--&gt; for w=5 [rad/s] 
+--&gt; for w=10 [rad/s] 
+--&gt; for w=20 [rad/s] 
+--&gt; for w=50 [rad/s] 
+</pre><img vspace="5" hspace="5" src="ex_blackBox_02.png" alt=""> <p>and etc. Do note that everything runs much slower. This issue should be fixed in future openQsyn versions.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Exmaple: Black box
+%%
+% Black-Box is a speciel type of qplant that allows for arbitrary plant
+% definitions. In this exmaple we use blakc box qplant to define a
+% descrete-time plant. The descrete-time plant is obtained by Zero-Order
+% Hold translation,
+% 
+% $$ A(s)P(s) \rightarrow P(z). $$
+%
+% The continuos-time plant is given as
+%
+% $$ P(s) = \frac{s+a}{1 + s \zeta s /\omega_n + s^2/\omega_n^2},  $$
+% 
+% with 
+% $$ k \in [2,5], ~~ a \in [1,3], ~~ \zeta \in [0.1,0.6], ~~ \omega_n \in [4,8]. $$
+%
+% The anti aliasing filter is given as
+%
+% $$ A(s) = \frac{1}{1+2\cdot 0.7 s /100 + s^2/10000}. $$ 
+
+%%
+% The descrete plant model is defined by a dedicaated custom made m-file
+% named |explant|:
+
+f = @explant;
+
+%%
+%   REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+%   function Pz = explant(k,a,zet,wn,s)
+% 
+%   Ts = 0.02;
+%   z = exp(Ts*s);                              % approximate z
+%   num = k*[1 a];
+%   den = conv([1/(wn*wn) 2*zet/wn 1],[1/10000 2*0.7/100 1]);
+%   Pz = c2d(tf(num,den),Ts,'zoh');             % convert by ZOH
+%   [dnum, dden] = tfdata(Pz);                  % cell object are returned
+%   y = polyval(dnum{1},z)./polyval(dden{1},z);
+% 
+%   end
+%   REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+
+%%
+% Define the uncertain parameters as qpar array. Note that a qapr array
+% must be a column vector (horizontal concatenation produces a qpoly object!)
+
+% uncertain parameters
+k=qpar('k',2,2,5,8);
+a=qpar('a',3,1,3,8);
+z=qpar('z',0.6,0.3,0.6,8);
+wn=qpar('wn',4,4,8,8);
+pars=[k ; a ; z ; wn];
+
+%%
+% The blacl box plant is now defined as
+Pblack = qblackbox(f,pars)
+%%
+% Usage is same as a dum/den qplant. We can plot the nyquist plot for
+% selected cases, 
+parcases = [2 1 0.3 4 ; 5 3 0.6 8 ; 3 2 0.5 6].';
+Pblack.niccases(parcases,logspace(-2,2,30))
+
+%%
+% compute the nominal case and templates
+Pblack.cnom(logspace(-2,2,200))
+w = [0.2 0.5 1 2 5 10 20 50];
+Pblack.ctpl('grid',w);
+Pblack.showtpl;
+
+%%
+% and etc. 
+% Do note that everything runs much slower. This issue should be fixed in 
+% future openQsyn versions. 
+##### SOURCE END #####
+--></body></html>
