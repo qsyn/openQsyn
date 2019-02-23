@@ -73,7 +73,6 @@ function [bnd] = extract(cont)
 %           cont    contour vector produced by the Matlab command CONTOURC
 
 % Author: M Nordin
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
 % Version Upgrade: A. & Y. Greenhut
 bnd=[];
 

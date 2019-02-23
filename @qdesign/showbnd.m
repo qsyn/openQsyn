@@ -1,60 +1,89 @@
-function [varargout]=showbnd(qdes,bndname,fhandle,w,colors)
-%SHOWBND    plots bounds from a QDESIGN object for selected frequencies, on
-%Nichols chart
+function [varargout]=showbnd(qdes,bndname,varargin)
+%SHOWBND    plots bounds for selected frequencies on Nichols chart
 %
-%   Usage:   showbnd2(qdesign,bndname)
-%            showbnd2(qdesign,bndname,phandle)
-%            showbnd2(qdesign,bndname,phandle,w)
-%            showbnd2(qdesign,bndname,phandle,w,colors)
-%            fhandle = showbnd2(qdesign,bndname,phandle,w,colors)
-%   
-%   Output:
+% Usage:
 % 
-%   fhandle     handle to the figure  
+%   SHOWBND(qdesign,bndname)    plot computed HS bounds stored in qsedign
+%   object, under given name
 %
-%   Inputs:
+%   SHOWBND(qdesign,bndname,h)    plot on axisting figure given by handle h
 %
-%   bndfile     the boundfile name, string with or without extension '.bnd',
-%               containing the bounds
-%    
-%   phandle     handle to the figure, if =[] a new figure is invoked.  
+%   SHOWBND(qdesign,bndname,h,w)    specify frequencies to show
+%   
+%   SHOWBND(qdesign,bndname,h,w,col)    specify colors
+%            
+%   h = showbnd2(...)    return figure handle
 %
-%   bnd         name of the bounds to plot, strings, e.g. 'odsrs', 'rsrs'
+% Output:   
+%   
+%   h       handle to the figure
 %
-%   w           frequencies for which to plot each bound, [] gives   all freqs.
+% Inputs:
 %
-%   colors      RGB array for bound colors
-
-% Adapted from QSYN SHOWBND. 
+%   qdes        qdesign object
+%   bndname     name of the bounds to plot, strings, e.g. 'odsrs', 'rsrs'; 
+%               use 'dom' to plot domiant bounds
+%   h           handle to the figure, if =[] a new figure is invoked.  
+%   w           frequencies for which to plot each bound, [] gives all freqs.
+%   col         RGB array for bound colors
+%
+%
+% Exmaples:
+%
+%   h = SHOWBND(des,'odsrs',[1 3 5 8]); plots odsrs bounds at frequencies
+%   SHOWBND(des,'rsrs',[10 20 30]);     1,3,5,8. plots rsrs bounds for 
+%                                       frequencies 10,20,30 on same figure
+%   
+%   SHOWBND(des,'dom',[],[],[1 0 0])    plots dominant bounds at all
+%                                       possible frequencies in red.
+%
+   
+% Adapted from original QSYN SHOWBND. 
 % Authors: M Nordin, Copyright P-O Gutman 2004
 % NEW OO Method: Daniel Rubin, 2-Jan-2019
 
 if nargin==0
-    disp('showbnd(bndfile,bnd,w,phandle,colors)');
+    disp('fhandle = showbnd2(qdesign,bndname,phandle,w,colors)');
 	return
 end
 
-if nargin<5, colors=[]; end
-if nargin<4, w=[]; end
-if nargin<3, fhandle=[]; end
-if nargin<2, error('Not enough input arguments!'); end
+% check first input
+if ~isa(qdes,'qdesign') || ~isscalar(qdes)
+    error('first argument must be a qdesign scalar object');
+end
+% check all other inputs
+p = inputParser;
+addRequired(p,'bndname',@(x) any(validatestring(x,{qdes.bnd.name,'dom'})));
+addOptional(p,'fhandle',[],@(x) validateattributes(x,{'handle'}));
+addOptional(p,'w',[],@(x) validateattributes(x,{'numeric'},{'nonnegative','real'}));
+addOptional(p,'color',[],@(x) validateattributes(x,{'numeric'},{'ncol',3,'nonnegative','real'}));
+parse(p,bndname,varargin{:});
+
+fhandle = p.Results.fhandle;
+w = p.Results.w;
+col = p.Results.color;
 
 %defaults
 if isempty(fhandle)
     fhandle = figure('Name',[bndname,' bounds'],'NumberTitle','off');
     wrap_on=0;
-    %hngrid; % WHY NOT??? (Daniel R 19-June-2016)
+    %hngrid; 
 else
     figure(fhandle)
     hold on
     wrap_on=1;
     axis([get(gca,'xlim') get(gca,'ylim')]);  %POGutman 2004-12-01
 end
-hold on;
+hold on
 
-names = {qdes.bnd.name};
-bnd = qdes.bnd(strcmp(names,bndname));
-if isempty(bnd), error('BNDNAME was not found'); end
+if strcmp(bndname,'dom')
+    disp('computing dominante bounds')
+    bnd = dombnd(qdes);
+else
+    names = {qdes.bnd.name};
+    bnd = qdes.bnd(strcmp(names,bndname));
+    if isempty(bnd), error('BNDNAME was not found'); end
+end
 
 if isempty(w), w=bnd.w; end    
 [~,I] = ismember(w,bnd.w);
@@ -64,13 +93,12 @@ if isempty(w), w=bnd.w; end
 col_array = qdes.col(I,:);
 %%% plot options transfered as a structure
 plotstyle=struct('fill',0,'marker','.','color',col_array,'width',1.5); % default settings
-if ~isempty(colors), plotstyle.color=colors; end
+if ~isempty(col), plotstyle.color=col; end
 
 ncol=size(plotstyle.color,1);
 if length(w)>ncol
     plotstyle.color=repmat(plotstyle.color,ceil(length(w)/ncol),1);
 end
-
 
 % Main Loop
 for k=1:length(w)
