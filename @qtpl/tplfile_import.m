@@ -18,13 +18,14 @@ parse(p,filename,varargin{:})
 w = p.Results.w;
 
 S=load([p.Results.filename,'.tpl'],'-mat');
+w_tpl = sortrows(S.w_tpl,2); 
 
 if isempty(p.Results.w)
-    N = size(S.w_tpl,1);
+    N = size(w_tpl,1);
     idx = 1:N;
-elseif all(ismember(w,S.w_tpl(:,1)))
+elseif all(ismember(w,w_tpl(:,1)))
     N = length(p.Results.w);
-    [~,idx] = ismember(w,S.w_tpl(:,1));
+    [~,idx] = ismember(w,w_tpl(:,1));
 else
     error('at least one of specified frequencies not found in tplfile')
 end
@@ -35,7 +36,9 @@ nom = [];
 if isfield(S, 'w_nom')
     %inom = ismember(S.w_nom,S.w_tpl(:,1)); % get nominal point at each frequency
     %nom = S.nom(inom);
-    [isnom,inom]=ismember(S.w_tpl(idx,1),S.w_nom);
+    [isnom,inom]=ismember(w_tpl(idx,1),S.w_nom);
+else
+    isnom = zeros(N,1);
 end
 
 par_nom = [];
@@ -44,13 +47,14 @@ if isfield(S, 'par_nom')
 end
 
 for n=1:N    
-    k = S.w_tpl(idx(n),2);
-    T(n).frequency = S.w_tpl(k,1);
+    k = w_tpl(idx(n),2);
+    T(n).frequency = w_tpl(k,1);
     if isnom(n)
         nom = S.nom(inom(n));
     else
         nom=[];
     end
+    %fprintf('t_w%i \n',k);
     tpl = [nom ; S.(sprintf('t_w%i',k))];
     T(n).template = unwrap(real(tpl)*pi/180)*180/pi + 1i*imag(tpl); %unwrap
     if isfield(S,sprintf('par_%i',k))

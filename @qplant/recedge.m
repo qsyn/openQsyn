@@ -13,7 +13,7 @@ Pars = obj.pars(idx);
 npar=length(Pars);
 qdist = ([Pars.upper]' - [Pars.lower]')./double([Pars.cases]');
 indgrid = obj.idxgrid(npar);
-qg = grid(Pars,0,2);
+qg = grid(Pars,2,0);    % reordered inputs!
 
 f = obj.qplant2func();
 
@@ -94,14 +94,14 @@ Td=Tcurr-Tmin;
 Td=rem(real(Td)+540,360)-180+1j*imag(Td);
 %The wrapped distance
 if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>1 || qdist>=1
-    [T1,Q1]=qplant.recedge(trf,s,qmin,qnew,Tmin,Tcurr,Tacc,qdist);
+    [T1,Q1]=recedge1(trf,s,qmin,qnew,Tmin,Tcurr,Tacc,qdist);
     Tnew=[Tnew T1];
     Qpar=[Qpar Q1];
 end
 Td=Tmax-Tcurr;
 Td=rem(real(Td)+540,360)-180+1j*imag(Td);
 if abs(real(Td)/Tacc(1)+1j*imag(Td)/Tacc(2))>1 || qdist>=1
-    [T1,Q1]=qplant.recedge(trf,s,qnew,qmax,Tcurr,Tmax,Tacc,qdist);
+    [T1,Q1]=recedge1(trf,s,qnew,qmax,Tcurr,Tmax,Tacc,qdist);
     Tnew=[T1 Tnew];
     Qpar=[Q1 Qpar];
 end

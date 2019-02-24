@@ -100,7 +100,7 @@ classdef qtpl
            par = T.parameters(:,idx);
            
         end
-        function table(obj,idx,w)
+        function varargout = table(obj,idx,w)
             %DISP Displays the magnitude and paramerters in command window
             
             [tpl,par] = get(obj,idx,w);
@@ -113,8 +113,13 @@ classdef qtpl
             data = [real(tpl).' ; imag(tpl).' ; par];
             partab = array2table(data,'VariableNames',ccases,...
                 'RowNames',{'deg', 'dB',cpars{:}});    
-
-            disp(partab)
+            if nargout==0
+                disp(partab)
+            elseif nargout==1
+                varargout{1} = partab;
+            else
+                erorr('too many output argumetns')
+            end
         end
         function obj = unwrap(obj)
             %UNWRAP unwrap phase in qtpl

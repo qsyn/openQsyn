@@ -55,7 +55,7 @@ elseif isa(B,'qfr') || isa(B,'lti')
     end
 elseif isa(B,'qtpl')
     if ~all( w==[B.frequency]' )
-        error('frequencies must be identical for plus operation')
+        error('frequencies must be identical for complex plain operations')
     end
     tpl2 = B;
 else

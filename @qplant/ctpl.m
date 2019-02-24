@@ -27,6 +27,7 @@ function obj = ctpl(obj,method,w,varargin)
 %       accuracy    set accurcy for computation as [deg_accuracy , dB_accuracy]
 %                   for recgrid and aedgrid methods. def = [5 3].
 %       union       unite new tpls with existing ones. 0 (def) | 1
+%       parameters  parameter set for cases method
 %       
 %   
 
@@ -39,6 +40,7 @@ addRequired(p,'w',@(x) validateattributes(x,{'numeric'},{'vector','positive','re
 addParameter(p,'plotOn',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
 addParameter(p,'union',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
 addParameter(p,'accuracy',[5 3],@(x) validateattributes(x,{'numeric'},{'size',[1 2],'positive','real'}));
+addParameter(p,'parameters',[],@(x) validateattributes(x,{'numeric'},{'2d'}));
 parse(p,method,w,varargin{:})
 
 
@@ -46,7 +48,7 @@ method = p.Results.method;
 w = p.Results.w;
 options.plot_on = p.Results.plotOn;
 options.Tacc = p.Results.accuracy;
-
+options.pars = p.Results.parameters;
 
 % compute based on given method:
 switch method
