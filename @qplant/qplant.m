@@ -433,7 +433,7 @@ classdef qplant < handle
             
             f = obj.qplant2func();
             if isempty(par)
-                pgrid = grid(obj.pars,0);
+                pgrid = grid(obj.pars,[],0);
             elseif size(par,1) ~= length(obj.pars)
                 error('par must have %i raws', length(obj.pars));
             else
