@@ -18,6 +18,7 @@ function [varargout]=show(obj ,varargin)
 %       'fill'      fills thmpleates with color, 1 (filled) | zero (def) 
 %       'case'      vector of indices specifing plant case(s) to show
 %       'nommark'   marker for nominal point (def='s')
+%       'text'      print text freq. annoatation, specified as 0 or 1 (def).
 %
 %   Remarks:        During the execution of the display under the 'point' 
 %                   option, pressing  the left button gives the next point 
@@ -60,6 +61,7 @@ col_array =	[0,      0.4470, 0.7410
           	 0.3010, 0.7450, 0.9330
           	 0.6350, 0.0780, 0.1840];
 plotstyle=struct('fill',0,'marker','.','markersize',4,'nommark','s','color',col_array); % default settings
+txt = 1;
 
 if nargin>1
     k=1;
@@ -75,6 +77,7 @@ if nargin>1
                 case 'marker', plotstyle.marker=varargin{k+1};
                 case 'markersize', plotstyle.markersize=varargin{k+1};
                 case 'nommark', plotstyle.nommark=varargin{k+1};
+                case 'text', txt=varargin{k+1};
                 case 'fill', plotstyle.fill=varargin{k+1};
                 case 'case', IDX=varargin{k+1};
                 otherwise, error('unknown parameter %s',PARAMETER);
@@ -119,7 +122,9 @@ for k=1:N
     if ~isempty(plotstyle.nommark)
         plot(real(tpl(1)),imag(tpl(1)),plotstyle.nommark,'Color',Lcolor)
     end
-    text(real(tpl(1)+1),imag(tpl(1))-1,num2str(w_op(k)));   
+    if txt
+        text(real(tpl(1)+1),imag(tpl(1))-1,num2str(w_op(k)));
+    end
 end
 
 % pause(0.01); drawnow 
