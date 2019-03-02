@@ -54,7 +54,7 @@ end
 % check all other inputs
 p = inputParser;
 addRequired(p,'bndname',@(x) any(validatestring(x,{qdes.bnd.name,'dom'})));
-addOptional(p,'fhandle',[],@(x) validateattributes(x,{'handle'}));
+addOptional(p,'fhandle',[],@(x) any([isgraphics(x), isempty(x)]));
 addOptional(p,'w',[],@(x) validateattributes(x,{'numeric'},{'nonnegative','real'}));
 addOptional(p,'color',[],@(x) validateattributes(x,{'numeric'},{'ncol',3,'nonnegative','real'}));
 parse(p,bndname,varargin{:});

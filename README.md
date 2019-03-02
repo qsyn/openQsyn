@@ -41,11 +41,11 @@ For complete functionality the Control Systems Toolbox is required.
 ### To-Do list:
 - qplant:
   - ~~unstructured uncertainty~~
+  - ~~nominal case interoplation~~ 
   - real factored form 
   - import from Robust Control Toolbox
 - qtpl:  
-  - template union
-  - nominal case interoplation 
+  - ~~template union~~
 - qpar:
   - import from Robust Control Toolbox
 - qdesign:
