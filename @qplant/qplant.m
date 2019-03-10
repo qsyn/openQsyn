@@ -171,27 +171,25 @@ classdef qplant < handle
             nyq = f(C{:});
             obj.nominal=qfr(c2n(nyq,'unwarp'),w) ;
         end
-        function tpl = cgrid(obj,w,rnd)
+        function tpl = cgrid(obj,w,rnd,n)
             %CGRID computes tpl by the grid method
             %   facilitates grid, random grid, and random sampling
             %
             %   for random and random grid the parameter set is random, yet
             %   identical in every frequency.
-            
-            % TODO: add  unstructured uncertainty
-            %       add  options to change cases
+            %
             if nargin<3, rnd=0; end
             idx = ~strcmp({obj.pars.name},'uncint_par');
             switch rnd
                 case 0
                     method='grid';
-                    pgrid = grid(obj.pars(idx),[],rnd);
+                    pgrid = grid(obj.pars(idx),n,rnd);
                 case 1
                     method='random grid';
-                    pgrid = grid(obj.pars(idx),[],rnd);
+                    pgrid = grid(obj.pars(idx),n,rnd);
                 case 2
                     method='random sampling';
-                    pgrid = sample(obj.pars(idx),100); % correct usage: options.cases(=100)
+                    pgrid = sample(obj.pars(idx),n); % correct usage: options.cases(=100)
                 otherwise, error('unavilable rnd option')
             end
             

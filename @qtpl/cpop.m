@@ -41,6 +41,8 @@ prunning = p.Results.prunning;
 w = [tpl1.frequency]';
 N = length(w);
 
+pname2 = [];
+
 if isnumeric(B)
     t2.template = c2n(B);
     t2.parameters =[];
@@ -58,6 +60,7 @@ elseif isa(B,'qtpl')
         error('frequencies must be identical for complex plain operations')
     end
     tpl2 = B;
+    pname2 = tpl2(1).parNames;
 else
     error(['second argument must be either a numeric scalar, ',... 
         'QTPL object, QFR object, or LTI object']);
@@ -102,6 +105,16 @@ for k = 1:N
     
     T(k).parameters = p(:,idx);
     T(k).template = t(idx);
+    
+    if isempty(tpl1(k).parNames) && isempty(pname2)
+        T(k).parNames = [];
+    elseif isempty(tpl1(k).parNames)
+        T(k).parNames = pname2;
+    elseif isempty(pname2)
+        T(k).parNames = tpl1(k).parNames;
+    else
+        T(k).parNames = { tpl1(k).parNames{:} pname2{:} };
+    end
     
 end
         

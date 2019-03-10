@@ -51,7 +51,7 @@ classdef qtpl
             %
             %   Note that the plus opperation is performed in Nichols form (deg+i*db),
             %   i.e., for siso transfer functions A,B: plus(A,B) = A(s)*B(s).
-            T = tplop(A,B,'+');
+            T = cpop(A,B,'*');
         end
         function [ T ] = minus( A,B )
             %PLUS substruct two qtpl arrays
@@ -61,7 +61,7 @@ classdef qtpl
             %
             %   Note that the plus opperation is performed in Nichols form (deg+i*db),
             %   i.e., for siso transfer functions A,B: minu(A,B) = A(s)/B(s).
-            T = tplop(A,B,'-');
+            T = cpop(A,B,'/');
         end
         function [ T ] = sens(A,B)
             %SENS compute template of the sensitivinty trnasfer function 
@@ -107,8 +107,13 @@ classdef qtpl
             scases = sprintf('i_%i ',idx);
             ccases = split(scases(1:end-1)); % ignore 1 extra space at end
             
-            spars = sprintf('par%i ',1:size(obj(1).parameters,1));
-            cpars = split(spars(1:end-1)); % ignore 1 extra space at end
+            if isempty(obj(1).parNames)
+                spars = sprintf('par%i ',1:size(obj(1).parameters,1));
+                cpars = split(spars(1:end-1)); % ignore 1 extra space at end
+            else
+                cpars = obj(1).parNames;
+            end
+            
             
             data = [real(tpl).' ; imag(tpl).' ; par];
             partab = array2table(data,'VariableNames',ccases,...

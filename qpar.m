@@ -151,7 +151,7 @@ classdef qpar  < matlab.mixin.CustomDisplay
                 elseif rnd==0
                     a = linspace(obj(k),cases(k));
                 else %rnd==1
-                    a = obj(k).lower + (obj(k).lower+obj(k).upper)*rand(1,cases(k));
+                    a = obj(k).lower + (obj(k).upper-obj(k).lower)*rand(1,cases(k));
                 end
                 x = full(a);
                 s = ones(1,N);
@@ -166,14 +166,17 @@ classdef qpar  < matlab.mixin.CustomDisplay
         end
         function p = sample(obj,N)
             %SAMPLE generates N random samples of the parameter cases
-            %   generates a grid 
+            %   default N = 100.
+            if ~exist('N','var'), N=[]; end
+            if isempty(N), N=100; end
+            
             [n,m] = size(obj);
             if m~=1, error('par.sample only accepts a column vector'); end
             
             p = zeros(n,N);
             
             for k=1:n
-                p(k,:) = obj(k).lower + (obj(k).lower+obj(k).upper)*rand(1,N);
+                p(k,:) = obj(k).lower + (obj(k).upper-obj(k).lower)*rand(1,N);
             end
                         
         end

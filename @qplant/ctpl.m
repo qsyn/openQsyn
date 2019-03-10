@@ -28,7 +28,7 @@ function obj = ctpl(obj,method,w,varargin)
 %                   for recgrid and aedgrid methods. def = [5 3].
 %       union       unite new tpls with existing ones. 0 (def) | 1
 %       parameters  parameter set for cases method
-%       
+%       size        size of grid for methods 'grid', 'rngrid' and 'random' 
 %   
 
 if nargin<4, options=[]; end
@@ -41,32 +41,35 @@ addParameter(p,'plotOn',0,@(x) validateattributes(x,{'numeric'},{'scalar','binar
 addParameter(p,'union',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
 addParameter(p,'accuracy',[5 3],@(x) validateattributes(x,{'numeric'},{'size',[1 2],'positive','real'}));
 addParameter(p,'parameters',[],@(x) validateattributes(x,{'numeric'},{'2d'}));
+addParameter(p,'size',[],@(x) validateattributes(x,{'numeric'},{'2d'}));
 parse(p,method,w,varargin{:})
-
 
 method = p.Results.method;
 w = p.Results.w;
 options.plot_on = p.Results.plotOn;
 options.Tacc = p.Results.accuracy;
 options.pars = p.Results.parameters;
+N = p.Results.size;
 
 % compute based on given method:
 switch method
-    case 'grid', tpl=obj.cgrid(w,0);
-    case 'rndgrid', tpl=obj.cgrid(w,1);
-    case 'random', tpl=obj.cgrid(w,2);
+    case 'grid', tpl=obj.cgrid(w,0,N);
+    case 'rndgrid', tpl=obj.cgrid(w,1,N);
+    case 'random', tpl=obj.cgrid(w,2,N);
     case 'recgrid', tpl=obj.recgrid(w,options);
     case 'recedge', tpl=obj.recedge(w,options);
     case 'cases', tpl=obj.cases2tpl(options,w);
     otherwise, error('unrecognized method!')
 end
 
-% add nominal point at beginning of each template
+% add parameter names and the nominal point (at beginning of each template)
+pname = {obj.pars.name};
 pnom = [obj.pars.nominal]';
 tnom=cases(obj,pnom,w);
 for k=1:length(w)
-    tpl(k)=add2tpl(tpl(k),tnom(k),pnom,'x');
-    tpl(k).unwrap;
+    tpl(k).parNames = pname;                    % add names
+    tpl(k)=add2tpl(tpl(k),tnom(k),pnom,'x');    % add nominal point
+    tpl(k).unwrap;                              % unwrap according to nominal point
 end
 
 % adds uncetin poles/zeros
