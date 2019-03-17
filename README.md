@@ -17,16 +17,25 @@ reused code is done with his premission.
 ## How to use
 
 ### Installation
-1. Create a folder named e.g **openQsyn** and open git bush
+1. Create a folder named e.g **openQsyn** and open git bash
 2. Clone the repo by typing: `git clone https://github.com/rubindan/openQsyn.git`
-2. Add  **openQsyn** to your Matlab path
-3. Run `oqsyn` to initiate the toolbox
+3. Add  **openQsyn** to your Matlab path
+4. Run `oqsyn_ini` to initiate the toolbox
 
 ### Demo 
-A quick introductory example is found in the live script `exmaple.mlx`.
+A quick introductory example is provided by the live script `exmaple.mlx`.
 This exmaple will guide you through the steps of SISO design: definning a 
 new plant and design specifications, computaing templates and bounds, 
 designing a feedback compensator and a pre-filter. 
+
+### Documentation
+Open Qsyn uses Matlab based documentation, thus viewd using standard Matlab 
+`help` and `doc` commands.
+- General documentation can be accsessed by typing `help <folderName>`, with 
+  `<folderName>` the installation folder of Open Qsyn. 
+- Documentation for a functions is viewd by typing `help <functionName>`.
+- Documentation for a class is viewed by typing `help <className>`.
+- Documentation for a method is viewed by typing `help <className/methodName>`. 
 
 ## Status
 Open Qsyn toolbox is under construction, 
