@@ -51,7 +51,7 @@ classdef qtpl
             %
             %   Note that the plus opperation is performed in Nichols form (deg+i*db),
             %   i.e., for siso transfer functions A,B: plus(A,B) = A(s)*B(s).
-            T = cpop(A,B,'*');
+            T = tplop(A,B,'+');
         end
         function [ T ] = minus( A,B )
             %PLUS substruct two qtpl arrays
@@ -61,7 +61,7 @@ classdef qtpl
             %
             %   Note that the plus opperation is performed in Nichols form (deg+i*db),
             %   i.e., for siso transfer functions A,B: minu(A,B) = A(s)/B(s).
-            T = cpop(A,B,'/');
+            T = tplop(A,B,'-');
         end
         function [ T ] = sens(A,B)
             %SENS compute template of the sensitivinty trnasfer function 
@@ -139,6 +139,16 @@ classdef qtpl
                 obj(k).template(2:end) = obj(k).template(2:end)+r*360;
             end
             
+        end
+        function G = nom(obj)
+            %NOM returns a qfr object constracted of the nominal tpl points 
+            N=length(obj);
+            w = [obj.frequency].';
+            g = zeros(N,1);
+            for k=1:N
+                g(k) = obj(k).template(1);
+            end
+            G = qfr(g,w);
         end
     end
     
