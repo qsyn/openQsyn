@@ -1,9 +1,9 @@
 function dombnd = dombnd(obj)
 %DOMBND computes the dominante HS bounds 
-%   Used to compute dominante HS bounds  for qdes object with bounds from 
+%   Used to compute dominante HS bounds  for qdesign object with bounds from 
 %   multiple specifications. 
 %
-%   Called by: qdes.sheobnd('dom',...)
+%   Called by: qdes.showbnd('dom',...)
 %
 %   
 
@@ -20,7 +20,8 @@ for kw=1:length(w)
         if isempty(idx) 
             continue
         end
-        b = n2c(bnd(k).c{idx})+1; % move origing to (-1)
+        b = n2c(bnd(k).c{idx})+1;   % translate bounds to complex form with 
+                                    % origin at (-1)
         if all(isnan(b))
             continue
         end
