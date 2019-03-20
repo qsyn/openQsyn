@@ -55,10 +55,22 @@ classdef qplant < handle
             %
             %   P = QPLANT(func_handle,pars)   constructs a 'black box' qplant
             %   object P from a function handle and a qpar array. 
+            %
+            %   P = QPLANT(tpl)     constructs a measurment based qplant
+            %   from qtpl array
+
+            % measured plant:
+            if nargin==1
+                if ~isa(varargin{1},'qtpl')
+                    error('When called with a single input it has to be of qtpl class');
+                end
+                obj.templates = varargin{1};
+                obj.info = 'Plat constracted from qtpl data';
+                return
+            end
             
+            % num/den or blackbox plant:
             isBlackBox = 0; % default type
-            
-            if nargin~=2, error('qplant requires 2 input arguments'); end
             % check first input
             switch class(varargin{1})
                 case {'qpoly', 'qexpression'}

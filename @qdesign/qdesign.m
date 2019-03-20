@@ -86,6 +86,7 @@ classdef qdesign  < handle
                 Ltpl = series(tk,C);
                 h(end+1) = show(Ltpl,'marker','square',...
                      'markeredgecolor','k','markerfacecolor',t_color(k,:));
+                text() 
             end
             
             if nargout==1, varargin{1}=h; end

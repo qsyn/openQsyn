@@ -1,15 +1,20 @@
-function obj = cbnd(obj,spcname,w)
+function obj = cbnd(obj,spcname,w,spcfunc)
 %CBND Summary of this function goes here
 %   Detailed explanation goes here
 
 if nargin<3, w=[]; end
+if nargin<4, spcfunc=[]; end
 
 switch spcname
     case 'odsrs', spcfunc = @fodsrs; 
     case 'rsrs',  spcfunc = @frsrs; 
-    otherwise, error('unrecognized specification %s',spcname);
+    %otherwise, error('unrecognized specification %s',spcname);
 end
      
+if isempty(spcfunc)
+    error('for non standard spc names an spc. function must be specified')
+end
+
 if isempty(w), w = [obj.tpl.frequency]; end
 
 is = find(strcmp({obj.spc.name},spcname));

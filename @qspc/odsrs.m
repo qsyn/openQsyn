@@ -200,7 +200,7 @@ switch ordr
     case 2
         [spec_w,spec_t] = qspc.spc_od2(tab,w,dt,plt,n);
     case 3
-        [spec_w,spec_t] = spc_od3(tab,w,dt,plt,n);
+        [spec_w,spec_t] = qspc.spc_od3(tab,w,dt,plt,n);
     case 3.1
         [spec_w,spec_t] = qspc.spc_od31(tab,w,dt,plt,n);
     otherwise
