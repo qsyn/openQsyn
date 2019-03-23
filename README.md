@@ -32,7 +32,7 @@ designing a feedback compensator and a pre-filter.
 Open Qsyn uses Matlab based documentation, thus viewd using standard Matlab 
 `help` and `doc` commands.
 - General documentation is accsessed by typing `help <folderName>`, with 
-  `<folderName>` the installation folder of Open Qsyn. 
+  `<folderName>` Open Qsyn installation folder. 
 - Documentation for a functions is viewd by typing `help <functionName>`.
 - Documentation for a class is viewed by typing `help <className>`.
 - Documentation for a method is viewed by typing `help <className/methodName>`. 
