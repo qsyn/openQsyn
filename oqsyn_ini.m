@@ -1,4 +1,4 @@
-function oqsyn()
+function oqsyn_ini()
 % OQSYN initiates OpenQsyn  
 %
 % Open Qsyn is a modern open source toolbox for QFT control synthesis
@@ -11,7 +11,7 @@ fprintf('Open Qsyn toolbox is now initiated \n\n')
 
 % all it does is to add utilities and doc to the path
 fullpath=mfilename('fullpath');
-homepath=fullpath(1:end-5);
+homepath=fullpath(1:end-9);
 addpath([homepath,'utilities'])
 addpath(genpath([homepath,'doc']))
 
