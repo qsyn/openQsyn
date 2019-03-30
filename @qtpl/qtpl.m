@@ -73,6 +73,12 @@ classdef qtpl
             if nargin<2, B = 1; end
             T = A.cpop(B,'comp');
         end
+        function B = sort(A)
+           %SORT sort array of qtpl elements by frequecny
+           w = [A.frequency];
+           [~,I] = sort(w);
+           B = A(I);
+        end
         function [tpl,par] = get(obj,idx,w)
            %GET returns required tpl and par 
            
@@ -125,18 +131,20 @@ classdef qtpl
             else
                 erorr('too many output argumetns')
             end
-        end
-        function obj = unwrap(obj)
+        end  
+        function B = unwrap(A)
             %UNWRAP unwrap phase in qtpl
             %
-            N = length(obj);
-            nom = get(obj,1);
-            unom = unwrap(nom*pi/180)*180/pi + 1i*imag(nom);
+            N = length(A);
+            nom_qfr = nom(A);
+            nomTpl = nom_qfr.nic;
+            unom = unwrap(real(nomTpl)*pi/180)*180/pi + 1i*imag(nomTpl);
+            B  = A;
             for k=1:N
                 nomPhase = real(unom(k));
-                meanPhase = mean(real(obj(k).template(2:end)));
+                meanPhase = mean(real(A(k).template(2:end)));
                 r = round((nomPhase - meanPhase)/360);
-                obj(k).template(2:end) = obj(k).template(2:end)+r*360;
+                B(k).template = A(k).template+r*360;
             end
             
         end
