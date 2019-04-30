@@ -104,7 +104,7 @@ classdef qplant < handle
                         obj.den = varargin{2};
                     end
                     dpar = varargin{2};
-                case 'numeric'
+                case {'double','single','int8','int16','int32','int64'}
                     if isBlackBox
                         error('for a black box model the 2nd argument must be a qpar array');
                     end
@@ -174,7 +174,11 @@ classdef qplant < handle
         end
         function obj = cnom(obj,w)
             %CPNOM computes the nominal transfer function
-            %   Detailed explanation goes here
+            %   
+            %   CNOM(P,W)   computes the nominal for qplant object P for the frequency 
+            %   vector W; results is stored under the property 'nominal'.
+            %
+            %   See also: qplant/ctpl
             if nargin<2, w = logspace(-1,2,50); end
             f = qplant2func(obj);
             pnom = [obj.pars.nominal];

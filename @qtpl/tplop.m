@@ -11,33 +11,59 @@ function [ T ] = tplop( A,B,op )
 %   [ T ] = tplop( A,B,'+' )   performs an addition between qtpl objects A
 %   an dB, returns output as a qtpl object T.
 
-tpl1 = A;
-w = [tpl1.frequency]';
+
+if isa(A,'qtpl')
+    tplA = A;
+    pnameA = A(1).parNames;
+    pnameB ={};
+    AisQtpl=1;
+else
+    % in case A is no a qtpl the second output is. A is copied into B for
+    % type checking. In computation loop AisQtpl cariable is used to switch
+    % back A and B to tpl1 and tpl2
+    tplA = B;
+    pnameB = B(1).parNames;
+    pnameA = {};
+    B = A;
+    AisQtpl=0;
+end
+w = [tplA.frequency]';
+
 N = length(w);
-pname2 =[];
 
 if isnumeric(B) && isscalar(B)
     t2.template = B;
     t2.parameters =[];
-    tpl2 = repmat(t2,N,1);
+    tplB = repmat(t2,N,1);
 elseif isa(B,'qfr') || isa(B,'lti')
     t2c = squeeze(freqresp(B,w));
     t2n = c2n(t2c,'unwrap');
-    tpl2 = struct('template',[],'parameters',[]);
+    tplB = struct('template',[],'parameters',[]);
     for k=1:N
-        tpl2(k).template = t2n(k);
-        tpl2(k).parameters = [];
+        tplB(k).template = t2n(k);
+        tplB(k).parameters = [];
     end
 elseif isa(B,'qtpl')
     if ~all( w==[B.frequency]' )
         error('frequencies must be identical for plus operation')
     end
-    tpl2 = B;
-    pname2 = tpl2(1).parNames;
+    tplB = B;
+    pnameB = tplB(1).parNames;
 else
     error(['second argument must be either a numeric scalar, ',... 
         'QTPL object, QFR object, or LTI object']);
 end
+
+if AisQtpl
+    tpl1=tplA;
+    tpl2=tplB;
+else
+    tpl1=tplB;
+    tpl2=tplA;
+end
+
+if ~iscell(pnameA), pnameA={ pnameA }; end
+if ~iscell(pnameB), pnameB={ pnameB }; end
 
 T =qtpl(N);
 for k = 1:N
@@ -46,7 +72,7 @@ for k = 1:N
     
     t1 = repmat(tpl1(k).template,length(tpl2(k).template),1);
     t2 = repmat(tpl2(k).template,length(tpl1(k).template),1);
-    
+        
     switch op
         case isa(op,'function_handle'),  t = op(t1,t2); 
         case '+', t = t1 + t2;
@@ -72,15 +98,16 @@ for k = 1:N
     T(k).template = t(idx);
     
         
-    if isempty(tpl1(k).parNames) && isempty(pname2)
-        T(k).parNames = [];
-    elseif isempty(tpl1(k).parNames)
-        T(k).parNames = pname2;
-    elseif isempty(pname2)
-        T(k).parNames = tpl1(k).parNames;
-    else
-        T(k).parNames = { tpl1(k).parNames{:} pname2{:} };
-    end
+    % if isempty(pnameA) && isempty(pnameB)
+    %     T(k).parNames = [];
+    % elseif isempty(tpl1(k).parNames)
+    %     T(k).parNames = pnameB;
+    % elseif isempty(pnameB)
+    %     T(k).parNames = tpl1(k).parNames;
+    % else
+    %     T(k).parNames = { tpl1(k).parNames{:} pnameB{:} };
+    % end
+    T(k).parNames = [pnameA pnameB];
     
 end
         

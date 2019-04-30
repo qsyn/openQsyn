@@ -133,10 +133,11 @@ for k=1:length(w)
         %	        ' rad/s is outside current axis']); % peo
     end
     
-    ngrid
+    %ngrid
     xlabel('Phase [deg]')
     ylabel('Magnitude [db]')
     axis tight
+    box on
     if nargout>0
         varargout{1} = fhandle;
     end

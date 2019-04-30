@@ -46,9 +46,13 @@ if isfield(S, 'par_nom')
     par_nom = S.par_nom.';
 end
 
+if isfield(S,'parnames')
+    [T(:).parNames] = deal(reshape(S.parnames,1,[]));
+end
+
 for n=1:N    
-    k = w_tpl(idx(n),2);
-    T(n).frequency = w_tpl(k,1);
+    k = w_tpl(idx(n),2);            
+    T(n).frequency = w_tpl(w_tpl(:,2)==k,1); %w_tpl(k,1);
     if isnom(n)
         nom = S.nom(inom(n));
     else
@@ -64,6 +68,7 @@ for n=1:N
     end
 end
 
+T = sort(T);
 
 end
 
