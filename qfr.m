@@ -1,22 +1,75 @@
 classdef qfr
-    %QFR Summary of this class goes here
-    %   Detailed explanation goes here
+    %QFR frequency response function for qft control
     
     properties
-        frequency
-        nic
+        frequency   % frequency in rad/s
+        response    % response in Nichols form (deg+j*db)
     end
     
     methods
-        function obj = qfr(nresponse,frequecny)
-            %QFR Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.frequency = frequecny;
-            obj.nic = nresponse;
+        function obj = qfr(varargin)
+            %QFR Construct an instance of the qfr class
+            %
+            % Usage:
+            %
+            %   F = QFR(G)   constructs a qfr object F from the frd object G
+            %
+            %   F = QFR(G,w)   constructs a qfr object F from the LTI object
+            %   G and the freqeucny vector w
+            %
+            %   F = QFR(response,w)   constructs a qfr object F with given response
+            %   and frequency vector
+            %
+            %   F = QFR(num,den,w)  constructs a qfr object F from a transfer
+            %   function given by num and den, and the frequency vector w
+            
+            % some complex input handling...
+            switch nargin
+                case 1 % input must be frd
+                    if isa(varargin{1},'frd') && isscalar(varargin{1})
+                        w = varargin{1}.Frequency;
+                        res = c2n(squeeze(varargin{1}.ResponseData));
+                    else
+                        error('A single input argument to qfr must be a siso frd')
+                    end
+                case 2 % input is either lti+freq or a freq+response 
+                    if isa(varargin{1},'lti') && isscalar(varargin{1}) ...
+                            && isnumeric(varargin{2}) && isvector(varargin{2})
+                           res = c2n(squeeze(freqresp( varargin{1},varargin{2})));
+                           w = varargin{2};
+                    elseif isnumeric(varargin{1}) && isvector(varargin{1}) ...
+                             && isnumeric(varargin{2}) && isvector(varargin{2})
+                         if length(varargin{1})==length(varargin{1})
+                             res = varargin{1};
+                             w = varargin{2};
+                         else
+                             error('qfr(response,frequecny) -- both inputs must be of same size')
+                         end
+                    else
+                        error('qfr(response,frequecny) or qfr(G,frequecny) but soething is wrong')
+                    end
+                case 3
+                    if isnumeric(varargin{1}) && isvector(varargin{1}) ...
+                            && isnumeric(varargin{2}) && isvector(varargin{2}) ...
+                            && isnumeric(varargin{3}) && isvector(varargin{3})
+                        
+                        num = polyval(varargin{1},1i*varargin{3});
+                        den = polyval(varargin{2},1i*varargin{3});
+                        res = c2n(num./den);
+                        w = varargin{3};
+                    else
+                        error('qfr(num,den,freqeucny) but something is wrong')
+                    end
+                otherwise
+                    error('inputs are not good')
+            end
+            % make sure properties are column vector for consistency
+            obj.response = reshape(res,[],1);
+            obj.frequency = reshape(w,[],1);
         end
         function varargout = show(obj,varargin)
-            %NIC plots the on Nichols chart
-            h = plot(real(obj.nic),imag(obj.nic),varargin{:});
+            %SHOW show response on Nichols chart
+            h = plot(real(obj.response),imag(obj.response),varargin{:});
             if nargout==1, varargout{1}=h; end   
         end
         function [] = nichols(obj)
@@ -37,19 +90,17 @@ classdef qfr
             bodemag(G,obj.frequency,opt);
         end
         function G = frd(obj)
-            %FRD converts qfr to frd object
-            
-            response = n2c(obj.nic);
-            G = frd(response,obj.frequency);    
-        end 
-        
+            %FRD converts qfr to a Control Systems Toolbox FRD object
+            res = n2c(obj.response);
+            G = frd(res,obj.frequency);    
+        end   
         function G = series(A,B)
            %SERIES conection of QFR object with another QFR or LTI object
            w = A.frequency;
            switch class(B)
                case 'qfr'
                    if all(w == B.frequency)
-                       G = qfr(A.nic+B.nic,A.frequency);
+                       G = qfr(A.response+B.response,A.frequency);
                    else
                        error(['series connection of QFR object require that both ',...
                            'objects have identical frequency vector']); 
@@ -57,10 +108,10 @@ classdef qfr
                case {'tf','zpk','ss','frd'}
                    Bfr = squeeze(freqresp(B,w)).';
                    Bnic = c2n(Bfr.',-1).';
-                   G =  qfr(A.nic+Bnic,w);
+                   G =  qfr(A.response+Bnic,w);
                case 'double'
                    %if ~isscalar(B), error('a numeric value must be a scalar'); end
-                   G = qfr(A.nic+B,w);
+                   G = qfr(A.response+B,w);
                otherwise
                    error('seconf input must be an QFR object, LTI, or a double')
            end
@@ -69,7 +120,7 @@ classdef qfr
             %FREQRESP returns the frequency resposne at selected frequency
             %If w is not in obj.frequency, FREQRES interpolates
                         
-            t = interp1(obj.frequency,obj.nic,w);
+            t = interp1(obj.frequency,obj.response,w);
             
         end
     end
