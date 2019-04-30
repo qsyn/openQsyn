@@ -42,26 +42,79 @@ classdef qtpl
             obj.parameters = p.Results.parameters; 
             obj.parNames = p.Results.parNames; 
             
-        end  
+        end 
+        function [ T ] = shift( A,b )
+           %SHIFT shifts a qtpl object accross the Nichols chart
+           %
+           %    C = shift(A,b)  shift the qtpl object A by the scalar b,
+           %    given in Nichols form deg+j*db. 
+           %    
+           T = tplop(A,b,'+');
+        end
         function [ T ] = plus( A,B )
             %PLUS adds two qtpl arrays
             %
-            %   [ T ] = plus( A,B )   performs an addition between qtpl objects A and
-            %   B, returns output as a qtpl object T.
+            %   T = A+B  performs an addition between qtpl objects A and
+            %   B, returns output as a qtpl object C.
             %
-            %   Note that the plus opperation is performed in Nichols form (deg+i*db),
-            %   i.e., for siso transfer functions A,B: plus(A,B) = A(s)*B(s).
-            T = tplop(A,B,'+');
+            %   C = plus( A,B )   ALTERNATIVE EXECUTION
+            %
+            %   Note that the times opperation is performed in complex domain
+            %  
+            %   See also: qtpl/minus qtpl/times qtpl/rdivide qtpl/cpop
+            T = cpop(A,B,'+');
         end
         function [ T ] = minus( A,B )
-            %PLUS substruct two qtpl arrays
+            %MINUS substruct two qtpl arrays
             %
-            %   [ T ] = minus( A,B )   performs a substraction between qtpl
-            %   objects A and B, returns output as a qtpl object T.
+            %   C = A-B   performs a substraction between qtpl objects A and B, 
+            %   returns output as a qtpl object C.
             %
-            %   Note that the plus opperation is performed in Nichols form (deg+i*db),
-            %   i.e., for siso transfer functions A,B: minu(A,B) = A(s)/B(s).
-            T = tplop(A,B,'-');
+            %   C = minus(A,B)  alternative execution
+            % 
+            %   Note that the times opperation is performed in complex domain
+            %  
+            %   See also: qtpl/plus qtpl/times qtpl/rdivide qtpl/cpop
+            T = cpop(A,B,'-');
+        end
+        function [ T ] = uminus( A )
+            %UMINUS unary minus for a qtpl array
+            %
+            %   C = -A   negates the elements of qtpl object A and stores
+            %   the reuislts in C
+            %
+            %   C = uminus( A )   alternative execution
+            %
+            %   Note that the times opperation is performed in complex domain
+            %  
+            %   See also: qtpl/plus qtpl/times qtpl/rdivide qtpl/cpop
+            T = cpop(0,A,'-');
+        end
+        function [ T ] = times( A,B )
+            %TIMES elemnt-wise multipications of two qtpl arrays (.*)
+            %
+            %   C=A.*B   computes the product of qtpl objects A and B, returns 
+            %   output as a qtpl object C.
+            %
+            %   C = times(A,B)  alternative execution
+            %
+            %   Note that the times opperation is performed in complex domain
+            %  
+            %   See also: qtpl/plus qtpl/minuss qtpl/rdivide qtpl/cpop
+            T = cpop(A,B,'*');
+        end
+        function [ T ] = rdivide( A,B )
+            %RDIVIDE elemnt-wise division of two qtpl arrays (./)
+            %
+            %   C = A./B   divides each element of qtpl object A by the 
+            %   corresponding element in qtpl C 
+            %
+            %   C = rdivide( A,B )  alternative execution
+            %
+            %   Note that the times opperation is performed in complex domain
+            %  
+            %   See also: qtpl/plus qtpl/minus qtpl/times qtpl/cpop
+            T = cpop(A,B,'/');
         end
         function [ T ] = sens(A,B)
             %SENS compute template of the sensitivinty trnasfer function 

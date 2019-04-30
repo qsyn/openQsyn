@@ -30,6 +30,7 @@ function obj = ctpl(obj,method,w,varargin)
 %       parameters  parameter set for cases method
 %       size        size of grid for methods 'grid', 'rngrid' and 'random' 
 %   
+%   See also: qplant/cnom
 
 if nargin<4, options=[]; end
 

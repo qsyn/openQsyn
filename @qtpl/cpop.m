@@ -1,80 +1,117 @@
 function [ T ] = cpop( A,B,opr,varargin )
 %CPOP operations between templates in the complex plain
 %
-%	[ T ] = CPOP( A,B,OPR ) performs the operation described by OPR between
-%	qtpl object A, and an object B.
+%	T = CPOP( A,B,OPR ) performs the operation described by OPR between
+%	A and B, which at least one of them is a qtpl object
 %
-%   Note that the plus opperation is performed in complex form (re+im*i),
+%   Note that the opperation is performed in complex form (re+im*i),
 %   thus templates are transformed to complex form and back
 %
+%   uncertainties are treated as non-dependent! 
+%
 %   Inputs 
-%   A       qtpl array
-%   B       one of the following: 
-%               qtpl array with same frequenciers as A
-%               numeric array of frequency response points in complex form
-%               Matlab control toolboxz LTI siso object
-%               qfr object               
-%   opr     operation: '+'|'-'|'*'|'/'|'sens'|'comp'
+%   A           qtpl array
+%   B           one of the following: 
+%               * qtpl array with same frequenciers as A
+%               * numeric array of frequency response points in complex form
+%               * Matlab control toolboxz LTI siso object 
+%               * qfr object               
+%   opr         operation: '+'|'-'|'*'|'/'|'sens'|'comp'
+%   prunning    optional prunning option: 0 (def) | 1 (qsyn) | 2 (matlab)    
 %
 %   Output
 %   T       qplt array
 %   
 %   Exmaple: 
-%   [ T ] = cpop( A,B,'+')   performs an addition between qtpl objects A
+%   T = CPOP( A,B,'+')   performs an addition between qtpl objects A
 %   and B, returns output as the qtpl object T.
+%
+%   See also: qtpl/plus qtpl/minus qtpl/times qtpl/rdivide qtpl/sens
+%   qtpl/comp
+
 
 %-- Parse inputs --
 p = inputParser;
-addRequired(p,'A',@(x)isa(x,'qtpl'));
+addRequired(p,'A',@(x)isa(x,'qtpl') || isnumeric(x));
 addRequired(p,'B');
 addRequired(p,'opr',@(x)validateattributes(x,{'char'},{'nonempty'}));
 addParameter(p,'prunning',0,@(x)validateattributes(x,...
     {'numeric'},{'>=',0,'<=',2,'integer','scalar'},'cpop','option')); % set prunning method
 parse(p,A,B,opr,varargin{:});
 
-tpl1 = p.Results.A;
-B = p.Results.B;
+if isa(p.Results.A,'qtpl')
+    tplA = p.Results.A;
+    pnameA = p.Results.A(1).parNames;
+    pnameB ={};
+    AisQtpl=1;
+else
+    % in case A is no a qtpl the second output is. A is copied into B for
+    % type checking. In computation loop AisQtpl cariable is used to switch
+    % back A and B to tpl1 and tpl2
+    tplA = p.Results.B;
+    pnameB = p.Results.B(1).parNames;
+    pnameA = {};
+    B = p.Results.A;
+    AisQtpl=0;
+end
+
+%tpl1 = p.Results.A;
+%B = p.Results.B;
 opr = p.Results.opr;
 prunning = p.Results.prunning;
 %-----------------
 
-w = [tpl1.frequency]';
+w = [tplA.frequency]';
 N = length(w);
-
-pname2 = [];
 
 if isnumeric(B)
     t2.template = c2n(B);
     t2.parameters =[];
-    tpl2 = repmat(t2,N,1);
+    tplB = repmat(t2,N,1);
 elseif isa(B,'qfr') || isa(B,'lti')
     t2c = squeeze(freqresp(B,w));
     t2n = c2n(t2c,'unwrap');
-    tpl2 = struct('template',t2n,'parameters',[]);
+    tplB = struct('template',t2n,'parameters',[]);
     for k=1:N
-        tpl2(k).template = t2n(k);
-        tpl2(k).parameters = [];
+        tplB(k).template = t2n(k);
+        tplB(k).parameters = [];
     end
 elseif isa(B,'qtpl')
     if ~all( w==[B.frequency]' )
         error('frequencies must be identical for complex plain operations')
     end
-    tpl2 = B;
-    pname2 = tpl2(1).parNames;
+    tplB = B;
+    pnameB = tplB(1).parNames;
 else
     error(['second argument must be either a numeric scalar, ',... 
         'QTPL object, QFR object, or LTI object']);
 end
 
+if AisQtpl
+    tpl1=tplA;
+    tpl2=tplB;
+else
+    tpl1=tplB;
+    tpl2=tplA;
+end
+
+if ~iscell(pnameA), pnameA={ pnameA }; end
+if ~iscell(pnameB), pnameB={ pnameB }; end
+
 T =qtpl(N);
 for k = 1:N
     
     T(k).frequency = w(k);
-    
     t1c = n2c(tpl1(k).template);
-    t2c = n2c(tpl2(k).template);
+    t2c = n2c(tpl2(k).template); 
+    
     n1 = length(t1c);
     n2 = length(t2c);
+    
+    p1 =  repmat(tpl1(k).parameters,1,n2);
+    p2 =  repmat(tpl2(k).parameters,1,n1);
+    p = [p1 p2];
+   
     t1 = repmat(t1c,n2,1);
     t2 = repmat(t2c,n1,1);
     
@@ -91,7 +128,7 @@ for k = 1:N
     
     t = c2n(tc,'unwrap');
     
-    if length(tpl2(k).template) > 1 && prunning ==1
+    if length(tpl2(k).template) > 1 && prunning == 1
         [~,idx] = prune(t,[2 2]);
     elseif length(tpl2(k).template) > 1 && prunning == 2
         idx=boundary(real(t),imag(t),0.3);
@@ -99,22 +136,10 @@ for k = 1:N
         idx = 1:length(t1);
     end
     
-    p1 =  repmat(tpl1(k).parameters,1,n2);
-    p2 =  repmat(tpl2(k).parameters,1,n1);
-    p = [p1 p2];
-    
     T(k).parameters = p(:,idx);
     T(k).template = t(idx);
     
-    if isempty(tpl1(k).parNames) && isempty(pname2)
-        T(k).parNames = [];
-    elseif isempty(tpl1(k).parNames)
-        T(k).parNames = pname2;
-    elseif isempty(pname2)
-        T(k).parNames = tpl1(k).parNames;
-    else
-        T(k).parNames = { tpl1(k).parNames{:} pname2{:} };
-    end
+    T(k).parNames = [pnameA pnameB];
     
 end
         
