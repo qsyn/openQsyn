@@ -51,7 +51,7 @@ classdef qdesign  < handle
             wnom = obj.nom.frequency;
             Cwnom = squeeze(freqresp(C,wnom)); % in complex plain
             Fwnom = squeeze(freqresp(F,wnom)); % in complex plain
-            Pnom = n2c(obj.nom.nic).';
+            Pnom = n2c(obj.nom.response);
             Lnom = Cwnom.*Pnom;
             Tnom = Fwnom.*Lnom./(1+Lnom);
             
@@ -86,7 +86,7 @@ classdef qdesign  < handle
                 Ltpl = series(tk,C);
                 h(end+1) = show(Ltpl,'marker','square',...
                      'markeredgecolor','k','markerfacecolor',t_color(k,:));
-                text(real(Ltpl.nic),imag(Ltpl.nic),...
+                text(real(Ltpl.response),imag(Ltpl.response),...
                     sprintf(' %g',obj.tpl(k).frequency),'clipping','on') % single space added
             end
             

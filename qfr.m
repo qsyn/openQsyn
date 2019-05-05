@@ -107,7 +107,7 @@ classdef qfr
                    end
                case {'tf','zpk','ss','frd'}
                    Bfr = squeeze(freqresp(B,w)).';
-                   Bnic = c2n(Bfr.',-1).';
+                   Bnic = c2n(Bfr.',-1);
                    G =  qfr(A.response+Bnic,w);
                case 'double'
                    %if ~isscalar(B), error('a numeric value must be a scalar'); end
@@ -121,6 +121,40 @@ classdef qfr
             %If w is not in obj.frequency, FREQRES interpolates
                         
             t = interp1(obj.frequency,obj.response,w);
+            
+        end
+        function m = mag(obj,w)
+           %MAG returns magnitude response
+           %
+           % Usage:
+           %
+           %    m = mag(qfr)   returns magnitude response [db]
+           %
+           %    m = mag(qfr,w)   returns magniautde response at specific frequencies
+           %
+           if exist('w','var')
+               t = freqresp(obj,w);
+               m = imag(t);
+           else
+               m = imag(obj.response);
+           end
+            
+        end
+        function m = phase(obj,w)
+           %MAG returns phase response
+           %
+           % Usage:
+           %
+           %    m = phase(qfr)   returns phase response [deg]
+           %
+           %    m = phase(qfr,w)   returns phase response at specific frequencies
+           %
+           if exist('w','var')
+               t = freqresp(obj,w);
+               m = real(t);
+           else
+               m = real(obj.response);
+           end
             
         end
     end
