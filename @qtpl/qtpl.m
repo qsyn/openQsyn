@@ -190,7 +190,7 @@ classdef qtpl
             %
             N = length(A);
             nom_qfr = nom(A);
-            nomTpl = nom_qfr.nic;
+            nomTpl = nom_qfr.response;
             unom = unwrap(real(nomTpl)*pi/180)*180/pi + 1i*imag(nomTpl);
             B  = A;
             for k=1:N

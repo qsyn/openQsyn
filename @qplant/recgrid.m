@@ -9,6 +9,13 @@ fprintf('Accuracy: %g [deg], %g [dB] \n',dist(1),dist(2));
 %
 idx = ~strcmp({obj.pars.name},'uncint_par');
 Pars = obj.pars(idx);
+
+if length(Pars)==1
+    disp('RECGRID: Only one uncertain parameter. Using Recursive Edge Grid instead');
+    tpl = recedge(obj,w,options);
+    return
+end
+    
 nomPars = Pars.nom;
 rangePars = [[Pars.lower ].' [Pars.upper].'];
 % npar=length(Pars);

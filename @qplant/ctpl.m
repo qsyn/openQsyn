@@ -52,6 +52,17 @@ options.Tacc = p.Results.accuracy;
 options.pars = p.Results.parameters;
 N = p.Results.size;
 
+if isempty(obj.pars) % no uncertain parameters! 
+    disp('no uncertain parameters in qplant object...');
+    f = qplant2func(obj);
+    pnom = [obj.pars.nominal];
+    C = num2cell(pnom);
+    C{end+1}=1j*w;
+    nyq = f(C{:});
+    obj.templates = c2n(nyq,'unwarp') ;
+    return
+end
+
 % compute based on given method:
 switch method
     case 'grid', tpl=obj.cgrid(w,0,N);

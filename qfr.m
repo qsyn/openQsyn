@@ -107,7 +107,7 @@ classdef qfr
                    end
                case {'tf','zpk','ss','frd'}
                    Bfr = squeeze(freqresp(B,w)).';
-                   Bnic = c2n(Bfr.',-1).';
+                   Bnic = c2n(Bfr.',-1);
                    G =  qfr(A.response+Bnic,w);
                case 'double'
                    %if ~isscalar(B), error('a numeric value must be a scalar'); end

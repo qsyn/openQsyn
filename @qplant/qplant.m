@@ -79,7 +79,7 @@ classdef qplant < handle
                 case 'qpar'
                     obj.num = varargin{1};
                     npar = varargin{1};
-                case 'numeric'
+                case {'double','single','int32','int64'}
                     validateattributes(varargin{1},{'numeric'},...
                         {'row','nonempty','real'},'qplant','num')
                     obj.num = varargin{1};

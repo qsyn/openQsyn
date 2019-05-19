@@ -13,7 +13,11 @@ Pars = obj.pars(idx);
 npar=length(Pars);
 qdist = ([Pars.upper]' - [Pars.lower]')./double([Pars.cases]');
 indgrid = obj.idxgrid(npar);
-qg = grid(Pars,2,0);    % reordered inputs!
+if length(Pars)>1
+    qg = grid(Pars,2,0);    % reordered inputs!
+else
+    qg = linspace(Pars.lower,Pars.upper,Pars.cases); % single uncartain parameter
+end
 
 f = obj.qplant2func();
 
@@ -44,7 +48,7 @@ for kw = 1:length(w)
     end
     T = unwrap(real(T)*pi/180)*180/pi + 1i*imag(T); % unwrap again
     prune_on = 1;
-    if prune_on
+    if prune_on && numel(T)>3
         idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
         %[~,idx] = prune(T,[2 2]);
     else
