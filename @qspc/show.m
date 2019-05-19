@@ -1,4 +1,4 @@
-function [phandle_new]=show(obj,plot_op,linespec,phandle)
+function [varargout]=show(obj,plot_op,linespec,phandle)
 %SHOWSPC    displays a single specification 
 %               
 %[phandle]=showspc(spcfile,spec,plot_op,color,phandle)
@@ -92,5 +92,9 @@ if strcmp(plot_op,'freq') || strcmp(plot_op,'both')
     ylabel('Spec. [db]')
 end
     
+if nargout==1
+    varargout={phandle_new};
+end
+
 end
     

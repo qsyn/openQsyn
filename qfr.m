@@ -123,6 +123,40 @@ classdef qfr
             t = interp1(obj.frequency,obj.response,w);
             
         end
+        function m = mag(obj,w)
+           %MAG returns magnitude response
+           %
+           % Usage:
+           %
+           %    m = mag(qfr)   returns magnitude response [db]
+           %
+           %    m = mag(qfr,w)   returns magniautde response at specific frequencies
+           %
+           if exist('w','var')
+               t = freqresp(obj,w);
+               m = imag(t);
+           else
+               m = imag(obj.response);
+           end
+            
+        end
+        function m = phase(obj,w)
+           %MAG returns phase response
+           %
+           % Usage:
+           %
+           %    m = phase(qfr)   returns phase response [deg]
+           %
+           %    m = phase(qfr,w)   returns phase response at specific frequencies
+           %
+           if exist('w','var')
+               t = freqresp(obj,w);
+               m = real(t);
+           else
+               m = real(obj.response);
+           end
+            
+        end
     end
     
     methods(Static)

@@ -51,7 +51,7 @@ classdef qdesign  < handle
             wnom = obj.nom.frequency;
             Cwnom = squeeze(freqresp(C,wnom)); % in complex plain
             Fwnom = squeeze(freqresp(F,wnom)); % in complex plain
-            Pnom = n2c(obj.nom.nic).';
+            Pnom = n2c(obj.nom.response);
             Lnom = Cwnom.*Pnom;
             Tnom = Fwnom.*Lnom./(1+Lnom);
             
