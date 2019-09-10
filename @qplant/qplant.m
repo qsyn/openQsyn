@@ -499,6 +499,19 @@ classdef qplant < handle
             end
             
         end
+        function sys = mtimes(A,B)
+           %MTIMES series connection of a qplant object
+           %    Same as QPLANT/SERIES
+           sys = qsys({A,B},'B{1}*B{2}');
+        end
+        function sys = series(A,B)
+            %SERIES series connection of a qplant object
+            sys = qsys({A,B},'B{1}*B{2}');
+        end
+        function sys = feedback(A,B)
+            %FEEDBACK connect qplant objects by negative feedback
+            sys = qsys({A,B},'1/(1+B{1}*B{2})');
+        end
     end
     
     methods(Static)

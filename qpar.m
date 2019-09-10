@@ -134,7 +134,7 @@ classdef qpar  < matlab.mixin.CustomDisplay
             %
             %   cases   intiger specifing the number of cases 
             % 
-            %   rnd     boolian scalar to specify if grid is random. def
+            %   rnd     boolian scalar to specify if grid is random. default
             %           option is 0 (not random). 
             %
             %%% Adapted from NDGRID
