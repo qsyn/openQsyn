@@ -79,7 +79,7 @@ classdef qplant < handle
                 case 'qpar'
                     obj.num = varargin{1};
                     npar = varargin{1};
-                case 'numeric'
+                case {'double','single','int32','int64'}
                     validateattributes(varargin{1},{'numeric'},...
                         {'row','nonempty','real'},'qplant','num')
                     obj.num = varargin{1};
@@ -498,6 +498,19 @@ classdef qplant < handle
                 [tpl,par] = get(T,idx);
             end
             
+        end
+        function sys = mtimes(A,B)
+           %MTIMES series connection of a qplant object
+           %    Same as QPLANT/SERIES
+           sys = qsys({A,B},'B{1}*B{2}');
+        end
+        function sys = series(A,B)
+            %SERIES series connection of a qplant object
+            sys = qsys({A,B},'B{1}*B{2}');
+        end
+        function sys = feedback(A,B)
+            %FEEDBACK connect qplant objects by negative feedback
+            sys = qsys({A,B},'1/(1+B{1}*B{2})');
         end
     end
     

@@ -55,16 +55,16 @@ if isempty(n)
 else
     n=n(:);
 end
-nconst=(qmin==qmax) | n==1;  % The constant parameters!
+nconst=(qmin==qmax) | n==1;  % The constant parameters!  --> deprecated
 
-if sum(1-nconst)==0
-    disp('All parameters constant');
-    Qpar=0.5*qmin+0.5*qmax;
-    T=c2n(feval(trf,Qpar,s));
-elseif sum(1-nconst)==1
-    disp('ADGRID:Only one uncertain parameter. Using adedge(rfun,s,qpar,Tacc,n) instead');
-    [T,Qpar]=adedge(trf,s,qpar,Tacc,n);
-else
+% if sum(1-nconst)==0
+%     disp('All parameters constant');
+%     Qpar=0.5*qmin+0.5*qmax;
+%     T=c2n(feval(trf,Qpar,s));
+% elseif sum(1-nconst)==1     
+%     disp('ADGRID:Only one uncertain parameter. Using adedge(rfun,s,qpar,Tacc,n) instead');
+%     [T,Qpar]=adedge(trf,s,qpar,Tacc,n);
+% else
     disp(['ADGRID: ',num2str(sum(1-nconst)),' uncertain and ',num2str(sum(nconst)),' constant parameter(s). Accuracy [',num2str(Tacc(1)),' deg ',num2str(Tacc(2)),'dB]']);
     qconst=0.5*(qmin+qmax).*nconst;
     qmin=qmin(logical(1-nconst));
@@ -109,7 +109,7 @@ else
     end
     disp(['# function evaluations = ',num2str(Nfun)]);
     disp(['Final Border Size = ',num2str(length(T))]);
-end
+% end
 %if plot_on;  close; end;
 %pause
 

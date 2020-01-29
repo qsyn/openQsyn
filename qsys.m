@@ -29,9 +29,11 @@ classdef qsys
             
             nq=0; %qplant counter
             for k=1:length(obj.blocks)
-                blk = obj.blocks{k};
+                blk = obj.blocks{1};
                 if isa(blk,'qplant')
                     nq = nq+1;
+                elseif isa(blk,'qsys')
+                    nq = nq + blk.nqplant;
                 elseif ~any([isa(blk,'qfr') isa(blk,'lti') (isnumeric(blk) && isreal(blk))])
                     error('qsys accepts only qplants, qfr, lti, and real scalar blocks')
                 end
@@ -40,6 +42,10 @@ classdef qsys
                 error('qsys requires at least 1 block element to be a qplant object')
             end
             obj.nqplant = nq;
+        end
+        function obj = series(A,B)
+            %SERIES series connection of a qsys object
+            obj = qsys({A,B},'B{1}*B{2}');
         end
         function bodcases(obj,varargin)
             %BODCASES system frequency response for selected cases on Bode plot
@@ -65,7 +71,7 @@ classdef qsys
             %       color       specifiy color: RGB array
             %       shownom     show nominal in bold dashed line: 0 (def) | 1
             %       showmag     show magnitude plot: 0 | 1 (def)
-            %       shophase    show phase plot: 0 | 1 (def)
+            %       showphase    show phase plot: 0 | 1 (def)
             %
             %   See also: qplant/bodcases
             
@@ -193,23 +199,33 @@ classdef qsys
             if isempty(w), w = logspace(-2,3,200); end
             w = reshape(w,[],1); % make sure w is a column vector.
             
-            if ~iscell(par), par={par}; end % force cell
+            if isempty(par), par=cell(obj.nqplant,1);  end  % no par specified
+            if ~iscell(par), par={par}; end                 % force cell
             
             N = length(obj.blocks); % number of blocks
             T = cell(obj.nqplant,1);
             kp=0;
             for k=1:N
                 blk = obj.blocks{k};
-                if isa(blk,'qplant')
+                if (isa(blk,'qplant') || isa(blk,'qsys'))
                     kp = kp+1;
-                    T{k} = blk.cases(par{kp},w);
+                    if isscalar(par)
+                        T{k} = n2c(blk.cases(par{1},w));
+                    else
+                        T{k} = n2c(blk.cases(par{kp},w));
+                    end
                 elseif isnumeric(blk)
                     T{k} = blk;
-                else
-                    T{k} = freqresp(blk,w);
+                else % LTI object 
+                    T{k} = squeeze(freqresp(blk,w));
                 end
             end
             f = qsys2func(obj);
+            %[nrows,ncols] = cellfun(@size,T); % continue here...
+            
+            %for k=1:N
+                
+            %end
             varargout{1} = c2n(f(T),-180);
             if nargout==2
                 varargout{2} = w;
@@ -224,6 +240,11 @@ classdef qsys
             exp = replace(obj.connections,{'*','/','^'},{'.*','./','.^'});
             f = str2func([argF exp]);
         end
+        function sys = feedback(A,B)
+            %FEEDBACK connects qplant or qsys objects by negative feedback
+            sys = qsys({A,B},'1/(1+B{1}*B{2})');
+        end
+        
     end
 end
 
