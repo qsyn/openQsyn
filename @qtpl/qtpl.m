@@ -3,9 +3,9 @@ classdef qtpl
     %   Detailed explanation goes here
     
     properties
-        frequency
-        template
-        parameters
+        frequency   (1,1)   {mustBeNumeric,mustBeReal,mustBeNonnegative}
+        template    (:,1)   {mustBeNumeric}
+        parameters  (:,1)   {mustBeNumeric}
         parNames
     end
     

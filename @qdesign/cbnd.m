@@ -1,6 +1,31 @@
 function obj = cbnd(obj,spcname,w,spcfunc)
-%CBND Summary of this function goes here
-%   Detailed explanation goes here
+%CBND calculate bounds from given templates and specifications
+%
+%Usage:
+%
+%   CBND(des,spcname)   calculates bounds from template and spec wth name
+%   spcname, both under the qdesign object des.
+%   
+%   CBND(des,spcname,w)   specifies frequecnies in which to calculate 
+%
+%   CBND(des,spcname,w,spcfunc)   provide a function handle for the
+%   calculation. Use this option for custom specification calculations
+%
+%Inputs:
+%
+%   des     qdesign name with templates and specification(s)
+%
+%   spcname string specifiying the specification to be used. Pre-defined names 
+%           'odsrs' - output disturbance rejection (sensitivity)
+%           'rsrs'  - reference step tracking (servo)
+%
+%   w       vector of frequecnies
+%
+%   spcfunc function handle; required if spcname is not on of the
+%           pre-defined names.
+%
+%Output:    qdesign object with calculated bounds
+%
 
 if nargin<3, w=[]; end
 if nargin<4, spcfunc=[]; end
@@ -46,7 +71,7 @@ function c = cbnd1(tpls,spcfunc,spec)
 
 %default initial grid
 gphase0=-360:10:0;
-gmag0=-50:5:50;
+gmag0=-50:5:60;
 
 w = [tpls.frequency]';
 upper = interp1(spec.frequency,spec.upper,w);

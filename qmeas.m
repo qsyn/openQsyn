@@ -1,6 +1,8 @@
 classdef qmeas < qplant
-    %QMEAS Summary of this class goes here
-    %   Detailed explanation goes here
+    %QMEAS measurement based qplant 
+    %   
+    % Serves to perform bound calculations when only frequency response
+    % data is aviable
     
     properties
         
@@ -8,9 +10,13 @@ classdef qmeas < qplant
     
     methods
         function obj = qmeas(tpl)
-            %QBLACKBOX Construct an instance of this class
-            %   Detailed explanation goes here
+            %QMEAS construct an instance of this class
+            %
+            %   P = QMEAS(T)   creates a qmeas object P from the qtpl object T
+            %
+          
             obj = obj@qplant(tpl);
+            
         end
         
         function cnom(varargin)

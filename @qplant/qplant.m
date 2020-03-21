@@ -41,9 +41,9 @@ classdef qplant < handle
     end
     
     properties
-        info            % string
-        templates       % template (qtpl array)
-        nominal         % nominal case (qfr)
+        info        char   % string
+        templates   qtpl   % template (qtpl array)
+        nominal     qfr    % nominal case (qfr)
     end
     
     

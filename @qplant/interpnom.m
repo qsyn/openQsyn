@@ -20,6 +20,9 @@ function [varargout]=interpnom(obj,w,n)
 %               is a logarithmic grid of 200 points)
 %   n           index of the template case in the 1st template to be used 
 %               for the interpolation (default=1)
+%
+% Remark: if n>1, than the template point #1 is replaced with the selected n
+% and all points betewwn 1 and n are shifted by 1 index.
 
 if nargin==0, disp('[nom,w]=INTERPNOM(P,w,n)'), return; end
 if nargin<3, n=1; end
@@ -39,6 +42,14 @@ end
 tpl=zeros(length(w_tpl),1);
 for k=1:length(w_tpl)  
     tpl(k) = obj.templates(k).template(n);
+    if n>1
+        obj.templates(k).template = [obj.templates(k).template(n) 
+            obj.templates(k).template(1:n-1) 
+            obj.templates(k).template(n+1:end) ];
+        obj.templates(k).parameters = [obj.templates(k).parameters(n),...
+            obj.templates(k).parameters(1:n-1),... 
+            obj.templates(k).parameters(n+1:end) ];
+    end
 end
 
 phase = real(tpl);

@@ -11,10 +11,11 @@ bnd = obj.bnd;
 w = unique([bnd.w]);
 
 dombnd = struct('name','dombnd','w',w,'c',[]);
+N = 360; % number of points along contour
 
 for kw=1:length(w)
-    a = zeros(length(bnd),360);
-    theta = linspace(-2*pi+0.01,-0.01,360);
+    a = zeros(length(bnd),N);
+    theta = linspace(-2*pi+0.01,-0.01,N);
     for k = 1:length(bnd)
         [~,idx ] = ismember(w(kw),bnd(k).w);
         if isempty(idx) 
@@ -37,9 +38,10 @@ for kw=1:length(w)
         %angB = angle(b(1:inan(1)-1)); 
         if any(isnan(b))
             b = b(~isnan(b)); % b without nans
-            K = convhull(real(b),imag(b));  % nans indicate holes in bounds
-            angB = angle(b(K));
-            b = b(K);
+            %K = convhull(real(b),imag(b));  % nans indicate holes in bounds
+            %angB = angle(b(K));
+            %b = b(K);
+            angB = angle(b);
         else
             angB = angle(b); 
         end

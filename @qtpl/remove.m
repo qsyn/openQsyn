@@ -27,9 +27,9 @@ w_tpl = [obj.frequency];
 if isempty(p.Results.w)
     N = length(w_tpl);
     tplidx = 1:N;
-elseif all(ismember(w,w_tpl(:,1)))
+elseif all(ismember(w,w_tpl))
     N = length(p.Results.w);
-    [~,tplidx] = ismember(w,w_tpl(:,1));
+    [~,tplidx] = ismember(w,w_tpl);
 else
     error('at least one of specified frequencies not found in tplfile')
 end

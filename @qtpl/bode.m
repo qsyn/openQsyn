@@ -136,8 +136,8 @@ if length(tpl)>ncol
     col=repmat(col,ceil(length(tpl)/ncol),1);
 end
 
-bodeplotter(TPL(2:end,:),w_op,opt,col); % plot all points in template
-bodeplotter(TPL(1,:),w_op,opt,[0 0 0],struct('width',2,'style','--')); % plot the nominal case 
+bodeplotter(TPL(1:end,:),w_op,opt,col); % plot all points in template
+%bodeplotter(TPL(1,:),w_op,opt,[0 0 0],struct('width',2,'style','--')); % mark the nominal case 
 
 if nargout==1
     varargout{1}=phandle;
