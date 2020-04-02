@@ -18,14 +18,20 @@ reused code is done with his premission.
 
 ## How to use
 
-### Installation
+### Installing the Toolbox (non Git users)
+1. Download the zip.
+2. Unzip into a new folder named e.g. **openQsyn**
+3. Add  **openQsyn** to your Matlab path
+4. Run `oqsyn_ini` to initiate the toolbox
+
+### Installation via Git
 1. Create a folder named e.g **openQsyn** and open git bash
 2. Clone the repo by typing: `git clone https://github.com/rubindan/openQsyn.git`
 3. Add  **openQsyn** to your Matlab path
 4. Run `oqsyn_ini` to initiate the toolbox
 
 ### Demo 
-A quick introductory example is provided by the live script `exmaple.mlx`.
+A quick introductory example is provided by the live script `example.mlx`.
 This exmaple will guide you through the steps of SISO design: definning a 
 new plant and design specifications, computaing templates and bounds, 
 designing a feedback compensator and a pre-filter. 
