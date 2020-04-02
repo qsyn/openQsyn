@@ -11,7 +11,7 @@
 % the original _Qsyn_ toolbox, Prof. Per-Olof Gutman, and all reused code is done 
 % under his premission.
 %
-% The project is hosted on GitHub: <https://github.com/rubindan/openQsyn> 
+% The project is hosted on GitHub: <https://github.com/qsyn/openQsyn> 
 
 %% 
 % Typical QFT design is doen according to the following steps:

@@ -5,7 +5,7 @@ classdef qtpl
     properties
         frequency   (1,1)   {mustBeNumeric,mustBeReal,mustBeNonnegative}
         template    (:,1)   {mustBeNumeric}
-        parameters  (:,1)   {mustBeNumeric}
+        parameters  (:,:)   {mustBeNumeric}
         parNames
     end
     
@@ -41,6 +41,12 @@ classdef qtpl
             obj.template = p.Results.template;
             obj.parameters = p.Results.parameters; 
             obj.parNames = p.Results.parNames; 
+            
+            % complete missing parameters
+            if isempty(obj.parameters)
+                obj.parameters = 1:length(obj.template);
+                obj.parNames = 'index (def)';
+            end
             
         end 
         function [ T ] = shift( A,b )
@@ -213,9 +219,13 @@ classdef qtpl
         end
     end
     
+    methods(Hidden = true)
+        T = tplop( A,B,op );
+    end
+    
     methods(Static)
         %h = bodeplotter(tpl,w,opt,col)  % moved to utilities
-        T = tplfile_import(filename,varargin)
+        T = tplfile_import(filename,varargin);
     end
     
 end

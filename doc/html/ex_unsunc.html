@@ -6,7 +6,7 @@
    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Example:Plant with uncertain uncertainty</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-02-10"><meta name="DC.source" content="ex_unsunc.m"><style type="text/css">
+      --><title>Example:Plant with unstructured uncertainty</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-22"><meta name="DC.source" content="ex_unsunc.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Example:Plant with uncertain uncertainty</h1><!--introduction--><!--/introduction--><p>The plant is given as</p><p><span class="MathJax_Preview"><img src="ex_unsunc_eq02930832486406380935.png" alt="$$ P(s) = \frac{s+a}{1 + s \zeta / \omega_n + s^2 / \omega_n^2} $$"></span><script type="math/tex"> P(s) = \frac{s+a}{1 + s \zeta / \omega_n + s^2 / \omega_n^2} </script></p><p>with uncertain paraetmers given as</p><p><span class="MathJax_Preview"><img src="ex_unsunc_eq13842471372895612606.png" alt="$$ k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]$$"></span><script type="math/tex"> k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]</script></p><p>and with uncertain uncertainty given as</p><pre class="codeinput">w = [0.1 0.2 0.5 1 2 5 10 20 50 100];
+  </style></head><body><div class="content"><h1>Example:Plant with unstructured uncertainty</h1><!--introduction--><!--/introduction--><p>The plant is given as</p><p><span class="MathJax_Preview"><img src="ex_unsunc_eq02930832486406380935.png" alt="$$ P(s) = \frac{s+a}{1 + s \zeta / \omega_n + s^2 / \omega_n^2} $$"></span><script type="math/tex"> P(s) = \frac{s+a}{1 + s \zeta / \omega_n + s^2 / \omega_n^2} </script></p><p>with uncertain paraetmers given as</p><p><span class="MathJax_Preview"><img src="ex_unsunc_eq13842471372895612606.png" alt="$$ k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]$$"></span><script type="math/tex"> k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]</script></p><p>and with unstructured uncertainty given as</p><pre class="codeinput">w = [0.1 0.2 0.5 1 2 5 10 20 50 100];
 m = [0 0.3 0.3 0.3 0.3 0.35 0.35 0.35 0.5 0.5];
 semilogx(w,m); xlabel(<span class="string">'m(j\omega)'</span>); ylabel(<span class="string">'freqeuncy [rad/s]'</span>)
 </pre><img vspace="5" hspace="5" src="ex_unsunc_01.png" alt=""> <p>Define uncertain parameters:</p><pre class="codeinput">k=qpar(<span class="string">'k'</span>,2,2,5,8);
@@ -83,13 +83,13 @@ P =
 
           num: [1&times;1 qpoly]
           den: [1&times;1 qpoly]
-        delay: []
          pars: [4&times;1 qpar]
+        delay: []
      unstruct: []
        uncint: []
-    templates: []
-      nominal: []
-         info: 'generated from [num,den] data on: 10-Feb-2019 21:42:54'
+         info: 'generated from [num,den] data on: 22-Mar-2020 21:06:48'
+    templates: [0&times;0 qtpl]
+      nominal: [0&times;0 qfr]
 
 </pre><p>compute the nominal and template by e.g. recurcive grid ans show the results</p><pre class="codeinput">P.ctpl(<span class="string">'recgrid'</span>,w);
 P.cnom(logspace(-2,3,200));
@@ -98,43 +98,43 @@ P.showtpl
 Accuracy: 5 [deg], 3 [dB] 
 --&gt; for w=0.1 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 257265
+# function evaluations = 641
 Final Border Size = 39
 --&gt; for w=0.2 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 258050
+# function evaluations = 1426
 Final Border Size = 38
 --&gt; for w=0.5 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 258963
+# function evaluations = 2339
 Final Border Size = 43
 --&gt; for w=1 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 261510
+# function evaluations = 4886
 Final Border Size = 63
 --&gt; for w=2 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 272427
+# function evaluations = 15803
 Final Border Size = 73
 --&gt; for w=5 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 360556
+# function evaluations = 103932
 Final Border Size = 154
 --&gt; for w=10 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 380989
+# function evaluations = 124365
 Final Border Size = 95
 --&gt; for w=20 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 383086
+# function evaluations = 126462
 Final Border Size = 65
 --&gt; for w=50 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 384295
+# function evaluations = 127671
 Final Border Size = 51
 --&gt; for w=100 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 384936
+# function evaluations = 128312
 Final Border Size = 52
 </pre><img vspace="5" hspace="5" src="ex_unsunc_02.png" alt=""> <p>Add the unstructored uncertainty unsing the command aunstruc - a shortcut for add unstructored uncertainty</p><pre class="codeinput">P.aunstruc(w,m)
 </pre><pre class="codeoutput">
@@ -144,13 +144,13 @@ ans =
 
           num: [1&times;1 qpoly]
           den: [1&times;1 qpoly]
-        delay: []
          pars: [4&times;1 qpar]
+        delay: []
      unstruct: [10&times;2 double]
        uncint: []
+         info: 'generated from [num,den] data on: 22-Mar-2020 21:06:48'
     templates: [10&times;1 qtpl]
       nominal: [1&times;1 qfr]
-         info: 'generated from [num,den] data on: 10-Feb-2019 21:42:54'
 
 </pre><p>Now compute the templates again</p><pre class="codeinput">P.ctpl(<span class="string">'recgrid'</span>,w);
 P.showtpl
@@ -158,47 +158,47 @@ P.showtpl
 Accuracy: 5 [deg], 3 [dB] 
 --&gt; for w=0.1 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 385577
+# function evaluations = 128953
 Final Border Size = 39
 --&gt; for w=0.2 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 386362
+# function evaluations = 129738
 Final Border Size = 38
 --&gt; for w=0.5 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 387275
+# function evaluations = 130651
 Final Border Size = 43
 --&gt; for w=1 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 389822
+# function evaluations = 133198
 Final Border Size = 63
 --&gt; for w=2 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 400739
+# function evaluations = 144115
 Final Border Size = 73
 --&gt; for w=5 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 488868
+# function evaluations = 232244
 Final Border Size = 154
 --&gt; for w=10 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 509301
+# function evaluations = 252677
 Final Border Size = 95
 --&gt; for w=20 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 511398
+# function evaluations = 254774
 Final Border Size = 65
 --&gt; for w=50 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 512607
+# function evaluations = 255983
 Final Border Size = 51
 --&gt; for w=100 [rad/s] 
 ADGRID: 4 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 513248
+# function evaluations = 256624
 Final Border Size = 52
 </pre><img vspace="5" hspace="5" src="ex_unsunc_03.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% Example:Plant with uncertain uncertainty
+%% Example:Plant with unstructured uncertainty
 %
 %%
 % The plant is given as 
@@ -209,7 +209,7 @@ Final Border Size = 52
 % 
 % $$ k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]$$
 % 
-% and with uncertain uncertainty given as 
+% and with unstructured uncertainty given as 
 w = [0.1 0.2 0.5 1 2 5 10 20 50 100];
 m = [0 0.3 0.3 0.3 0.3 0.35 0.35 0.35 0.5 0.5];
 semilogx(w,m); xlabel('m(j\omega)'); ylabel('freqeuncy [rad/s]')

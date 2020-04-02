@@ -110,7 +110,7 @@ for k = 1:N
     
     p1 =  repmat(tpl1(k).parameters,1,n2);
     p2 =  repmat(tpl2(k).parameters,1,n1);
-    p = [p1 p2];
+    p = [p1 ; p2];
    
     t1 = repmat(t1c,n2,1);
     t2 = repmat(t2c,n1,1);

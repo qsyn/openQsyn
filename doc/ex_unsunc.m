@@ -1,4 +1,4 @@
-%% Example:Plant with uncertain uncertainty
+%% Example:Plant with unstructured uncertainty
 %
 %%
 % The plant is given as 
@@ -9,7 +9,7 @@
 % 
 % $$ k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]$$
 % 
-% and with uncertain uncertainty given as 
+% and with unstructured uncertainty given as 
 w = [0.1 0.2 0.5 1 2 5 10 20 50 100];
 m = [0 0.3 0.3 0.3 0.3 0.35 0.35 0.35 0.5 0.5];
 semilogx(w,m); xlabel('m(j\omega)'); ylabel('freqeuncy [rad/s]')

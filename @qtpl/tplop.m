@@ -1,6 +1,9 @@
 function [ T ] = tplop( A,B,op )
 %TPLOP operations between templates 
 %
+%   Using tplop is not reccomanded and therefore hiiden from the user! 
+%   Use tplshift for moving templates across the Nichols chart. 
+%
 %	[ T ] = tplop( A,B,OP ) performs the operation described by OP between
 %	qtpl object A, and an object B.
 %
@@ -18,7 +21,7 @@ if isa(A,'qtpl')
     pnameB ={};
     AisQtpl=1;
 else
-    % in case A is no a qtpl the second output is. A is copied into B for
+    % in case A is not a qtpl the second output is. A is copied into B for
     % type checking. In computation loop AisQtpl cariable is used to switch
     % back A and B to tpl1 and tpl2
     tplA = B;
@@ -92,7 +95,7 @@ for k = 1:N
     n2 = max(1,length(tpl2(k).parameters));     % exclude 0 length
     p1 =  repmat(tpl1(k).parameters,n2,1);
     p2 =  repmat(tpl2(k).parameters,n1,1);
-    p = [p1 p2];
+    p = [p1 ; p2];
     
     T(k).parameters = p(:,idx);
     T(k).template = t(idx);

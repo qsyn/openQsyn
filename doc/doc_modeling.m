@@ -8,6 +8,13 @@
 % * <matlab:doc('qpoly') qpoly>  describes an uncertain polynom --composed of qpars and qexpressions 
 % * <matlab:doc('qplant') qplant> describes an uncertain plant
 
+%%
+% Note that this page describes plant modeling as a set of LTI tranfer functions.
+% *Open Qsyn* also allows for "black box" plants and 
+% for plants described as measured frequecy response data. 
+% See <matlab:web('ex_blackBox.html') Black Box Example> and 
+% <matlab:web('ex_qmeas.html') Data Based Design Example>, respectively. 
+
 %% Modeling uncertain parameters
 % Uncertain parameters are modeled using <matlab:doc('qpar') qpar> objects. 
 % a <matlab:doc('qpar') qpar> object is constructed as follows

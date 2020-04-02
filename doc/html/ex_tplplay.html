@@ -1,0 +1,133 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Exmaple: Playing around with templates</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-31"><meta name="DC.source" content="ex_tplplay.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Exmaple: Playing around with templates</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#4">Complex Plane Operations</a></li></ul></div><p>The qtpl class offers conviniante methods for ajustions and modifications. This example covers most of them. Let us start by generating two random templates:</p><pre class="codeinput">template1 = -90 + 10*rand(200,1) + 1i*rand(200,1);
+template2 = -100 - 5i + 1*rand(100,1) + 10i*rand(100,1);
+
+tpl1 = qtpl(1,template1); <span class="comment">% assign to frequency w=1 rad/s</span>
+tpl2 = qtpl(1,template2); <span class="comment">% assign to frequency w=1 rad/s</span>
+tpl1.show;
+tpl2.show(gcf,<span class="string">'color'</span>,[1 0 0])
+axis([-102 -78 -8 8]); ngrid;
+</pre><img vspace="5" hspace="5" src="ex_tplplay_01.png" alt=""> <p>Observe that since no uncetrain parameters where specified, these filed assumes the default values, e.g.</p><pre class="codeinput">disp(tpl1.parNames)
+disp(tpl1.parameters)
+</pre><pre class="codeoutput">index (def)
+  Columns 1 through 13
+
+     1     2     3     4     5     6     7     8     9    10    11    12    13
+
+  Columns 14 through 26
+
+    14    15    16    17    18    19    20    21    22    23    24    25    26
+
+  Columns 27 through 39
+...</pre><p>Tempaltes can be manipulated using two principle mechanisms:</p><div><ul><li>Complex plane (Nyquist) operations are facilitated by <tt>cpop</tt></li></ul></div><div><ul><li>Nichols plane operations are facilitated by <tt>tplop</tt></li></ul></div><h2 id="4">Complex Plane Operations</h2><p>The qtpl method CPOP( A,B,OPR ) performs the operation described by OPR between objects A and B, where at least one of them is a qtpl object. useful operations include product (<tt>'*'</tt>) and division (<tt>'/'</tt>).</p><p><b>Example 1</b>: Multiply the template tpl1 by 2.</p><pre class="codeinput">tpl3 = tplop(tpl1,2,<span class="string">'*'</span>);
+tpl3.show(gcf,<span class="string">'color'</span>,[0 1 0])
+</pre><img vspace="5" hspace="5" src="ex_tplplay_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Exmaple: Playing around with templates
+%%
+% The qtpl class offers conviniante methods for ajustions and
+% modifications. This example covers most of them.
+% Let us start by generating two random templates: 
+
+template1 = -90 + 10*rand(200,1) + 1i*rand(200,1);
+template2 = -100 - 5i + 1*rand(100,1) + 10i*rand(100,1);
+
+tpl1 = qtpl(1,template1); % assign to frequency w=1 rad/s
+tpl2 = qtpl(1,template2); % assign to frequency w=1 rad/s
+tpl1.show; 
+tpl2.show(gcf,'color',[1 0 0]) 
+axis([-102 -78 -8 8]); ngrid; 
+
+%%
+% Observe that since no uncetrain parameters where specified, these filed 
+% assumes the default values, e.g.   
+disp(tpl1.parNames)
+disp(tpl1.parameters)
+
+%%
+% Tempaltes can be manipulated using two principle mechanisms: 
+%
+% * Complex plane (Nyquist) operations are facilitated by |cpop| 
+%
+% * Nichols plane operations are facilitated by |tplop|
+
+%% Complex Plane Operations
+% 
+% The qtpl method CPOP( A,B,OPR ) performs the operation described by OPR between
+% objects A and B, where at least one of them is a qtpl object. useful
+% operations include product (|'*'|) and division (|'/'|).
+
+%%  
+% *Example 1*: Multiply the template tpl1 by 2.
+tpl3 = tplop(tpl1,2,'*');
+tpl3.show(gcf,'color',[0 1 0])
+
+##### SOURCE END #####
+--></body></html>
