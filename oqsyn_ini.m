@@ -15,6 +15,6 @@ homepath=fullpath(1:end-9);
 addpath([homepath,'utilities'])
 addpath(genpath([homepath,'doc']))
 
-builddocsearchdb('C:\Users\RubinDan\Documents\MATLAB\Qsyn\oo\doc\html')
+builddocsearchdb([homepath,'\doc\html'])
 
 end

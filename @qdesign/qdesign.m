@@ -29,7 +29,7 @@ classdef qdesign  < handle
                  'Compute bounds using CBND'])
         end
         function [] = clmag(obj,C,F)
-            %COMP computes closed loop magnitude response
+            %CLMAG computes closed loop magnitude response
             %
             %   obj     qdesign object 
             %

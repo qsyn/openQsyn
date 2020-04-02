@@ -78,16 +78,35 @@ classdef qfr
             G = obj.frd();
             nichols(G,obj.frequency);
         end
-        function [] = bode(obj)
+        %function [] = bode(obj)
             %BODE plots a bode plot
-            G = obj.frd();
-            bode(G,obj.frequency);
-        end
+            %G = obj.frd();
+            %bode(G,obj.frequency);
+        %end
+        
         function [] = bodeplot(obj,varargin)
             %BODEPLOT plots a bode plot with additional options
-            G = obj.frd();
-            opt = bodeoptions(varargin{:});
-            bodemag(G,obj.frequency,opt);
+            
+            p = inputParser;
+            p.addOptional('w',obj.frequency,@(x) isnumeric(x) && isvector(x) && (x > 0) && isreal(x));
+            p.addOptional('color',[0 0 1],@(x) isnumeric(x) && size(x,2)==3);
+            p.addOptional('linestyle','-',@(x) ischar(x));
+            p.addParameter('PhaseVisible','on')
+            p.addParameter('MagVisible','on')
+            p.parse(varargin{:});
+            
+            showMagPhase = strcmp({p.Results.MagVisible, p.Results.PhaseVisible},'on');
+            if all(showMagPhase==1)
+                opt = 'magphase';
+            elseif all(showMagPhase == [1 0]) 
+                opt = 'mag';
+            elseif all(showMagPhase == [0 1])
+                opt = 'phase';
+            else
+                error('PhaseVisible option must be a boolian scalar');
+            end
+            
+            bodeplotter(obj.response.',p.Results.w,opt,p.Results.color)
         end
         function G = frd(obj)
             %FRD converts qfr to a Control Systems Toolbox FRD object
