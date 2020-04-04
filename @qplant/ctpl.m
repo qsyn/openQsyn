@@ -15,7 +15,7 @@ function obj = ctpl(obj,method,w,varargin)
 %               'grid'      uniform grid over parameter
 %               'rngrid'    random grid over the parameters
 %               'random'    random sample points
-%               'recgrid'   recurcive grid (TO DO)
+%               'recgrid'   recurcive grid
 %               'aedgrid'   recurcive edge grid
 %               'cases'     explicitly given parameter cases
 %

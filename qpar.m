@@ -154,13 +154,17 @@ classdef qpar  < matlab.mixin.CustomDisplay
                     a = obj(k).lower + (obj(k).upper-obj(k).lower)*rand(1,cases(k));
                 end
                 x = full(a);
-                s = ones(1,N);
-                s(k) = numel(x);
-                x = reshape(x,s);
-                s = cases;
-                s(k) = 1;
-                pk = repmat(x,s);
-                p(k,:) = reshape(pk,1,[]);
+                if N > 1 
+                    s = ones(1,N);
+                    s(k) = numel(x);
+                    x = reshape(x,s);
+                    s = cases;
+                    s(k) = 1;
+                    pk = repmat(x,s);
+                    p(k,:) = reshape(pk,1,[]);
+                else
+                    p = x;
+                end
             end
                         
         end
