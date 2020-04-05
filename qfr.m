@@ -78,11 +78,11 @@ classdef qfr
             G = obj.frd();
             nichols(G,obj.frequency);
         end
-        %function [] = bode(obj)
+        function [] = bode(obj)
             %BODE plots a bode plot
             %G = obj.frd();
-            %bode(G,obj.frequency);
-        %end
+            bodeplot(obj);
+        end
         
         function [] = bodeplot(obj,varargin)
             %BODEPLOT plots a bode plot with additional options
