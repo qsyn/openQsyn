@@ -71,6 +71,7 @@ switch method
     case 'recgrid', tpl=obj.recgrid(w,options);
     case 'recedge', tpl=obj.recedge(w,options);
     case 'cases', tpl=obj.cases2tpl(options,w);
+    case 'rff', tpl=obj.crff(w,options);
     otherwise, error('unrecognized method!')
 end
 
