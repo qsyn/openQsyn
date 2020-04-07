@@ -11,10 +11,9 @@ classdef qrff
         function obj = qrff(type,par1,par2)
             %QRFF Construct an instance of the qrff class
             %   Detailed explanation goes here
-             
             
-            
-            
+            validStrings = {'gain','delay','dc','hf','uns','int'};
+
             if nargin == 3 
                 pars = [par1 ; par2];
             elseif nargin ==2
@@ -23,6 +22,7 @@ classdef qrff
                 error('Not enough input arguments.')
             end
             if ischar(type) 
+                validatestring(type,validStrings);
                 obj.type = type;
             else
                 error('type must be a string')
@@ -48,7 +48,7 @@ classdef qrff
     %methods(Hidden=true)
     methods
         T = rffel(element,a,w,dist)
-        T = rffpz(a,w,form,pzf,dist) 
+        T = rffpz(obj,w,pzf,dist) 
         T = rffmul(t1,t2,dist)
         T = rffutil1(w,phi,zmin,zmax,wmin,wmax,form,pzf,kase)
         Tnew = rffutil3(Tleft,T,Tright,edge,dist)
