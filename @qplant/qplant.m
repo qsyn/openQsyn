@@ -73,7 +73,7 @@ classdef qplant < handle
             isBlackBox = 0; % default type
             % check first input
             switch class(varargin{1})
-                case {'qpoly', 'qexpression'}
+                case {'qpoly', 'qexpression','qrff'}
                     obj.num = varargin{1};
                     npar = varargin{1}.pars;
                 case 'qpar'
@@ -93,7 +93,7 @@ classdef qplant < handle
             end
             % check second input
             switch class(varargin{2})
-                case {'qpoly', 'qexpression'}
+                case {'qpoly', 'qexpression','qrff'}
                     if isBlackBox
                         error('for a black box model the 2nd argument must be a qpar array');
                     end
@@ -269,7 +269,7 @@ classdef qplant < handle
             % if not a black box continue as follows:
             
             p = obj.num;
-            if isa(p,'qpoly') || ( isnumeric(p) && isrow(p) )
+            if isa(p,'qpoly') || isa(p,'qrff') || ( isnumeric(p) && isrow(p) )
                 snum = obj.poly2str(p);
             elseif isa(p,'qexpression')
                 snum = strrep(strrep(strrep(p.expression, '*', '.*'),'/','./'),'^','.^');
@@ -278,7 +278,7 @@ classdef qplant < handle
             end
             
             p = obj.den;
-            if isa(p,'qpoly') || ( isnumeric(p) && isrow(p) )
+            if isa(p,'qpoly') || isa(p,'qrff') || ( isnumeric(p) && isrow(p) )
                 sden = obj.poly2str(p);
             elseif isa(p,'qexpression')
                 sden = strrep(strrep(strrep(p.expression, '*', '.*'),'/','./'),'^','.^');
@@ -519,6 +519,11 @@ classdef qplant < handle
             %POLY2STR converts a polynom to a string
             if isa(p,'qpoly')
                 fnum = qpoly2func(p);
+                snum = func2str(fnum);
+                inum = strfind(snum,')');
+                s = snum(inum+1:end);
+            elseif isa(p,'qrff')
+                fnum = qrff2func(p);
                 snum = func2str(fnum);
                 inum = strfind(snum,')');
                 s = snum(inum+1:end);
