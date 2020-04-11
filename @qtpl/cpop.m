@@ -17,7 +17,10 @@ function [ T ] = cpop( A,B,opr,varargin )
 %               * Matlab control toolboxz LTI siso object 
 %               * qfr object               
 %   opr         operation: '+'|'-'|'*'|'/'|'sens'|'comp'
-%   prunning    optional prunning option: 0 (def) | 1 (qsyn) | 2 (matlab)    
+%   pruning    optional pruning option: 0 (def) | 1  | 2 
+%                   option 1 -- use Qsyn prune function
+%                   option 2 -- use Matlab boundary function (from 2017b)
+%               
 %
 %   Output
 %   T       qplt array
@@ -35,7 +38,7 @@ p = inputParser;
 addRequired(p,'A',@(x)isa(x,'qtpl') || isnumeric(x));
 addRequired(p,'B');
 addRequired(p,'opr',@(x)validateattributes(x,{'char'},{'nonempty'}));
-addParameter(p,'prunning',0,@(x)validateattributes(x,...
+addParameter(p,'pruning',0,@(x)validateattributes(x,...
     {'numeric'},{'>=',0,'<=',2,'integer','scalar'},'cpop','option')); % set prunning method
 parse(p,A,B,opr,varargin{:});
 
@@ -58,7 +61,7 @@ end
 %tpl1 = p.Results.A;
 %B = p.Results.B;
 opr = p.Results.opr;
-prunning = p.Results.prunning;
+pruning = p.Results.pruning;
 %-----------------
 
 w = [tplA.frequency]';
@@ -128,10 +131,12 @@ for k = 1:N
     
     t = c2n(tc,'unwrap');
     
-    if length(tpl2(k).template) > 1 && prunning == 1
+    if  pruning == 1 && length(t) > 1  
         [~,idx] = prune(t,[2 2]);
-    elseif length(tpl2(k).template) > 1 && prunning == 2
+        idx = [1 idx]; % nominal stays 
+    elseif pruning == 2 && length(t) > 1  
         idx=boundary(real(t),imag(t),0.3);
+        idx = [1; idx]; % nominal stays
     else
         idx = 1:length(t1);
     end
