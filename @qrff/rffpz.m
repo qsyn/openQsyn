@@ -50,7 +50,11 @@ function [T] = rffpz(obj,w,pzf,dist)
 % Author: B Cohen, P-O Gutman
 % Version upgrade: A. & Y. Greenhut
 
-a = [obj.pars.lower obj.pars.upper];
+if isa(obj.par1,'qpar')
+    a = [obj.par1.lower obj.par1.upper]; 
+else
+    a = [obj.par1 obj.par1];
+end
 form = obj.type;
 
 % Defaults

@@ -18,6 +18,7 @@ function obj = ctpl(obj,method,w,varargin)
 %               'recgrid'   recurcive grid
 %               'aedgrid'   recurcive edge grid
 %               'cases'     explicitly given parameter cases
+%               'rff'       real-factored form
 %
 %       w       frequency vector in rad/s
 %

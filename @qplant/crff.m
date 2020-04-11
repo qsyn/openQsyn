@@ -1,6 +1,8 @@
-function tpl = crff(w_tpl,options)
+function tpl = crff(obj,w_tpl,options)
 %CRFF computes rff template
 %   Detailed explanation goes here
+
+%if isa(obj.num,'qrff'
 
 disp(['Calculating templates using the Real Factored Form method']);
 
@@ -15,9 +17,9 @@ disp(['Calculating templates using the Real Factored Form method']);
 
 
 ndist=[0.25 1]; % to replace with options.accuracy?
-dist=ndist(1);
+angDist=ndist(1);
 
-if (abs(360-fix(360/dist)*dist)>eps)
+if (abs(360-fix(360/angDist)*angDist)>eps)
     error('360 must be an integer multiple of the angular resolution, dist(1) [deg]');
 end
 
@@ -35,11 +37,15 @@ for ii=1:length(w_tpl)
     for k = 1:length(obj.num)
         rffElement = obj.num(k);
         if strcmp(rffElement.type,{'gain','delay','uns','int'})
-            t = rffElement.rffel(w,dist); 
+            t = rffElement.rffel(w,angDist); 
         else
-            t = rffElement.rffpz('z',dist);
+            if isempty(rffElement.par2)
+                t = rffElement.rffpz('z',angDist);
+            else
+                t = rffElement.rffcpz('z',angDist);
+            end
         end
-        t_ = rffmul(t,t_,dist);
+        t_ = rffmul(t,t_,angDist);
     end
     
     if ~isempty(t_)
@@ -52,11 +58,15 @@ for ii=1:length(w_tpl)
     for k = 1:length(obj.den)
         rffElement = obj.den(k);
         if strcmp(rffElement.type,{'gain','delay','uns','int'})
-            t = rffElement.rffel(w,dist); 
+            t = rffElement.rffel(w,angDist); 
         else
-            t = rffElement.rffpz('p',dist);
+            if isempty(rffElement.par2)
+                t = rffElement.rffpz('p',angDist);
+            else
+                t = rffElement.rffcpz('p',angDist);
+            end
         end
-        t_ = rffmul(t,t_,dist);
+        t_ = rffmul(t,t_,angDist);
     end
     
     [n,nn]=size(t_);
@@ -65,7 +75,7 @@ for ii=1:length(w_tpl)
     else
         den_r = [0];
     end
-    t_=rffmul(num_r,-den_r,dist);
+    t_=rffmul(num_r,-den_r,angDist);
     
     %Jens: .'
     %if length(Kn1) > 0 ,    t_=t_+c2n(eval(Kn1),'unwrap').';      end;

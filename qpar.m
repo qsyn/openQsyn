@@ -39,7 +39,10 @@ classdef qpar  < matlab.mixin.CustomDisplay
             elseif nargin==4 && isnumeric(ubnd)
                 cases = 3;
                 disp('3 cases are selected as default');
-            elseif nargin~=5
+            elseif nargin==0
+                par = qpar.empty;
+                return; % empty qpar object 
+            elseif nargin ~=5
                 error('unexceptable number of argumetns to qpar')
             end
             

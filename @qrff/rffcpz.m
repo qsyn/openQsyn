@@ -1,8 +1,8 @@
-function [T]=rffcpz(obj,w,pzf,dist)
+function [T]=rffcpz(obj,w,pzf,angDist)
 
 %RFFCPZ     computes a complex pole/zero pair template in real factored form.
 %
-%       [T]=rffcpz(a1,a2,w,form,pzf,dist)
+%       [T] = RFFCPZ(a1,a2,w,form,pzf,angDist)
 %
 %       T: 	column vector with an even number of elements.
 %       	The first half the vector T is the low gain template edge,
@@ -44,7 +44,7 @@ function [T]=rffcpz(obj,w,pzf,dist)
 %               or 1/(s^2 + 2*z*wn*s + wn^2).
 %
 %
-%       dist:   The template edges are computed for angles that are
+%       angDist:   The template edges are computed for angles that are
 %       	multiples of dist [deg] which must be  a positive real
 %       	number  such that 360 may be divided by dist without
 %       	remainder The default of dist is 1 [deg]. The angular
@@ -67,11 +67,20 @@ function [T]=rffcpz(obj,w,pzf,dist)
 % Original Authors: P-O Gutman, B Cohen
 % Version update: A. & Y. Greenhut
 
-a2 = [obj.pars(1).lower obj.pars(1).upper]; % wn
-a1 = [obj.pars(2).lower obj.pars(2).upper]; % zeta
+if ~exist('angDist','var'), angDist=1; end
+if isa(obj.par1,'qpar')
+    a2 = [obj.par1.lower obj.par1.upper]; % wn
+else
+    a2 = [obj.par1 obj.par1];
+end
+if isa(obj.par2,'qpar')
+    a1 = [obj.par2.lower obj.par2.upper]; % zeta
+else
+    a1 = [obj.par2 obj.par2];
+end
 form = obj.type;
 
-if (abs(360-fix(360/dist)*dist)>eps)
+if (abs(360-fix(360/angDist)*angDist)>eps)
     error('360 must be an integer multiple of the angular resolution, dist [deg]');
 end
 
@@ -86,7 +95,7 @@ end
 % Defaults
 if ~exist('form','var'), form=[]; end
 if ~exist('pzf','var'),  pzf=[];  end
-if ~exist('dist','var'), dist=1;  end
+if ~exist('dist','var'), angDist=1;  end
 
 if isempty(form),form='dc'; end
 if isempty(pzf), pzf='z';   end
@@ -135,7 +144,7 @@ if (  ( (a1(1)==a1(2)) && (a2(1)==a2(2)))) % peo 960518
     % an upper an lower edge. see rffmul
     
     %round it again, man, because c2n may introduce a slight error:
-    T = round(real(T)/dist)*dist + 1j*imag(T);   %peo 961015
+    T = round(real(T)/angDist)*angDist + 1j*imag(T);   %peo 961015
     
     return
 end
@@ -155,7 +164,7 @@ if ((zmin==0) && (wmin==w)), phi_ = 0; end
 if ((zmin==0) && (wmax==w)), phi_ = 180; end
 phi11=min(phi_);
 phi12=max(phi_);
-phi = [round(phi11/dist)*dist : dist : round(phi12/dist)*dist];
+phi = [round(phi11/angDist)*angDist : angDist : round(phi12/angDist)*angDist];
 phi = phi(find( (phi-phi11>=0)&(phi-phi12<=0) )); % desired angles inside the interval
 
 % calculating extreme points
@@ -182,7 +191,7 @@ if ( ((wmax-w)<0) && (zmin<0) && (zmax>=0) )	%angle(-1)=180 deg
     phi21 = max(phi_);			%minimum angle
     phi22 = min(phi_) + 360;		%maximum angle
 end
-phi = [round(phi21/dist)*dist : dist : round(phi22/dist)*dist];
+phi = [round(phi21/angDist)*angDist : angDist : round(phi22/angDist)*angDist];
 phi = phi(find( (phi-phi21>=0)&(phi-phi22<=0) )); % desired angles inside the interval
 
 % calculating extreme points
@@ -202,7 +211,7 @@ if ( (zmax==0) && (wmin==w) ), phi_ = 0; end
 if ( (zmax==0) && (wmax==w) ), phi_ = 180; end
 phi31=min(phi_);
 phi32=max(phi_);
-phi = [round(phi31/dist)*dist : dist : round(phi32/dist)*dist];
+phi = [round(phi31/angDist)*angDist : angDist : round(phi32/angDist)*angDist];
 phi = phi(find( (phi-phi31>=0)&(phi-phi32<=0) )); % desired angles inside the interval
 
 % calculating extreme points
@@ -230,7 +239,7 @@ if ( ((wmin-w)<0) && (zmin<0) && (zmax>=0) )	%angle(-1)=180 deg
     phi41 = max(phi_);			%minimum angle
     phi42 = min(phi_) + 360;		%maximum angle
 end
-phi = [round(phi41/dist)*dist : dist : round(phi42/dist)*dist];
+phi = [round(phi41/angDist)*angDist : angDist : round(phi42/angDist)*angDist];
 phi = phi(find( (phi-phi41>=0)&(phi-phi42<=0) )); % desired angles inside the interval
 
 % calculating extreme points
@@ -254,7 +263,7 @@ end
 if ( (sign((w-wmin)*(wmax-w)) > 0) && (sign(zmin*zmax) < 0) )
     Thi = [ T1(:) ; T2(:) ; T3(:) ; T4(:) ];	%column vector
     %disp(' test 1234kv0')
-    Thi = rffutil3([],Thi,[],'hi',dist);	%sort and eliminate angular doubles
+    Thi = rffutil3([],Thi,[],'hi',angDist);	%sort and eliminate angular doubles
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -269,7 +278,7 @@ elseif ( (sign((w-wmin)*(wmax-w)) > 0) && ( (zmin>= 0) && (zmin < eps) ) )
     Thi = [T2(:) ; T3(:) ; T4(:) ];	%high gain edge column vector
     %disp(' test 12kv0')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax2,Thi,Tmax4,'hi',dist);
+    Thi = rffutil3(Tmax2,Thi,Tmax4,'hi',angDist);
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -289,7 +298,7 @@ elseif ( (sign((w-wmin)*(wmax-w)) > 0) && ( (zmax<= 0) && (zmax > -eps) ) )
     Tmax4(1) = -180 + 1j*imag(Tmax4(1));
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax4,Thi,Tmax2,'hi',dist);
+    Thi = rffutil3(Tmax4,Thi,Tmax2,'hi',angDist);
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -306,7 +315,7 @@ elseif ( ( (wmin-w>=0) && ((wmin-w)<eps) ) && (sign(zmin*zmax)<0) )
     Thi = [T1(:) ; T2(:) ; T3(:) ];	%high gain edge column vector
     %disp(' test 41kv0')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax1,Thi,Tmax3,'hi',dist);
+    Thi = rffutil3(Tmax1,Thi,Tmax3,'hi',angDist);
     
     if strcmp(form,'hf')	%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -326,7 +335,7 @@ elseif ( ( (wmax-w<=0) && ((w-wmax)<eps) ) && (sign(zmin*zmax)<0) )
     Tmax1  = Tmax1 + 360;
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax3,Thi,Tmax1,'hi',dist);
+    Thi = rffutil3(Tmax3,Thi,Tmax1,'hi',angDist);
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -341,7 +350,7 @@ elseif ( ( (wmin-w>=0) && ((wmin-w)<eps) ) && ( (zmin>= 0) && (zmin < eps) ) )
     Thi = [ T2(:) ; T3(:) ];	%high gain edge column vector
     %disp(' test 1kv0')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax2,Thi,Tmax3,'hi',dist);	%
+    Thi = rffutil3(Tmax2,Thi,Tmax3,'hi',angDist);	%
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -356,7 +365,7 @@ elseif ( ( (w-wmax>=0) && ((w-wmax)<eps) ) && ( (zmin>= 0) && (zmin < eps) ) )
     Thi = [ T3(:) ; T4(:) ];	%high gain edge column vector
     %disp(' test 2kv0')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax3,Thi,Tmax4,'hi',dist);
+    Thi = rffutil3(Tmax3,Thi,Tmax4,'hi',angDist);
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -376,7 +385,7 @@ elseif ( ( (w-wmax>=0) && ((w-wmax)<eps) ) && ( (zmax<= 0) && (zmax > -eps) ) )
     Tmax4  = Tmax4 - 360;
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax4,Thi,Tmax1,'hi',dist);
+    Thi = rffutil3(Tmax4,Thi,Tmax1,'hi',angDist);
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -392,7 +401,7 @@ elseif ( ( (wmin-w>=0) && ((wmin-w)<eps) )&& ( (zmax<= 0) && (zmax > -eps) ) )
     Thi = [ T1(:) ; T2(:) ];	%high gain edge column vector
     %disp(' test 4kv0')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax1,Thi,Tmax2,'hi',dist);
+    Thi = rffutil3(Tmax1,Thi,Tmax2,'hi',angDist);
     
     if strcmp(form,'hf')		%get gain right for pole-zero cancellations
         Tlo = real(Thi) + 1j*imag(c2n(eps));
@@ -412,12 +421,12 @@ elseif ( (sign((w-wmin)*(wmax-w)) >= 0) && ( (zmin > eps) ) )
     Thi = [T2(:) ; T3(:) ; T4(:) ];	%high gain edge column vector
     %disp(' test 12kv ')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax2,Thi,Tmax4,'hi',dist);
+    Thi = rffutil3(Tmax2,Thi,Tmax4,'hi',angDist);
     
     Tlo = [T1(:) ];			%low gain edge column vector
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Tlo = rffutil3(Tmax1,Tlo,Tmax1,'lo',dist);
+    Tlo = rffutil3(Tmax1,Tlo,Tmax1,'lo',angDist);
     
     
     % The template lies in the third and fourth quadrants, with the origin outside
@@ -432,7 +441,7 @@ elseif ( (sign((w-wmin)*(wmax-w)) >= 0) && ( (zmax <  -eps) ) )
     if  (~isempty(ix)), Tmax4(ix)=Tmax4(ix)-360; end
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax4,Thi,Tmax2,'hi',dist);
+    Thi = rffutil3(Tmax4,Thi,Tmax2,'hi',angDist);
     
     Tlo = [T3(:) ];			%low gain edge column vector
     
@@ -442,7 +451,7 @@ elseif ( (sign((w-wmin)*(wmax-w)) >= 0) && ( (zmax <  -eps) ) )
     ix = find(real(Tmax3)>0);
     if (~isempty(ix)), Tmax3(ix)= Tmax3(ix) - 360; end
     
-    Tlo  = rffutil3(Tmax3,Tlo,Tmax3,'lo',dist);
+    Tlo  = rffutil3(Tmax3,Tlo,Tmax3,'lo',angDist);
     
     
     
@@ -452,11 +461,11 @@ elseif ( ( (wmin-w) > eps ) && (sign(zmin*zmax)<=0) )
     Thi = [T1(:) ; T2(:) ; T3(:) ];	%high gain edge column vector
     %disp(' test 41kv ')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax1,Thi,Tmax3,'hi',dist);
+    Thi = rffutil3(Tmax1,Thi,Tmax3,'hi',angDist);
     
     Tlo = [T4(:) ];			%low gain edge column vector
     
-    Tlo  = rffutil3(Tmax4,Tlo,Tmax4,'lo',dist);	%sort and eliminate and complement
+    Tlo  = rffutil3(Tmax4,Tlo,Tmax4,'lo',angDist);	%sort and eliminate and complement
     
     
     % The template lies in the second and third quadrants, with the origin outside
@@ -470,7 +479,7 @@ elseif (  (wmax-w < -eps)  && (sign(zmin*zmax)<=0) )
     Tmax1  = Tmax1 + 360;
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax3,Thi,Tmax1,'hi',dist);	%
+    Thi = rffutil3(Tmax3,Thi,Tmax1,'hi',angDist);	%
     
     Tlo = [T2(:) ];			%low gain edge column vector
     %add +360 deg to negative phases to get contiguous phases
@@ -481,7 +490,7 @@ elseif (  (wmax-w < -eps)  && (sign(zmin*zmax)<=0) )
     
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Tlo  = rffutil3(Tmax2,Tlo,Tmax2,'lo',dist);
+    Tlo  = rffutil3(Tmax2,Tlo,Tmax2,'lo',angDist);
     
     
     
@@ -491,11 +500,11 @@ elseif ( ((wmin-w)  > eps) &&   (zmin > eps)  )
     Thi = [T2(:) ; T3(:) ];	%high gain edge column vector
     %disp(' test 1kv ')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = qrff.rffutil3(Tmax2,Thi,Tmax3,'hi',dist);
+    Thi = qrff.rffutil3(Tmax2,Thi,Tmax3,'hi',angDist);
     
     Tlo = [T1(:) ; T4(:) ];			%low gain edge column vector
     
-    Tlo = qrff.rffutil3(Tmax1,Tlo,Tmax4,'lo',dist);	%sort,  eliminate  doubles,complement
+    Tlo = qrff.rffutil3(Tmax1,Tlo,Tmax4,'lo',angDist);	%sort,  eliminate  doubles,complement
     
     
     
@@ -506,11 +515,11 @@ elseif ( ((wmax-w) < -eps) &&   (zmin > eps)  )
     %disp(' test 2kv ')
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = qrff.rffutil3(Tmax3,Thi,Tmax4,'hi',dist);
+    Thi = qrff.rffutil3(Tmax3,Thi,Tmax4,'hi',angDist);
     
     Tlo = [T2(:) ; T1(:) ];			%low gain edge column vector
     
-    Tlo = qrff.rffutil3(Tmax2,Tlo,Tmax1,'lo',dist);	%sort etc
+    Tlo = qrff.rffutil3(Tmax2,Tlo,Tmax1,'lo',angDist);	%sort etc
     
     
     % The template lies in the third quadrant, with the origin outside
@@ -527,7 +536,7 @@ elseif ( ((wmax-w) < -eps) &&   (zmax < -eps)  )
     if  (~isempty(ix)), Tmax1(ix)=Tmax1(ix)-360; end
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = qrff.rffutil3(Tmax4,Thi,Tmax1,'hi',dist);
+    Thi = qrff.rffutil3(Tmax4,Thi,Tmax1,'hi',angDist);
     
     Tlo = [T3(:) ; T2(:) ];			%low gain edge column vector
     
@@ -539,7 +548,7 @@ elseif ( ((wmax-w) < -eps) &&   (zmax < -eps)  )
     ix = find(real(Tmax2)>0);
     if  (~isempty(ix)), Tmax2(ix)=Tmax2(ix)-360; end
     
-    Tlo = rffutil3(Tmax3,Tlo,Tmax2,'lo',dist);	%sort etc
+    Tlo = rffutil3(Tmax3,Tlo,Tmax2,'lo',angDist);	%sort etc
     
     
     
@@ -549,11 +558,11 @@ elseif ( ((wmin-w)  > eps) &&  (zmax < -eps)   )
     Thi = [T1(:) ; T2(:) ];	%high gain edge column vector
     %disp(' test 4kv ')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = qrff.rffutil3(Tmax1,Thi,Tmax2,'hi',dist);
+    Thi = qrff.rffutil3(Tmax1,Thi,Tmax2,'hi',angDist);
     
     Tlo = [T4(:) ; T3(:) ];			%low gain edge column vector
     
-    Tlo = qrff.rffutil3(Tmax4,Tlo,Tmax3,'lo',dist);	%sort etc
+    Tlo = qrff.rffutil3(Tmax4,Tlo,Tmax3,'lo',angDist);	%sort etc
     
     
     
