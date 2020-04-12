@@ -129,14 +129,20 @@ classdef qplant < handle
         end
         function obj = adelay(obj,del)
             %ADELAY adds a delay to an existing plant without delay
-            if ~isempty(obj.delay), error('plant already have a delay'); end
+            %
+            %To modify a delay after it is added use qplant.delay; do not
+            %forget to edit the related parameters as well.
+            
+            if ~isempty(obj.delay) 
+               error('Plant already has a delay. Use qplant.delay to change an existing delay'); 
+            end
             if isa(del,'qexpression')
                 obj.delay = del;
                 obj.pars = unique(vertcat(obj.pars ,del.pars));
             elseif isa(del,'qpar')
                 obj.delay = del;
                 obj.pars = unique(vertcat(obj.pars ,del));
-            elseif isnumeric(num) && isscalar(num)
+            elseif isnumeric(del) && isscalar(del)
                 obj.delay = del;
             else
                 error('unsupported object for delay')
