@@ -2,3 +2,8 @@
 *.tpl
 *.bnd
 *.spc
+rmQsyn.m
+
+*.eps
+
+doc/html/helpsearch-v3
