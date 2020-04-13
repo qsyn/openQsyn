@@ -109,8 +109,7 @@ if strcmp(element,'gain')              % Gain
 end
 
 if strcmp(element,'delay')           % t=e^(-a*s)
-    s=1j*w;
-    
+ 
     phim = -(max(a)*w*180/pi);		%least phase, degrees
     phiM = -(min(a)*w*180/pi);
     T = [round(phim/dist)*dist : dist : round(phiM/dist)*dist]'; %column vector
@@ -118,13 +117,12 @@ if strcmp(element,'delay')           % t=e^(-a*s)
 end
 
 if strcmp(element,'uns')            % t=1+M(w)
-    
-    
+
     if length(a) == 1
         if a<0 || a>=1
             error(' modulus of unstructured uncertainty must be in [0,1)');
         end
-        M=a;
+        M = a;
     else
         if min(a(1,:))<0
             error(' frequencies for unstructured uncertainty must be positive!');
@@ -178,9 +176,11 @@ if strcmp(element,'uns')            % t=1+M(w)
     r=[r1 ; r2];
     %t=r.*exp([phi; phi ]*pi/180*j);
     T= [phi;phi] + 20*log10(abs(r))*1j;
+    
 end
 
 if strcmp(element,'int')          % t=1/(s^n)  n== integer;
+    
     if max(abs(rem(a,1)))>1e-10
         error('the number of integrators or differentiators is not integer')
     end
@@ -189,6 +189,7 @@ if strcmp(element,'int')          % t=1/(s^n)  n== integer;
     
     T= round(-90*n/dist)*dist + 1j*20*log10(abs((1)./s.^n));
     T=[T;T];
+    
 end
 
 

@@ -79,7 +79,7 @@ end
 % add parameter names and the nominal point (at beginning of each template)
 pname = {obj.pars.name};
 pnom = [obj.pars.nominal]';
-tnom=cases(obj,pnom,w);
+tnom = cases(obj,pnom,w);
 for k=1:length(w)
     tpl(k).parNames = pname;                    % add names
     tpl(k)=add2tpl(tpl(k),tnom(k),pnom,'x');    % add nominal point

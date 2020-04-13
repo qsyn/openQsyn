@@ -51,14 +51,14 @@ classdef qrff
                     case 'delay'
                         Sk = sprintf('exp(-s*%s)',par1s);
                     case 'dc'
-                        if isempty(obj.par2)
+                        if isempty(obj(k).par2)
                             Sk = sprintf('(1+s/%s)',par1s);
                         else
                             SdW = sprintf('s./%s',par1s);
                             Sk = sprintf('(1 + 2.*%s.*(%s) + (%s).^2)',par2s,SdW,SdW);
                         end
                     case 'hf'
-                        if isempty(obj.par2)
+                        if isempty(obj(k).par2)
                             Sk = sprintf('(s+%s)',par1s);
                         else
                             wn = par1s;
@@ -86,8 +86,10 @@ classdef qrff
             %PARS
             p = qpar();
             k = 1;
-            if isa(obj.par1,'qpar'), p(1,1) = obj.par1; k=k+1; end
-            if isa(obj.par1,'qpar'), p(k,1) = obj.par2; end
+            for jj = 1:length(obj)
+                if isa(obj(jj).par1,'qpar'), p(k,1) = obj(jj).par1; k=k+1; end
+                if isa(obj(jj).par2,'qpar'), p(k,1) = obj(jj).par2; k=k+1; end
+            end
         end
     end
     
@@ -102,6 +104,7 @@ classdef qrff
         T = rffmul(t1,t2,dist)
         T = rffutil1(w,phi,zmin,zmax,wmin,wmax,form,pzf,kase)
         Tnew = rffutil3(Tleft,T,Tright,edge,dist)
+        Tnew = cltmp(t,dist)
     end
 end
 

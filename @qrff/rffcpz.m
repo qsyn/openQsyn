@@ -95,7 +95,7 @@ end
 % Defaults
 if ~exist('form','var'), form=[]; end
 if ~exist('pzf','var'),  pzf=[];  end
-if ~exist('dist','var'), angDist=1;  end
+if ~exist('angDist','var'), angDist=1;  end
 
 if isempty(form),form='dc'; end
 if isempty(pzf), pzf='z';   end
@@ -421,12 +421,12 @@ elseif ( (sign((w-wmin)*(wmax-w)) >= 0) && ( (zmin > eps) ) )
     Thi = [T2(:) ; T3(:) ; T4(:) ];	%high gain edge column vector
     %disp(' test 12kv ')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax2,Thi,Tmax4,'hi',angDist);
+    Thi = qrff.rffutil3(Tmax2,Thi,Tmax4,'hi',angDist);
     
     Tlo = [T1(:) ];			%low gain edge column vector
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Tlo = rffutil3(Tmax1,Tlo,Tmax1,'lo',angDist);
+    Tlo = qrff.rffutil3(Tmax1,Tlo,Tmax1,'lo',angDist);
     
     
     % The template lies in the third and fourth quadrants, with the origin outside
@@ -441,7 +441,7 @@ elseif ( (sign((w-wmin)*(wmax-w)) >= 0) && ( (zmax <  -eps) ) )
     if  (~isempty(ix)), Tmax4(ix)=Tmax4(ix)-360; end
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax4,Thi,Tmax2,'hi',angDist);
+    Thi = qrff.rffutil3(Tmax4,Thi,Tmax2,'hi',angDist);
     
     Tlo = [T3(:) ];			%low gain edge column vector
     
@@ -451,7 +451,7 @@ elseif ( (sign((w-wmin)*(wmax-w)) >= 0) && ( (zmax <  -eps) ) )
     ix = find(real(Tmax3)>0);
     if (~isempty(ix)), Tmax3(ix)= Tmax3(ix) - 360; end
     
-    Tlo  = rffutil3(Tmax3,Tlo,Tmax3,'lo',angDist);
+    Tlo  = qrff.rffutil3(Tmax3,Tlo,Tmax3,'lo',angDist);
     
     
     
@@ -461,11 +461,11 @@ elseif ( ( (wmin-w) > eps ) && (sign(zmin*zmax)<=0) )
     Thi = [T1(:) ; T2(:) ; T3(:) ];	%high gain edge column vector
     %disp(' test 41kv ')
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax1,Thi,Tmax3,'hi',angDist);
+    Thi = qrff.rffutil3(Tmax1,Thi,Tmax3,'hi',angDist);
     
     Tlo = [T4(:) ];			%low gain edge column vector
     
-    Tlo  = rffutil3(Tmax4,Tlo,Tmax4,'lo',angDist);	%sort and eliminate and complement
+    Tlo  = qrff.rffutil3(Tmax4,Tlo,Tmax4,'lo',angDist);	%sort and eliminate and complement
     
     
     % The template lies in the second and third quadrants, with the origin outside
@@ -479,7 +479,7 @@ elseif (  (wmax-w < -eps)  && (sign(zmin*zmax)<=0) )
     Tmax1  = Tmax1 + 360;
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Thi = rffutil3(Tmax3,Thi,Tmax1,'hi',angDist);	%
+    Thi = qrff.rffutil3(Tmax3,Thi,Tmax1,'hi',angDist);	%
     
     Tlo = [T2(:) ];			%low gain edge column vector
     %add +360 deg to negative phases to get contiguous phases
@@ -490,7 +490,7 @@ elseif (  (wmax-w < -eps)  && (sign(zmin*zmax)<=0) )
     
     
     %sort, eliminate angular doubles, complement extreme points with phase rounding
-    Tlo  = rffutil3(Tmax2,Tlo,Tmax2,'lo',angDist);
+    Tlo  = qrff.rffutil3(Tmax2,Tlo,Tmax2,'lo',angDist);
     
     
     

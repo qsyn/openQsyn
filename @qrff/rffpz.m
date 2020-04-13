@@ -2,7 +2,7 @@ function [T] = rffpz(obj,w,pzf,dist)
 
 %RFFPZ      produces a real pole or real zero template in  real factored form.
 %
-%           [T] = rffpz(a,w,form,pzf,dist)
+%           [T] = rffpz(obj,w,form,pzf,dist)
 %
 %       T: 	column vector with an even number of elements.
 %           The upper half the vector T is the low  gain template edge,

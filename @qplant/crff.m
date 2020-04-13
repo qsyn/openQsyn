@@ -2,19 +2,7 @@ function tpl = crff(obj,w_tpl,options)
 %CRFF computes rff template
 %   Detailed explanation goes here
 
-%if isa(obj.num,'qrff'
-
 disp(['Calculating templates using the Real Factored Form method']);
-
-% if ~isempty(Par_range)
-%     index2=[1 find(Par_name==',') ,  length(Par_name) ];
-%     for eval_p=1:length(index2)-1
-%         P_name=Par_name(index2(eval_p)+1:index2(eval_p+1)-1);
-%         P_range=Par_range(eval_p,[1 2]);
-%         eval([P_name,'=P_range;'])
-%     end
-% end
-
 
 ndist=[0.25 1]; % to replace with options.accuracy?
 angDist=ndist(1);
@@ -23,29 +11,26 @@ if (abs(360-fix(360/angDist)*angDist)>eps)
     error('360 must be an integer multiple of the angular resolution, dist(1) [deg]');
 end
 
-%[sn1,sn2]=size(Un_t1);
-%[sd1,sd2]=size(Un_t2);
-
-
 tpl = qtpl(length(w_tpl));
 for ii=1:length(w_tpl)
-    disp(['--> for w=',num2str(w_tpl(ii)),' [rad/sec]']);
-    %s = 1j*w_tpl(ii);
-    t_=[];
+    w = w_tpl(ii);
+    disp(['--> for w=',num2str(w),' [rad/sec]']);
+    
     
     % compute numerator
+    t_=[];
     for k = 1:length(obj.num)
         rffElement = obj.num(k);
-        if strcmp(rffElement.type,{'gain','delay','uns','int'})
+        if any(strcmp(rffElement.type,{'gain','delay','uns','int'}))
             t = rffElement.rffel(w,angDist); 
         else
             if isempty(rffElement.par2)
-                t = rffElement.rffpz('z',angDist);
+                t = rffElement.rffpz(w,'z',angDist);
             else
-                t = rffElement.rffcpz('z',angDist);
+                t = rffElement.rffcpz(w,'z',angDist);
             end
         end
-        t_ = rffmul(t,t_,angDist);
+        t_ = qrff.rffmul(t,t_,angDist);
     end
     
     if ~isempty(t_)
@@ -54,19 +39,20 @@ for ii=1:length(w_tpl)
         num_r=0;
     end
     
+    % compute denumerator
     t_ = [];
     for k = 1:length(obj.den)
         rffElement = obj.den(k);
-        if strcmp(rffElement.type,{'gain','delay','uns','int'})
+        if any(strcmp(rffElement.type,{'gain','delay','uns','int'}))
             t = rffElement.rffel(w,angDist); 
         else
             if isempty(rffElement.par2)
-                t = rffElement.rffpz('p',angDist);
+                t = rffElement.rffpz(w,'z',angDist); % note that z is used anyways! 
             else
-                t = rffElement.rffcpz('p',angDist);
+                t = rffElement.rffcpz(w,'z',angDist); % note that z is used anyways!
             end
         end
-        t_ = rffmul(t,t_,angDist);
+        t_ = qrff.rffmul(t,t_,angDist);
     end
     
     [n,nn]=size(t_);
@@ -75,7 +61,7 @@ for ii=1:length(w_tpl)
     else
         den_r = [0];
     end
-    t_=rffmul(num_r,-den_r,angDist);
+    t_ = qrff.rffmul(num_r,-den_r,angDist);
     
     %Jens: .'
     %if length(Kn1) > 0 ,    t_=t_+c2n(eval(Kn1),'unwrap').';      end;
@@ -92,8 +78,8 @@ for ii=1:length(w_tpl)
         min_t = min_t(index_min);
         max_t = max_t(index_max);
         max_t = max_t(length(max_t):-1:1);
-        t_=[min_t ; max_t];
-        %t_=cltmp(t_,ndist); % to add as a qtpl method
+        t_ = [min_t ; max_t];
+        t_ = qrff.cltmp(t_,ndist); 
     end
     %if length(n_dif)>1  % add uncertain differentiators
     %    t_=tplop('A+B',t_,c2n((1j*w_tpl(ii)).^n_dif(1:(length(n_dif)-1)),'unwrap'));
@@ -104,7 +90,8 @@ for ii=1:length(w_tpl)
     %add2tpl(tplf,w_tpl(ii),t_,[],option);
     
     T = t_;
-    tpl(ii) = qtpl(w_tpl(k),T.',[]);
+    nanpars = NaN(length(obj.pars),length(T)); % until RFF outputs its parameter grid 
+    tpl(ii) = qtpl(w,T.',nanpars);
     
 end
 
