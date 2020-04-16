@@ -6,6 +6,7 @@ function tpl = recedge(obj,w,options)
 
 fprintf('Calculating templates by recurcive edge grid\n')
 
+prune_on = 1;
 Tacc=options.Tacc;
 
 idx = ~strcmp({obj.pars.name},'uncint_par');
@@ -47,10 +48,10 @@ for kw = 1:length(w)
         end
     end
     T = unwrap(real(T)*pi/180)*180/pi + 1i*imag(T); % unwrap again
-    prune_on = 1;
+    
     if prune_on && numel(T)>3
-        idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
-        %[~,idx] = prune(T,[2 2]);
+        %idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
+        [~,idx] = prune(T,[2 2]);
     else
         idx=1:length(T);
     end
