@@ -103,7 +103,10 @@ end
 % Main Loop
 for k=1:length(w)
     bound=bnd.c{I(k)};
-    if isempty(bound(~isnan(bound))); return; end
+    if isempty(bound(~isnan(bound)))
+        warning('HS bound at w=%g [rad/s] is empty.',w(k))
+        continue; 
+    end
     %The bound is not empty
     if wrap_on
         xlim=get(gca,'xlim'); %degree-axis
@@ -132,15 +135,17 @@ for k=1:length(w)
         %	disp(['The ',bnd,'  bound for ',num2str(w(l)),...
         %	        ' rad/s is outside current axis']); % peo
     end
+
     
-    %ngrid
-    xlabel('Phase [deg]')
-    ylabel('Magnitude [db]')
-    axis tight
-    box on
-    if nargout>0
-        varargout{1} = fhandle;
-    end
-    
+end
+%ngrid
+xlabel('Phase [deg]')
+ylabel('Magnitude [db]')
+axis tight
+box on
+if nargout>0
+    varargout{1} = fhandle;
+end
+
 end
 

@@ -35,15 +35,15 @@ classdef qplant < handle
         num             % num  (qpoly array)
         den             % den (qpoly array)
         pars            % uncertain parameters (qpar array)
-        delay           % delay (string)
         unstruct        % unstructed uncertainty
-        uncint          % uuncertain integrator/diffrentiator
+        uncint          % uncertain integrator/diffrentiator
     end
     
     properties
         info        char   % string
         templates   qtpl   % template (qtpl array)
         nominal     qfr    % nominal case (qfr)
+        delay              % delay (string)
     end
     
     
@@ -324,6 +324,9 @@ classdef qplant < handle
             %
             %   P = TF(QPLANT,PAR)   returns the transfer function for the
             %   case given by vector of parameters PAR
+            %
+            %Requires Control System Toolbox
+            
             if nargin<2, par = []; end
             if ~isempty(par) && length(par)~=length(obj.pars)
                 error('Number of input parameters must be same as in qplant object')
@@ -348,6 +351,13 @@ classdef qplant < handle
                 DEN = obj.den.polycase(dpar);
             end
             P = tf(NUM,DEN);
+            if ~isempty(obj.delay)
+                if isa(obj.delay,'qpar')
+                    P.IOdelay = obj.delay.nom;
+                else
+                    P.IOdelay = obj.delay;
+                end
+            end
         end
         function varargout = showtpl(obj,w,varargin)
             %SHOWTPL plots the templates at given frequencies

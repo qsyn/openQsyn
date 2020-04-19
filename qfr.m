@@ -126,11 +126,12 @@ classdef qfr
                    end
                case {'tf','zpk','ss','frd'}
                    Bfr = squeeze(freqresp(B,w)).';
-                   Bnic = c2n(Bfr.',-1);
+                   Bnic = c2n(Bfr.',-180);
                    G =  qfr(A.response+Bnic,w);
                case 'double'
                    %if ~isscalar(B), error('a numeric value must be a scalar'); end
-                   G = qfr(A.response+B,w);
+                   Gw = qfr(A.response+B,w);
+                   G = unwrap(Gw);
                otherwise
                    error('seconf input must be an QFR object, LTI, or a double')
            end
@@ -175,6 +176,14 @@ classdef qfr
                m = real(obj.response);
            end
             
+        end
+        function newObj = unwrap(obj)
+           %UNWARP returns unwraped QFR object starting in [-360,0]  
+           tol =180;
+           newObj = obj;
+           y = unwrap(real(obj.response)*pi/180,tol*pi/180)*180/pi+1i*imag(obj.response);
+           n_r = ceil((real(y(1,1)))/360);
+           newObj.response = y-(n_r)*360;
         end
     end
     
