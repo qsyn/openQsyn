@@ -6,7 +6,7 @@
    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Modeling of uncertain plants</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-03-25"><meta name="DC.source" content="doc_modeling.m"><style type="text/css">
+      --><title>Modeling of uncertain plants</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-20"><meta name="DC.source" content="doc_modeling.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Modeling of uncertain plants</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#3">Modeling uncertain parameters</a></li><li><a href="#10">Creating uncertain arithmetic expressions</a></li><li><a href="#14">Creating an uncertain polynomial</a></li><li><a href="#17">Creating the plant</a></li></ul></div><h2 id="1">Overview</h2><p>The first stage in QFT design is to define the uncertain plant. <b>Open Qsyn</b> facilitates plant modeling using these classes:</p><div><ul><li><a href="matlab:doc('qpar')">qpar</a> describes a single uncertain parameter</li><li><a href="matlab:doc('qexpression')">qexpression</a> describes an aritmatic expression composed of one or more qpar elements</li><li><a href="matlab:doc('qpoly')">qpoly</a>  describes an uncertain polynom --composed of qpars and qexpressions</li><li><a href="matlab:doc('qplant')">qplant</a> describes an uncertain plant</li></ul></div><p>Note that this page describes plant modeling as a set of LTI tranfer functions. <b>Open Qsyn</b> also allows for "black box" plants and for plants described as measured frequecy response data. See <a href="matlab:web('ex_blackBox.html')">Black Box Example</a> and <a href="matlab:web('ex_qmeas.html')">Data Based Design Example</a>, respectively.</p><h2 id="3">Modeling uncertain parameters</h2><p>Uncertain parameters are modeled using <a href="matlab:doc('qpar')">qpar</a> objects. a <a href="matlab:doc('qpar')">qpar</a> object is constructed as follows</p><pre class="language-matlab">a = qpar(name,nominal_val,lower_bound,upper_bound,cases)
+  </style></head><body><div class="content"><h1>Modeling of uncertain plants</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#4">Modeling uncertain parameters</a></li><li><a href="#11">Creating uncertain arithmetic expressions</a></li><li><a href="#15">Creating an uncertain polynomial</a></li><li><a href="#18">Creating the plant</a></li></ul></div><h2 id="1">Overview</h2><p>The first stage in QFT design is to define the uncertain plant. <b>Open Qsyn</b> facilitates plant modeling using these classes:</p><div><ul><li><a href="matlab:doc('qpar')">qpar</a> describes a single uncertain parameter</li><li><a href="matlab:doc('qexpression')">qexpression</a> describes an aritmatic expression composed of one or more qpar elements</li><li><a href="matlab:doc('qpoly')">qpoly</a>  describes an uncertain polynom --composed of qpars and qexpressions</li><li><a href="matlab:doc('qplant')">qplant</a> describes an uncertain plant</li></ul></div><p>Note that this page describes plant modeling as a set of LTI tranfer functions. <b>Open Qsyn</b> also allows for "black box" plants and for plants described as measured frequecy response data. See <a href="matlab:web('ex_blackBox.html')">Black Box Example</a> and <a href="matlab:web('ex_qmeas.html')">Data Based Design Example</a>, respectively.</p><p>In addition, plant that are given in Real Factored Form can also (should!) be consturcted differently, in a way that expolites their unique structure, see <a href="matlab:web('ex_rff.html')">RFF Example</a>.</p><h2 id="4">Modeling uncertain parameters</h2><p>Uncertain parameters are modeled using <a href="matlab:doc('qpar')">qpar</a> objects. a <a href="matlab:doc('qpar')">qpar</a> object is constructed as follows</p><pre class="language-matlab">a = qpar(name,nominal_val,lower_bound,upper_bound,cases)
 </pre><p>where name is a string; nominal_val, lower_bound, upper_bound are scalar numbers describing the nominl value, lower bound, and upper bound, respectively; cases is an optional input agrument which specifies the number of uncertain cases, i.e. the number of grid points.</p><p><b>Exmaple</b>: constarct an uncertain parameter <span class="MathJax_Preview"><img src="doc_modeling_eq02724542671846692596.png" alt="$a \in [0,2]$"></span><script type="math/tex">a \in [0,2]</script> with nominal value 1.</p><pre class="codeinput">a = qpar(<span class="string">'A'</span>,1,0,2)
 </pre><pre class="codeoutput">3 cases are selected as default
 
@@ -104,13 +104,13 @@ pargrid = grid(parArray)
 </pre><pre class="codeoutput">
 asmap =
 
-    1.6294    1.8116    0.2540    1.8268    1.2647
+    1.6338    0.3789    0.2474    1.6420    1.2758
 
 
 absamp =
 
-    0.1951    0.5570    1.0938    1.9150    1.9298
-    0.1158    0.1971    0.1957    0.1485    0.1800
+    0.0322    1.7919    1.0308    1.0890    1.2129
+    0.1760    0.1855    0.1383    0.1085    0.1734
 
 
 pargrid =
@@ -142,7 +142,7 @@ ismember  mrdivide  plus      uminus
    forevery element of parameter set A that is a member of 
    parameter set B.
 
-</pre><h2 id="10">Creating uncertain arithmetic expressions</h2><p><tt>qpar</tt>  elements can be combined with other <tt>qpar</tt> elements and numericals to create uncertain arithmetic expressions. Allowed arithmetic expressions are <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>.</p><p><b>Exmaple</b>:</p><pre class="codeinput">ab = a*b
+</pre><h2 id="11">Creating uncertain arithmetic expressions</h2><p><tt>qpar</tt>  elements can be combined with other <tt>qpar</tt> elements and numericals to create uncertain arithmetic expressions. Allowed arithmetic expressions are <tt>+</tt>, <tt>-</tt>, <tt>*</tt>, <tt>/</tt>.</p><p><b>Exmaple</b>:</p><pre class="codeinput">ab = a*b
 </pre><pre class="codeoutput">
 ab = 
 
@@ -186,7 +186,7 @@ ans =
 
     0.1667    0.3333         0    0.2000    0.4000
 
-</pre><h2 id="14">Creating an uncertain polynomial</h2><p>An uncertain polinomial is represented by a <a href="matlab:doc('qpoly')">qpoly</a> object. Each coefficient in such polynomial is either a <tt>qpar</tt>, a <tt>qexpression</tt>, or a real scalar. A <tt>qexpression</tt> is generated by horizolnal concatenation of elements</p><pre class="codeinput">p1 = [1 a]
+</pre><h2 id="15">Creating an uncertain polynomial</h2><p>An uncertain polinomial is represented by a <a href="matlab:doc('qpoly')">qpoly</a> object. Each coefficient in such polynomial is either a <tt>qpar</tt>, a <tt>qexpression</tt>, or a real scalar. A <tt>qexpression</tt> is generated by horizolnal concatenation of elements</p><pre class="codeinput">p1 = [1 a]
 </pre><pre class="codeoutput">
 p1 = 
 
@@ -223,7 +223,7 @@ a0 =
        discrete: []
     description: 'an exmaple parameter'
 
-</pre><h2 id="17">Creating the plant</h2><p>Finally, an uncertaon plant, or <a href="matlab:doc('qplant')">qplant</a>, is generated by</p><pre class="language-matlab">P = qplant(num,den)
+</pre><h2 id="18">Creating the plant</h2><p>Finally, an uncertaon plant, or <a href="matlab:doc('qplant')">qplant</a>, is generated by</p><pre class="language-matlab">P = qplant(num,den)
 </pre><p>with num,den two qpoly objects which represents the plant transfer function numerator and denumerator.</p><p><b>Example</b>: create the plant</p><p><span class="MathJax_Preview"><img src="doc_modeling_eq07798080041892236983.png" alt="$$ P(s) = \frac{s+a}{s+b}, ~~ a \in [0,2], ~~ b \in [0.1,0.2]$$"></span><script type="math/tex"> P(s) = \frac{s+a}{s+b}, ~~ a \in [0,2], ~~ b \in [0.1,0.2]</script></p><pre class="codeinput">num = [1 a];
 den = [1 b];
 P = qplant(num,den)
@@ -235,12 +235,12 @@ P =
           num: [1&times;1 qpoly]
           den: [1&times;1 qpoly]
          pars: [2&times;1 qpar]
-        delay: []
      unstruct: []
        uncint: []
-         info: 'generated from [num,den] data on: 25-Mar-2020 11:58:59'
+         info: 'generated from [num,den] data on: 20-Apr-2020 00:38:30'
     templates: [0&times;0 qtpl]
       nominal: [0&times;0 qfr]
+        delay: []
 
 </pre><p>The plant <tt>P</tt> is a <tt>qplant</tt> objects which includes the num,den qpoly object as properties, as well as a <tt>pars</tt> property which stores the qpar array of qpar objects in both qpolys.</p><p>A plant object allows for time as well a frequency domain simulations with the methods such as <tt>step</tt>, <tt>niccases</tt>, and <tt>bodcases</tt> (stands for Nichols-cases and Bode-cases, respectively). For example, a Bode plot of a uniform grid of 8 points for each parametr is done by</p><pre class="codeinput">pargrid=grid(P.pars,8);
 bodcases(P,pargrid)
@@ -262,6 +262,11 @@ bodcases(P,pargrid)
 % for plants described as measured frequecy response data. 
 % See <matlab:web('ex_blackBox.html') Black Box Example> and 
 % <matlab:web('ex_qmeas.html') Data Based Design Example>, respectively. 
+
+%%
+% In addition, plant that are given in Real Factored Form can also (should!) be 
+% consturcted differently, in a way that expolites their unique structure,
+% see <matlab:web('ex_rff.html') RFF Example>.
 
 %% Modeling uncertain parameters
 % Uncertain parameters are modeled using <matlab:doc('qpar') qpar> objects. 

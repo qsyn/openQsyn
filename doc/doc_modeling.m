@@ -15,6 +15,11 @@
 % See <matlab:web('ex_blackBox.html') Black Box Example> and 
 % <matlab:web('ex_qmeas.html') Data Based Design Example>, respectively. 
 
+%%
+% In addition, plants that are given in Real Factored Form can also (should!) be 
+% consturcted differently, in a way that expolites their unique structure,
+% see <matlab:web('ex_rff.html') RFF Example>.
+
 %% Modeling uncertain parameters
 % Uncertain parameters are modeled using <matlab:doc('qpar') qpar> objects. 
 % a <matlab:doc('qpar') qpar> object is constructed as follows

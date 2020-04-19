@@ -6,7 +6,7 @@
    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Template Computation</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-02-16"><meta name="DC.source" content="doc_tplcomp.m"><style type="text/css">
+      --><title>Template Computation</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-20"><meta name="DC.source" content="doc_tplcomp.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Template Computation</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#4">Plotting Templates</a></li><li><a href="#7">Template Union</a></li></ul></div><h2 id="1">Overview</h2><p>The second stage in QFT design is to compute the uncertain templates. In <b>open Qsyn</b> templates are computed from <tt>qplant</tt> objects using the command <a href="matlab:doc('qplant/ctpl')"><tt>ctpl</tt></a>. <b>Open Qsyn</b> offers several options for the template computation:</p><div><ul><li>Grid</li><li>Random Grid</li><li>Random Samples</li><li>Recursive edge grid</li><li>Recursive grid</li><li>Cases</li></ul></div><p>To compute the templates using specified <tt>method</tt> at frequencies <tt>w</tt> type</p><pre class="language-matlab">ctpl(P,method,w)
+  </style></head><body><div class="content"><h1>Template Computation</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#4">Plotting Templates</a></li><li><a href="#7">Template Union</a></li></ul></div><h2 id="1">Overview</h2><p>The second stage in QFT design is to compute the uncertain templates. In <b>open Qsyn</b> templates are computed from <tt>qplant</tt> objects using the command <a href="matlab:doc('qplant/ctpl')"><tt>ctpl</tt></a>. <b>Open Qsyn</b> offers several options for the template computation:</p><div><ul><li>Grid</li><li>Random Grid</li><li>Random Samples</li><li>Recursive edge grid</li><li>Recursive grid</li><li>Real Factored Form (RFF)</li><li>Cases</li></ul></div><p>To compute the templates using specified <tt>method</tt> at frequencies <tt>w</tt> type</p><pre class="language-matlab">ctpl(P,method,w)
 </pre><p>The nominal plant is computed by <a href="matlab:doc('qplant.cnom')"><tt>cnom</tt></a>. Use as</p><pre class="language-matlab">cnom(P,w_nom)
 </pre><p><b>Example</b>: compute the templates fot the plant</p><p><span class="MathJax_Preview"><img src="doc_tplcomp_eq04896201087436659779.png" alt="$$ P(s) = \frac{\omega^2}{s^2 + 2\zeta \omega + \omega^2}, ~~ \omega \in [10,20], ~~ \zeta \in [0.3,0.5]$$"></span><script type="math/tex"> P(s) = \frac{\omega^2}{s^2 + 2\zeta \omega + \omega^2}, ~~ \omega \in [10,20], ~~ \zeta \in [0.3,0.5]</script></p><p>at freqeuncies <span class="MathJax_Preview"><img src="doc_tplcomp_eq04699568093166099010.png" alt="$\omega = \{ 0.1,~ 0.2,~ 0.5,~ 1,~ 3,~ 5,~ 10,~ 20,~ 50, \}$"></span><script type="math/tex">\omega = \{ 0.1,~ 0.2,~ 0.5,~ 1,~ 3,~ 5,~ 10,~ 20,~ 50, \}</script> rad/s, using a unifor grid of 5 points for <span class="MathJax_Preview"><img src="doc_tplcomp_eq08589834809570054062.png" alt="$\omega$"></span><script type="math/tex">\omega</script> and 6 points for <span class="MathJax_Preview"><img src="doc_tplcomp_eq13496487163394900197.png" alt="$\zeta$"></span><script type="math/tex">\zeta</script>.</p><pre class="codeinput">omega = qpar(<span class="string">'w'</span>,10,10,20,5);
 zeta = qpar(<span class="string">'z'</span>,0.3,0.3,0.5,6);
@@ -81,12 +81,12 @@ P =
           num: [1&times;1 qexpression]
           den: [1&times;1 qpoly]
          pars: [2&times;1 qpar]
-        delay: []
      unstruct: []
        uncint: []
-         info: 'generated from [num,den] data on: 16-Feb-2019 22:33:51'
-    templates: []
-      nominal: []
+         info: 'generated from [num,den] data on: 20-Apr-2020 00:35:13'
+    templates: [0&times;0 qtpl]
+      nominal: [0&times;0 qfr]
+        delay: []
 
 </pre><p>Since the nominal parameter values were not defined, we arbitrarly select them as the lower values. We now compute thew desired templates and also the nominal case</p><pre class="codeinput">w_tpl = [0.1 0.2 0.5 1 3 5 10 20 50];
 ctpl(P,<span class="string">'grid'</span>,w_tpl);
@@ -106,6 +106,13 @@ cnom(P,w_nom);
 show(T1);
 </pre><img vspace="5" hspace="5" src="doc_tplcomp_01.png" alt=""> <p>To save time and keystrokes one can instead use the <a href="matlab:doc('qplant/showtpl')"><tt>showtpl</tt></a> command directly on the plant object. Both <tt>qplt/show</tt> and <tt>qplant/showtpl</tt> accepts more input arguments that specify additional options. For e.g. to plot the template at 10 rad/s with red circle markers:</p><pre class="codeinput">showtpl(P,10,<span class="string">'color'</span>,[1 0 0],<span class="string">'marker'</span>,<span class="string">'o'</span>,<span class="string">'mode'</span>,<span class="string">'nonom'</span>)
 </pre><img vspace="5" hspace="5" src="doc_tplcomp_02.png" alt=""> <p>The nominal is stored in a dedicated class <a href="matlab:doc('qfr')"><tt>qfr</tt></a>. A <tt>qfr</tt> object behaves similarly to Control System Toolbox LTI objects. Hence a bode plot for exaple is plotted as follows</p><pre class="codeinput">figure, bode(P.nominal)
+</pre><pre class="codeoutput">
+ans = 
+
+  1&times;2 Axes array:
+
+    Axes    Axes
+
 </pre><img vspace="5" hspace="5" src="doc_tplcomp_03.png" alt=""> <h2 id="7">Template Union</h2><p>Not all template computation methods mentioned above are made equal. It is sometimes useful to merge templates computed by different methods. This is done by <a href="matlab:doc('qtpl/union')"><tt>union</tt></a>.</p><p>Example:</p><pre class="codeinput">ctpl(P,<span class="string">'recgrid'</span>,w_tpl(7)) <span class="comment">% this replaces existing template at 10 rad/s</span>
 T2 = P.templates(7);
 T = union(T2,T1);
@@ -116,7 +123,7 @@ P.templates = T; <span class="comment">% insert the new template in the plant P<
 Accuracy: 5 [deg], 3 [dB] 
 --&gt; for w=10 [rad/s] 
 ADGRID: 2 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 2516
+# function evaluations = 148
 Final Border Size = 50
 
 ans = 
@@ -126,21 +133,21 @@ ans =
           num: [1&times;1 qexpression]
           den: [1&times;1 qpoly]
          pars: [2&times;1 qpar]
-        delay: []
      unstruct: []
        uncint: []
-         info: 'generated from [num,den] data on: 16-Feb-2019 22:33:51'
+         info: 'generated from [num,den] data on: 20-Apr-2020 00:35:13'
     templates: [9&times;1 qtpl]
       nominal: [1&times;1 qfr]
+        delay: []
 
 </pre><img vspace="5" hspace="5" src="doc_tplcomp_04.png" alt=""> <p>Alternatively, the new qtpls can be united with the old ones on the go by setting <tt>union</tt> option in <tt>ctpl</tt> to 1.</p><p>Example:</p><pre class="codeinput">ctpl(P,<span class="string">'recgrid'</span>,w_tpl(8),<span class="string">'union'</span>,1);
 </pre><pre class="codeoutput">Calculating templates by recurcive grid
 Accuracy: 5 [deg], 3 [dB] 
 --&gt; for w=20 [rad/s] 
 ADGRID: 2 uncertain and 0 constant parameter(s). Accuracy [5 deg 3dB]
-# function evaluations = 2658
+# function evaluations = 290
 Final Border Size = 45
-</pre><p>This is the time to move forward to <a href="matlab:web('doc_bounds.html')">Step 3: Horowitz-Sidi bounds computation</a></p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+</pre><p>Please note thar for RFF template computation, the qplant must be generated differently. Please see <a href="matlab:web('ex_rff.html')">RFF computation example</a>.</p><p>This is the time to move forward to <a href="matlab:web('doc_bounds.html')">Step 3: Horowitz-Sidi bounds computation</a></p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Template Computation
 
@@ -155,6 +162,7 @@ Final Border Size = 45
 % * Random Samples
 % * Recursive edge grid
 % * Recursive grid
+% * Real Factored Form (RFF) 
 % * Cases
 %
 % To compute the templates using specified |method| at frequencies |w| type
@@ -230,6 +238,11 @@ P.templates = T; % insert the new template in the plant P
 % 
 % Example:
 ctpl(P,'recgrid',w_tpl(8),'union',1);
+
+%%
+% Please note thar for RFF template computation, the qplant must be
+% generated differently. Please see 
+% <matlab:web('ex_rff.html') RFF computation example>.
 
 %% 
 % This is the time to move forward to 

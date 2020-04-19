@@ -11,6 +11,7 @@
 % * Random Samples
 % * Recursive edge grid
 % * Recursive grid
+% * Real Factored Form (RFF) 
 % * Cases
 %
 % To compute the templates using specified |method| at frequencies |w| type
@@ -86,6 +87,11 @@ P.templates = T; % insert the new template in the plant P
 % 
 % Example:
 ctpl(P,'recgrid',w_tpl(8),'union',1);
+
+%%
+% Please note thar for RFF template computation, the qplant must be
+% generated differently. Please see 
+% <matlab:web('ex_rff.html') RFF computation example>.
 
 %% 
 % This is the time to move forward to 

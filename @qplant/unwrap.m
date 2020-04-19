@@ -9,12 +9,18 @@ if isempty(obj.templates)
 end
 
 nom = obj.nominal.unwrap;
+tpl = obj.templates;
 
+for k = 1:length(tpl)
+    
+    [~,I] = min(abs(nom.frequency - tpl(k).frequency));
+    n_r=ceil((real(tpl(k).template(1))-real(nom.response(I)))/360);
+    tpl(k).template = tpl(k).template-(n_r)*360;
 
+end
 
-
-
-
+obj.nominal = nom;
+obj.templates = tpl;
 
 end
 
