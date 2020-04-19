@@ -64,7 +64,7 @@ for n=1:N
     if isfield(S,sprintf('par_%i',k))
         T(n).parameters = [par_nom S.(sprintf('par_%i',k))];
     else
-        T(n).parameters = [par_nom nan(size(S.(sprintf('t_w%i',k))))];
+        T(n).parameters = [par_nom nan(length(par_nom),length(S.(sprintf('t_w%i',k))))];
     end
 end
 

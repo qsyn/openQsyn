@@ -16,7 +16,7 @@ function obj = ctpl(obj,method,w,varargin)
 %               'rngrid'    random grid over the parameters
 %               'random'    random sample points
 %               'recgrid'   recurcive grid
-%               'aedgrid'   recurcive edge grid
+%               'recedge'   recurcive edge grid
 %               'cases'     explicitly given parameter cases
 %               'rff'       real-factored form
 %
@@ -26,7 +26,7 @@ function obj = ctpl(obj,method,w,varargin)
 %
 %       plotOn      plots during the computation. 0 (def) | 1.
 %       accuracy    set accurcy for computation as [deg_accuracy , dB_accuracy]
-%                   for recgrid and aedgrid methods. def = [5 3].
+%                   for recgrid, recedge and rff methods; def = [5 3];
 %       union       unite new tpls with existing ones. 0 (def) | 1
 %       parameters  parameter set for cases method
 %       size        size of grid for methods 'grid', 'rngrid' and 'random' 

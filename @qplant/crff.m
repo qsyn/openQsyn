@@ -2,10 +2,11 @@ function tpl = crff(obj,w_tpl,options)
 %CRFF computes rff template
 %   Detailed explanation goes here
 
+
 disp(['Calculating templates using the Real Factored Form method']);
 
-ndist=[0.25 1]; % to replace with options.accuracy?
-angDist=ndist(1);
+ndist = options.Tacc; 
+angDist = ndist(1);
 
 if (abs(360-fix(360/angDist)*angDist)>eps)
     error('360 must be an integer multiple of the angular resolution, dist(1) [deg]');
@@ -23,6 +24,10 @@ for ii=1:length(w_tpl)
         rffElement = obj.num(k);
         if any(strcmp(rffElement.type,{'gain','delay','uns','int'}))
             t = rffElement.rffel(w,angDist); 
+        elseif strcmp(rffElement.type,'poly')
+            f = rffElement.qrff2func;
+            c = f(w*1j);
+            t = c2n(c,-180);
         else
             if isempty(rffElement.par2)
                 t = rffElement.rffpz(w,'z',angDist);
@@ -45,6 +50,10 @@ for ii=1:length(w_tpl)
         rffElement = obj.den(k);
         if any(strcmp(rffElement.type,{'gain','delay','uns','int'}))
             t = rffElement.rffel(w,angDist); 
+        elseif strcmp(rffElement.type,'poly')
+            f = rffElement.qrff2func;
+            c = f(w*1j);
+            t =  c2n(c,-180);
         else
             if isempty(rffElement.par2)
                 t = rffElement.rffpz(w,'z',angDist); % note that z is used anyways! 
@@ -55,20 +64,17 @@ for ii=1:length(w_tpl)
         t_ = qrff.rffmul(t,t_,angDist);
     end
     
-    [n,nn]=size(t_);
-    if n > 0
-        den_r = [t_((n/2+1:n),:) ; t_((1:n/2),:)];
+    [n,~]=size(t_);
+    if n == 0
+        den_r = 0;        
+    elseif n>2
+        den_r = [t_((n/2+1:n),:) ; t_((1:n/2),:)];         
     else
-        den_r = [0];
+        den_r = t_;
     end
+    
     t_ = qrff.rffmul(num_r,-den_r,angDist);
-    
-    %Jens: .'
-    %if length(Kn1) > 0 ,    t_=t_+c2n(eval(Kn1),'unwrap').';      end;
-    %if length(Kn2) > 0,     t_=(t_)-c2n(eval(Kn2),'unwrap').';   end;
-    
-    %%% certain RFF element must be implamented inside their functions!!!
-    
+       
     [n,nn]=size(t_);
     if ((n*nn) > 1)
         min_t=t_(1:n/2);
@@ -85,7 +91,7 @@ for ii=1:length(w_tpl)
     %    t_=tplop('A+B',t_,c2n((1j*w_tpl(ii)).^n_dif(1:(length(n_dif)-1)),'unwrap'));
     %end
     %tnom=real(tab_le1([w_nom(:),nom(:)],w_tpl(ii))); %Mattias 960903
-    %t_=qunwrap(t_(:));%mattias 961122
+    %t_=qunwrap(t_);%mattias 961122
     %t_=t_+round((-max(real(t_))/2-min(real(t_))/2+real(tnom))/360)*360;%mattias 961122
     %add2tpl(tplf,w_tpl(ii),t_,[],option);
     

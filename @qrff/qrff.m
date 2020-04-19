@@ -13,10 +13,14 @@ classdef qrff
             %QRFF Construct an instance of the qrff class
             %   Detailed explanation goes here
             
-            validStrings = {'gain','delay','dc','hf','uns','int'};
-            validatestring(type,validStrings,'qrff','type',1)
+            validStrings = {'gain','delay','dc','hf','uns','int','poly'};
+            validatestring(type,validStrings,'qrff','type',1);
             p = inputParser;
-            p.addRequired('par1',@(x) isscalar(x) && (isnumeric(x) || isa(x,'qpar')));
+            if strcmp(type,'poly')
+                p.addRequired('par1',@(x)  isnumeric(x) && isrow(x));
+            else
+                p.addRequired('par1',@(x) isscalar(x) && (isnumeric(x) || isa(x,'qpar')));
+            end
             p.addOptional('par2',[],@(x) isscalar(x) && (isnumeric(x) || isa(x,'qpar')));
             p.parse(par1,varargin{:});
             
@@ -29,8 +33,7 @@ classdef qrff
         function h = qrff2func(obj)
             %QRFF2FUNC return an handle to a function object f@(p1,p2,...pn,s)
             %with p1,...,pn corresponding to uncertain parameters.
-            
-            
+                        
             Pars = {};
             for k = 1:length(obj)
                 if isa(obj(k).par1,'qpar')
@@ -49,13 +52,13 @@ classdef qrff
                     case 'gain'
                         Sk = par1s;
                     case 'delay'
-                        Sk = sprintf('exp(-s*%s)',par1s);
+                        Sk = sprintf('exp(-s.*%s)',par1s);
                     case 'dc'
                         if isempty(obj(k).par2)
-                            Sk = sprintf('(1+s/%s)',par1s);
+                            Sk = sprintf('(1+s./%s)',par1s);
                         else
                             SdW = sprintf('s./%s',par1s);
-                            Sk = sprintf('(1 + 2.*%s.*(%s) + (%s).^2)',par2s,SdW,SdW);
+                            Sk = sprintf('(1 + 2*%s.*(%s) + (%s).^2)',par2s,SdW,SdW);
                         end
                     case 'hf'
                         if isempty(obj(k).par2)
@@ -63,8 +66,17 @@ classdef qrff
                         else
                             wn = par1s;
                             zeta = par2s;
-                            Sk = sprintf('(s.^2 + 2.*%s.*%s + %s.^2)',zeta,wn,wn);
+                            Sk = sprintf('(s.^2 + 2*%s.*%s + %s.^2)',zeta,wn,wn);
                         end
+                    case 'poly'
+                        s = '';
+                        n = length(obj(k).par1)-1;
+                        for jj = 1:n+1
+                            if obj(k).par1(jj)~=0
+                                s = strcat(s,sprintf(' %g*s.^%i + ',obj(k).par1(jj),n+1-jj));
+                            end
+                        end
+                        Sk = ['(',s(2:end-2),')'];
                 end
                 
                 if k==1
