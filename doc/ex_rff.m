@@ -92,3 +92,10 @@ P2.showtpl
 %% 
 % One can see that the nominal is drawn at the wrong phase: $+180$ degrees instead
 % of $-180$ degrees. This can be corrected using the command |P2.unwrap()|. 
+
+%%
+% In the second example a delay is added using a delay rff element. Note
+% that dealys, as well as multiplicative unstructured uncertainty may be
+% inserted both as rff elements and using the qplant methods |adelay| and 
+% |auncint|. It is suggested that these methods wiil only be used when the
+% plant is not constructed using rff elements.

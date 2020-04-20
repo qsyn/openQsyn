@@ -30,14 +30,23 @@ f = @explant;
 % 
 %   Ts = 0.02;
 %   z = exp(Ts*s);                              % approximate z
-%   num = k*[1 a];
-%   den = conv([1/(wn*wn) 2*zet/wn 1],[1/10000 2*0.7/100 1]);
-%   Pz = c2d(tf(num,den),Ts,'zoh');             % convert by ZOH
-%   [dnum, dden] = tfdata(Pz);                  % cell object are returned
-%   y = polyval(dnum{1},z)./polyval(dden{1},z);
+%   N = length(s);
+%   y = zeros(N,1);
+%   for ii=1:N
+%       num = k(ii).*[1 a(ii)];
+%       den = conv([1/(wn(ii)*wn(ii)) 2*zet(ii)/wn(ii) 1],[1/10000 2*0.7/100 1]);
+%       Pz = c2d(tf(num,den),Ts,'zoh');             % convert by ZOH
+%       [dnum, dden] = tfdata(Pz);                  % cell object are returned
+%       y(ii) = polyval(dnum{1},z(ii))./polyval(dden{1},z(ii));
+%   end
 % 
 %   end
 %   ------------------------------------------------------------------------
+ 
+%%
+% Note that the only restriction is that the external plant function be
+% able to take vectors of parameters and s and return a vector of the same
+% size.
 
 %%
 % Define the uncertain parameters as qpar array. Note that a qapr array
@@ -51,7 +60,7 @@ wn=qpar('wn',4,4,8,8);
 pars=[k ; a ; z ; wn];
 
 %%
-% The blacl box plant is now defined as
+% The black box plant is now defined as
 Pblack = qblackbox(f,pars)
 %%
 % Usage is same as a dum/den qplant. We can plot the nyquist plot for
@@ -63,7 +72,7 @@ Pblack.niccases(parcases,logspace(-2,2,30))
 % compute the nominal case and templates
 Pblack.cnom(logspace(-2,2,200))
 w = [0.2 0.5 1 2 5 10 20 50];
-Pblack.ctpl('grid',w);
+Pblack.ctpl('recedge',w);
 Pblack.showtpl;
 
 %%

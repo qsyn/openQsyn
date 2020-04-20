@@ -119,7 +119,7 @@ P2.showtpl
 --&gt; for w=10 [rad/sec]
 --&gt; for w=20 [rad/sec]
 --&gt; for w=50 [rad/sec]
-</pre><img vspace="5" hspace="5" src="ex_rff_03.png" alt=""> <p>One can see that the nominal is drawn at the wrong phase: <span class="MathJax_Preview"><img src="ex_rff_eq13730660818168336607.png" alt="$+180$"></span><script type="math/tex">+180</script> degrees instead of <span class="MathJax_Preview"><img src="ex_rff_eq08359778732645892253.png" alt="$-180$"></span><script type="math/tex">-180</script> degrees. This can be corrected using the command <tt>P2.unwrap()</tt>.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+</pre><img vspace="5" hspace="5" src="ex_rff_03.png" alt=""> <p>One can see that the nominal is drawn at the wrong phase: <span class="MathJax_Preview"><img src="ex_rff_eq13730660818168336607.png" alt="$+180$"></span><script type="math/tex">+180</script> degrees instead of <span class="MathJax_Preview"><img src="ex_rff_eq08359778732645892253.png" alt="$-180$"></span><script type="math/tex">-180</script> degrees. This can be corrected using the command <tt>P2.unwrap()</tt>.</p><p>In the second example a delay is added using a delay rff element. Note that dealys, as well as multiplicative unstructured uncertainty may be inserted both as rff elements and using the qplant methods <tt>adelay</tt> and <tt>auncint</tt>. It is suggested that these methods wiil only be used when the plant is not constructed using rff elements.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Example: RFF template computation
 % 
@@ -216,5 +216,11 @@ P2.showtpl
 % One can see that the nominal is drawn at the wrong phase: $+180$ degrees instead
 % of $-180$ degrees. This can be corrected using the command |P2.unwrap()|. 
 
+%%
+% In the second example a delay is added using a delay rff element. Note
+% that dealys, as well as multiplicative unstructured uncertainty may be
+% inserted both as rff elements and using the qplant methods |adelay| and 
+% |auncint|. It is suggested that these methods wiil only be used when the
+% plant is not constructed using rff elements.
 ##### SOURCE END #####
 --></body></html>

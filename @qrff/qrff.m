@@ -11,7 +11,39 @@ classdef qrff
     methods
         function obj = qrff(type,par1,varargin)
             %QRFF Construct an instance of the qrff class
-            %   Detailed explanation goes here
+            %   
+            %   Usage: 
+            %
+            %   rff = QRFF(type,par)   defines a qrff object of specified "type" 
+            %   using the qpar or numerical parameter "par". 
+            %
+            %   rff = qrff(type,par1,par2)    is used is type requires two
+            %   parameters 
+            %
+            %   Avilables input combinations
+            %       qrff('gain',k)      uncertain gain k
+            %       qrff('unc',w,M)     unstructured uncertainty M(w)
+            %       qrff('delay',tau)   time delay exp(-tau*s) 
+            %       qrff('dc',a)        first order dc element (s/a+1)
+            %       qrff('dc',w,z)      second order dc element (s^2/w^2+2*z*s/w+1)
+            %       qrff('hf',a)        first order hf element (a+s)
+            %       qrff('hf',w,z)      second order hf element (s^2+2*z*w*s+w^2)
+            %     
+            %   Example 1: 2nd order dc element with uncertain wn and zeta
+            %       wn = qpar('wn',4,4,8);
+            %       zeta = qpar('z',0.4,0.4,0.6);
+            %       rffElement = QRFF('dc',wn,zeta);
+            % 
+            %   Example 2: 2nd order hf element with uncertain wn and constant zeta 
+            %       wn = qpar('wn',4,4,8);
+            %       zeta = 0.4;
+            %       rffElement = QRFF('hc'wn'zeta)
+            %
+            %   Example 3: unstructured uncertainty
+            %       wunc = [0.1 0.5 1 5 10 20 50];
+            %       M = [1 2 5 5 5 10 20];
+            %       rffElement = qrff('unc',wunc,M);
+            %
             
             validStrings = {'gain','delay','dc','hf','uns','int','poly'};
             validatestring(type,validStrings,'qrff','type',1);

@@ -6,7 +6,7 @@
    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Exmaple: Black box</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-02-14"><meta name="DC.source" content="ex_blackBox.m"><style type="text/css">
+      --><title>Exmaple: Black box</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-21"><meta name="DC.source" content="ex_blackBox.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -71,61 +71,63 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <span class="keyword">function</span> Pz = explant(k,a,zet,wn,s)
 </pre><pre class="language-matlab">Ts = 0.02;
 z = exp(Ts*s);                              <span class="comment">% approximate z</span>
-num = k*[1 a];
-den = conv([1/(wn*wn) 2*zet/wn 1],[1/10000 2*0.7/100 1]);
-Pz = c2d(tf(num,den),Ts,<span class="string">'zoh'</span>);             <span class="comment">% convert by ZOH</span>
-[dnum, dden] = tfdata(Pz);                  <span class="comment">% cell object are returned</span>
-y = polyval(dnum{1},z)./polyval(dden{1},z);
+N = length(s);
+y = zeros(N,1);
+<span class="keyword">for</span> ii=1:N
+    num = k(ii).*[1 a(ii)];
+    den = conv([1/(wn(ii)*wn(ii)) 2*zet(ii)/wn(ii) 1],[1/10000 2*0.7/100 1]);
+    Pz = c2d(tf(num,den),Ts,<span class="string">'zoh'</span>);             <span class="comment">% convert by ZOH</span>
+    [dnum, dden] = tfdata(Pz);                  <span class="comment">% cell object are returned</span>
+    y(ii) = polyval(dnum{1},z(ii))./polyval(dden{1},z(ii));
+<span class="keyword">end</span>
 </pre><pre class="language-matlab"><span class="keyword">end</span>
 ------------------------------------------------------------------------
-</pre><p>Define the uncertain parameters as qpar array. Note that a qapr array must be a column vector (horizontal concatenation produces a qpoly object!)</p><pre class="codeinput"><span class="comment">% uncertain parameters</span>
+</pre><p>Note that the only restriction is that the external plant function be able to take vectors of parameters and s and return a vector of the same size.</p><p>Define the uncertain parameters as qpar array. Note that a qapr array must be a column vector (horizontal concatenation produces a qpoly object!)</p><pre class="codeinput"><span class="comment">% uncertain parameters</span>
 k=qpar(<span class="string">'k'</span>,2,2,5,8);
 a=qpar(<span class="string">'a'</span>,3,1,3,8);
 z=qpar(<span class="string">'z'</span>,0.6,0.3,0.6,8);
 wn=qpar(<span class="string">'wn'</span>,4,4,8,8);
 pars=[k ; a ; z ; wn];
-</pre><p>The blacl box plant is now defined as</p><pre class="codeinput">Pblack = qblackbox(f,pars)
+</pre><p>The black box plant is now defined as</p><pre class="codeinput">Pblack = qblackbox(f,pars)
 </pre><pre class="codeoutput">
 Pblack = 
 
   qblackbox with properties:
 
-           er: []
+     blackBox: @explant
           num: []
           den: []
-     blackBox: @explant
          pars: [4&times;1 qpar]
-        delay: []
      unstruct: []
        uncint: []
-    templates: []
-      nominal: []
-         info: 'generated from BalckBox func handle on: 14-Feb-2019 15:28:02'
+         info: 'generated from BalckBox func handle on: 21-Apr-2020 00:19:08'
+    templates: [0&times;0 qtpl]
+      nominal: [0&times;0 qfr]
+        delay: []
 
 </pre><p>Usage is same as a dum/den qplant. We can plot the nyquist plot for selected cases,</p><pre class="codeinput">parcases = [2 1 0.3 4 ; 5 3 0.6 8 ; 3 2 0.5 6].';
 Pblack.niccases(parcases,logspace(-2,2,30))
 </pre><img vspace="5" hspace="5" src="ex_blackBox_01.png" alt=""> <p>compute the nominal case and templates</p><pre class="codeinput">Pblack.cnom(logspace(-2,2,200))
 w = [0.2 0.5 1 2 5 10 20 50];
-Pblack.ctpl(<span class="string">'grid'</span>,w);
+Pblack.ctpl(<span class="string">'recedge'</span>,w);
 Pblack.showtpl;
 </pre><pre class="codeoutput">
 ans = 
 
   qblackbox with properties:
 
-           er: []
+     blackBox: @explant
           num: []
           den: []
-     blackBox: @explant
          pars: [4&times;1 qpar]
-        delay: []
      unstruct: []
        uncint: []
-    templates: []
+         info: 'generated from BalckBox func handle on: 21-Apr-2020 00:19:08'
+    templates: [0&times;0 qtpl]
       nominal: [1&times;1 qfr]
-         info: 'generated from BalckBox func handle on: 14-Feb-2019 15:28:02'
+        delay: []
 
-Calculating templates using the grid method 
+Calculating templates by recurcive edge grid
 --&gt; for w=0.2 [rad/s] 
 --&gt; for w=0.5 [rad/s] 
 --&gt; for w=1 [rad/s] 
@@ -134,6 +136,7 @@ Calculating templates using the grid method
 --&gt; for w=10 [rad/s] 
 --&gt; for w=20 [rad/s] 
 --&gt; for w=50 [rad/s] 
+PRUNE: Phase uncertainty larger than 360, or not connected
 </pre><img vspace="5" hspace="5" src="ex_blackBox_02.png" alt=""> <p>and etc. Do note that everything runs much slower. This issue should be fixed in future openQsyn versions.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Exmaple: Black box
@@ -168,14 +171,23 @@ f = @explant;
 % 
 %   Ts = 0.02;
 %   z = exp(Ts*s);                              % approximate z
-%   num = k*[1 a];
-%   den = conv([1/(wn*wn) 2*zet/wn 1],[1/10000 2*0.7/100 1]);
-%   Pz = c2d(tf(num,den),Ts,'zoh');             % convert by ZOH
-%   [dnum, dden] = tfdata(Pz);                  % cell object are returned
-%   y = polyval(dnum{1},z)./polyval(dden{1},z);
+%   N = length(s);
+%   y = zeros(N,1);
+%   for ii=1:N
+%       num = k(ii).*[1 a(ii)];
+%       den = conv([1/(wn(ii)*wn(ii)) 2*zet(ii)/wn(ii) 1],[1/10000 2*0.7/100 1]);
+%       Pz = c2d(tf(num,den),Ts,'zoh');             % convert by ZOH
+%       [dnum, dden] = tfdata(Pz);                  % cell object are returned
+%       y(ii) = polyval(dnum{1},z(ii))./polyval(dden{1},z(ii));
+%   end
 % 
 %   end
 %   REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH
+ 
+%%
+% Note that the only restriction is that the external plant function be
+% able to take vectors of parameters and s and return a vector of the same
+% size.
 
 %%
 % Define the uncertain parameters as qpar array. Note that a qapr array
@@ -189,7 +201,7 @@ wn=qpar('wn',4,4,8,8);
 pars=[k ; a ; z ; wn];
 
 %%
-% The blacl box plant is now defined as
+% The black box plant is now defined as
 Pblack = qblackbox(f,pars)
 %%
 % Usage is same as a dum/den qplant. We can plot the nyquist plot for
@@ -201,7 +213,7 @@ Pblack.niccases(parcases,logspace(-2,2,30))
 % compute the nominal case and templates
 Pblack.cnom(logspace(-2,2,200))
 w = [0.2 0.5 1 2 5 10 20 50];
-Pblack.ctpl('grid',w);
+Pblack.ctpl('recedge',w);
 Pblack.showtpl;
 
 %%
