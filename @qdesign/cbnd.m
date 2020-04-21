@@ -16,10 +16,12 @@ function obj = cbnd(obj,spcname,w,spcfunc)
 %   des     qdesign name with templates and specification(s)
 %
 %   spcname string specifiying the specification to be used. Pre-defined names 
-%           'odsrs' - output disturbance rejection (sensitivity)
-%           'rsrs'  - reference step tracking (servo)
+%           'odsrs'     output disturbance rejection (sensitivity), |1/(1+GP)| < b
+%           'rsrs'      reference step tracking (servo), b1 < |FP/(1+GP)| < b2
+%           'idsrs'     input disturbance rejection, |P/(1+GP)| < b  
+%           'iosrs'     input step response, b1 < |GP/(1+GP)| < b2
 %
-%   w       vector of frequecnies
+%   w       vector of frequecnies; default is all templates frequecies
 %
 %   spcfunc function handle; required if spcname is not on of the
 %           pre-defined names.
@@ -31,8 +33,10 @@ if nargin<3, w=[]; end
 if nargin<4, spcfunc=[]; end
 
 switch spcname
-    case 'odsrs', spcfunc = @fodsrs; 
-    case 'rsrs',  spcfunc = @frsrs; 
+    case 'odsrs', spcfunc = @qdesign.fodsrs; 
+    case 'rsrs',  spcfunc = @qdesign.frsrs; 
+    case 'idsrs', spcfunc = @qdesign.fidsrs; 
+    case 'iosrs', spcfunc = @qdesign.fiosrs; 
     %otherwise, error('unrecognized specification %s',spcname);
 end
      

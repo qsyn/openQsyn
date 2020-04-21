@@ -97,6 +97,10 @@ classdef qdesign  < handle
     
     methods(Static)
         bound = makebnd(tpl,specfunc,spec,gphase,gmag)
+        Tmax = fiosrs(tpl_nom,tpl,GP,spec,par_nom,par)
+        Tmax = fidsrs(tpl_nom,tpl,GP,spec,par_nom,par)
+        Tmax = fodsrs(tpl_nom,tpl,GP,spec,par_nom,par)
+        Tmax = frsrs(tpl_nom,tpl,GP,spec,par_nom,par)
     end
 end
 

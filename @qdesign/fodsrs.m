@@ -29,7 +29,6 @@ function[Smax]=fodsrs(tpl_nom,tpl,GP,spec,par_nom,par)
 %   par         [], not in use
 
 % Author: P-O Gutman, M Nordin
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
 % Version Upgrade: A. & Y. Greenhut
 
 Smax=-20*log10(min(abs(1+n2c(GP+tpl-tpl_nom))))-spec(1); %obs!	

@@ -6,7 +6,7 @@
    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Example: RFF template computation</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-20"><meta name="DC.source" content="ex_rff.m"><style type="text/css">
+      --><title>Example: RFF template computation</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-21"><meta name="DC.source" content="ex_rff.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -71,7 +71,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
          \frac{\displaystyle\prod_{q=1} (1+2\zeta_q s/\omega_{q} + s^2/\omega_q^2)}{\displaystyle\prod_{w=1} (1+2\zeta_w s/\omega_{w} + s^2/\omega_w^2)}
          \frac{\displaystyle\prod_{r=1} (s^2+2\zeta_r \omega_{r} s + \omega_r^2)}{\displaystyle\prod_{i=1} (s^2+2\zeta_i \omega_{i} s + \omega_i^2) }
          \left(1+M(s)\right)
-</script></p><p>a method given in Gutman et. al. (1994) can be used to compute accurate templates in a short time. Note that in the above all parameters are uncertain, and <span class="MathJax_Preview"><img src="ex_rff_eq04174480755079218225.png" alt="$M(s)$"></span><script type="math/tex">M(s)</script> denotes multiplicative unstructured uncertainty First and second order factors whose gain equals 1 for s=0 are said to be given in direct current or dc-form, and the remaining first and second order factors are said to be in high frequency or hf-form.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#8">Example 2:</a></li></ul></div><p>To use the <tt>rff</tt> method, the qplant must be constructed using <tt>qrff</tt> elements instead of <tt>qpoly</tt> elements for the numerator and denumerator.</p><p><b>Exmaple 1</b>:</p><p>The plant is given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq14271380834448968728.png" alt="$$ P(s) = \frac{\displaystyle s+a}{\displaystyle 1 + 2 \zeta s / \omega_n + s^2 / \omega_n^2} $$"></span><script type="math/tex"> P(s) = \frac{\displaystyle s+a}{\displaystyle 1 + 2 \zeta s / \omega_n + s^2 / \omega_n^2} </script></p><p>with uncertain paraetmers given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq13842471372895612606.png" alt="$$ k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]$$"></span><script type="math/tex"> k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]</script></p><p>We construct the qpar elements as usual</p><pre class="codeinput">k=qpar(<span class="string">'k'</span>,2,2,5,8);
+</script></p><p>a method given in Gutman et. al. (1994) can be used to compute accurate templates in a short time. Note that in the above all parameters are uncertain, and <span class="MathJax_Preview"><img src="ex_rff_eq04174480755079218225.png" alt="$M(s)$"></span><script type="math/tex">M(s)</script> denotes multiplicative unstructured uncertainty First and second order factors whose gain equals 1 for s=0 are said to be given in direct current or dc-form, and the remaining first and second order factors are said to be in high frequency or hf-form.</p><p>To use the <tt>rff</tt> method, the qplant must be constructed using <tt>qrff</tt> elements instead of <tt>qpoly</tt> elements for the numerator and denumerator.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Exmaple 1</a></li><li><a href="#7">Example 2</a></li></ul></div><h2 id="1">Exmaple 1</h2><p>The plant is given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq14271380834448968728.png" alt="$$ P(s) = \frac{\displaystyle s+a}{\displaystyle 1 + 2 \zeta s / \omega_n + s^2 / \omega_n^2} $$"></span><script type="math/tex"> P(s) = \frac{\displaystyle s+a}{\displaystyle 1 + 2 \zeta s / \omega_n + s^2 / \omega_n^2} </script></p><p>with uncertain paraetmers given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq13842471372895612606.png" alt="$$ k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]$$"></span><script type="math/tex"> k \in [2,5],~ a \in [1,3],~ \zeta \in [0.1,0.6],~ \omega_n \in [4,8]</script></p><p>We construct the qpar elements as usual</p><pre class="codeinput">k=qpar(<span class="string">'k'</span>,2,2,5,8);
 a=qpar(<span class="string">'a'</span>,3,1,3,8);
 z=qpar(<span class="string">'z'</span>,0.6,0.3,0.6,8);
 wn=qpar(<span class="string">'wn'</span>,4,4,8,8);
@@ -102,7 +102,7 @@ P1.showtpl
 --&gt; for w=10 [rad/s] 
 --&gt; for w=20 [rad/s] 
 --&gt; for w=50 [rad/s] 
-</pre><img vspace="5" hspace="5" src="ex_rff_02.png" alt=""> <p>However, the <tt>rff</tt> method cannot be used on qplants constructed using qpoly elements.</p><h2 id="8">Example 2:</h2><p>The plant is given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq04716704323597029100.png" alt="$$ P(s) = \frac{\displaystyle k}{\displaystyle s^2} e^{-h s} $$"></span><script type="math/tex"> P(s) = \frac{\displaystyle k}{\displaystyle s^2} e^{-h s} </script></p><p>with uncertain paraetmers given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq05950432617276709240.png" alt="$$ k \in [1,10], ~~  h \in [0,1].$$"></span><script type="math/tex"> k \in [1,10], ~~  h \in [0,1].</script></p><p>This time the numerator has a gain <tt>k</tt> and a delay <tt>h</tt>, and the denumerator has a certain double integrator. The denumerator thus requires a <tt>poly</tt> qrff member, which encapsulates the certain polynomial <span class="MathJax_Preview"><img src="ex_rff_eq02192998514035368020.png" alt="$a(s)=s^2$"></span><script type="math/tex">a(s)=s^2</script>.</p><pre class="codeinput">k = qpar(<span class="string">'k'</span>,5,1,10,8);
+</pre><img vspace="5" hspace="5" src="ex_rff_02.png" alt=""> <p>However, the <tt>rff</tt> method cannot be used on qplants constructed using qpoly elements.</p><h2 id="7">Example 2</h2><p>The plant is given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq04716704323597029100.png" alt="$$ P(s) = \frac{\displaystyle k}{\displaystyle s^2} e^{-h s} $$"></span><script type="math/tex"> P(s) = \frac{\displaystyle k}{\displaystyle s^2} e^{-h s} </script></p><p>with uncertain paraetmers given as</p><p><span class="MathJax_Preview"><img src="ex_rff_eq05950432617276709240.png" alt="$$ k \in [1,10], ~~  h \in [0,1].$$"></span><script type="math/tex"> k \in [1,10], ~~  h \in [0,1].</script></p><p>This time the numerator has a gain <tt>k</tt> and a delay <tt>h</tt>, and the denumerator has a certain double integrator. The denumerator thus requires a <tt>poly</tt> qrff member, which encapsulates the certain polynomial <span class="MathJax_Preview"><img src="ex_rff_eq02192998514035368020.png" alt="$a(s)=s^2$"></span><script type="math/tex">a(s)=s^2</script>.</p><pre class="codeinput">k = qpar(<span class="string">'k'</span>,5,1,10,8);
 h = qpar(<span class="string">'h'</span>,0,0,1,8);
 num = [qrff(<span class="string">'gain'</span>,k) qrff(<span class="string">'delay'</span>,h)]; <span class="comment">% numerator</span>
 den = qrff(<span class="string">'poly'</span>,[1 0 0]);             <span class="comment">% denumerator</span>
@@ -122,7 +122,7 @@ P2.showtpl
 </pre><img vspace="5" hspace="5" src="ex_rff_03.png" alt=""> <p>One can see that the nominal is drawn at the wrong phase: <span class="MathJax_Preview"><img src="ex_rff_eq13730660818168336607.png" alt="$+180$"></span><script type="math/tex">+180</script> degrees instead of <span class="MathJax_Preview"><img src="ex_rff_eq08359778732645892253.png" alt="$-180$"></span><script type="math/tex">-180</script> degrees. This can be corrected using the command <tt>P2.unwrap()</tt>.</p><p>In the second example a delay is added using a delay rff element. Note that dealys, as well as multiplicative unstructured uncertainty may be inserted both as rff elements and using the qplant methods <tt>adelay</tt> and <tt>auncint</tt>. It is suggested that these methods wiil only be used when the plant is not constructed using rff elements.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Example: RFF template computation
-% 
+%
 % If an uncertain transfer functions is given in Real Factored Form
 %
 % $$P(s) = k e^{-\tau s} \frac{\displaystyle\prod_{k=1} (1+s/b_{k})}{\displaystyle\prod_{u=1} (1+s/b_{u})}  
@@ -136,13 +136,11 @@ P2.showtpl
 % Note that in the above all parameters are uncertain, and $M(s)$ denotes multiplicative unstructured uncertainty
 % First and second order factors whose gain equals 1 for s=0 are said to be given in direct current or dc-form, and the
 % remaining first and second order factors are said to be in high frequency or hf-form.
-
-%%
+%
 % To use the |rff| method, the qplant must be constructed using |qrff|
 % elements instead of |qpoly| elements for the numerator and denumerator.
 
-%%
-% *Exmaple 1*: 
+%% Exmaple 1
 % 
 % The plant is given as 
 %
@@ -186,7 +184,7 @@ P1.showtpl
 % However, the |rff| method cannot be used on qplants constructed using
 % qpoly elements.
 
-%% Example 2: 
+%% Example 2
 % 
 % The plant is given as 
 %

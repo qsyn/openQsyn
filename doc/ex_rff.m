@@ -1,5 +1,5 @@
 %% Example: RFF template computation
-% 
+%
 % If an uncertain transfer functions is given in Real Factored Form
 %
 % $$P(s) = k e^{-\tau s} \frac{\displaystyle\prod_{k=1} (1+s/b_{k})}{\displaystyle\prod_{u=1} (1+s/b_{u})}  
@@ -13,13 +13,11 @@
 % Note that in the above all parameters are uncertain, and $M(s)$ denotes multiplicative unstructured uncertainty
 % First and second order factors whose gain equals 1 for s=0 are said to be given in direct current or dc-form, and the
 % remaining first and second order factors are said to be in high frequency or hf-form.
-
-%%
+%
 % To use the |rff| method, the qplant must be constructed using |qrff|
 % elements instead of |qpoly| elements for the numerator and denumerator.
 
-%%
-% *Exmaple 1*: 
+%% Exmaple 1
 % 
 % The plant is given as 
 %
@@ -63,7 +61,7 @@ P1.showtpl
 % However, the |rff| method cannot be used on qplants constructed using
 % qpoly elements.
 
-%% Example 2: 
+%% Example 2
 % 
 % The plant is given as 
 %

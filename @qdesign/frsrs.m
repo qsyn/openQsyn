@@ -46,7 +46,6 @@ function [Tmax]=frsrs(tpl_nom,tpl,GP,spec,par_nom,par)
 
 
 % Author: M Nordin
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
 % Version Upgrade: A. & Y. Greenhut
 
 
