@@ -11,8 +11,8 @@ function[y]=n2c(z);
 %               deg + j*dB. 
 
 
+% This file is part of the OpenQsyn toolox, distribted under GNU LGPL3 license
 % Author: B. Cohen
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
 % Version Upgrade: A. & Y. Greenhut
 
 y=10.^(0.05*imag(z)).*exp(j*real(z)*(pi/180));

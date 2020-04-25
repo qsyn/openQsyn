@@ -8,6 +8,8 @@ function ha = nicholsplotter(tpl,w,col,linespec)
 %   w       frequencies 
 %   col     colors RGB array
 
+% This file is part of the OpenQsyn toolox, distribted under GNU LGPL3 license
+
 
 N = size(tpl,1);
 for k=1:N

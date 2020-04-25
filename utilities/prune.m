@@ -62,9 +62,8 @@ function [T,t_index]=prune(t,Tacc,upper)
 %
 %  See also TPLPRUNE  TPLREDUC
 
-
+% This file is part of the OpenQsyn toolox, distribted under GNU LGPL3 license
 % Author: M. Nordin
-% Copyright: PO Gutman 1996 
 
 
 if nargin==0

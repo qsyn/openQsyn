@@ -58,6 +58,7 @@ function [y]=c2n(x,op)
 %   See also: Matlab function UNWRAP, N2C
 %
 
+% This file is part of the OpenQsyn toolox, distribted under GNU LGPL3 license
 % Author: B Cohen, M Nordin, P-O Gutman 
 % Version upgrade: A. & Y. Greenhut
 

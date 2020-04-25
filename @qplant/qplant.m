@@ -185,12 +185,12 @@ classdef qplant < handle
             %   vector W; results is stored under the property 'nominal'.
             %
             %   See also: qplant/ctpl
-            if nargin<2, w = logspace(-1,2,50); end
+            if nargin<2, w = logspace(-1,2,200).'; end
             f = qplant2func(obj);
             pnom = [obj.pars.nominal];
             C = num2cell(pnom);
             C{end+1}=1j*w;
-            nyq = f(C{:});
+            nyq = f(C{:}).';
             obj.nominal=qfr(c2n(nyq,'unwarp'),w) ;
         end
         function tpl = cgrid(obj,w,rnd,n)

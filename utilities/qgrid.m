@@ -29,9 +29,8 @@ function[outgrid]=qgrid(n,qmin,qmax);
 %
 %   See also    PGRID, PARGRID
 
-
+% This file is part of the OpenQsyn toolox, distribted under GNU LGPL3 license
 % Author: C Baril, B Cohen
-% Copyright: El-Op Electro-Optics Industries Ltd, and Novomatic AB 1996
 % Version Upgrade: A. & Y. Greenhut
 
 n=n(:);qmin=qmin(:)';qmax=qmax(:)';  %Make column vectors;

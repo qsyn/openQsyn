@@ -84,6 +84,10 @@ classdef qdesign  < handle
             for k=1:length(obj.tpl)
                 tk = qfr(obj.tpl(k).template(1),obj.tpl(k).frequency);
                 Ltpl = series(tk,C);
+                [~,w_i] = min(abs(tk.frequency-Lnom.frequency)); %** fix phase shift issues 
+                phase_dist = real(Ltpl.response) - real(Lnom.response(w_i)); 
+                n_r = floor((abs(phase_dist)+5)/360)*sign(phase_dist);
+                Ltpl.response =  Ltpl.response-n_r*360; %*** 
                 h(end+1) = show(Ltpl,'marker','square',...
                      'markeredgecolor','k','markerfacecolor',t_color(k,:));
                 text(real(Ltpl.response),imag(Ltpl.response),...

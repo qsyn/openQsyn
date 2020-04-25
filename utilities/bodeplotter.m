@@ -9,6 +9,10 @@ function ha = bodeplotter(tpl,w,opt,col,linespec)
 %   opt         how to plot
 %   col         colors RGB array
 %   linspec     line plotting specs
+%
+
+%This file is part of the OpenQsyn toolox, distribted under GNU LGPL3 license
+
 
 if nargin<5
     linespec = struct('width',1,'style','-'); % def linespace
