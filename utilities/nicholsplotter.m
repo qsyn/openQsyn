@@ -12,11 +12,11 @@ function ha = nicholsplotter(tpl,w,col,linespec)
 
 
 N = size(tpl,1);
+hold on
 for k=1:N
     plot(real(tpl(k,:)),imag(tpl(k,:)),'Zdata',w,...
         'Color',col(k,:),'Tag',num2str(k),...
-        'linewidth',linespec.width,'linestyle',linespec.style);
-    hold on
+        'linewidth',linespec.width,'linestyle',linespec.style); 
 end
 hold off   
 ha = gca;
