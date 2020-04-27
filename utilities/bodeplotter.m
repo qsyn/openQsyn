@@ -21,7 +21,7 @@ if strcmp(opt,'magphase')
 end
 
 if ~strcmp(opt,'phase')
-    set(ha(1), 'ColorOrder', col, 'NextPlot', 'replacechildren');
+    set(gca, 'ColorOrder', col, 'NextPlot', 'replacechildren');
     semilogx(w,imag(tpl),'linewidth',linespec.width,'linestyle',linespec.style);  
     %if strcmp(CASE,'all') || strcmp(CASE,'nom')
     %    [w_nom,t_nom]=gettpl(tplf,'nom');
@@ -38,7 +38,7 @@ if strcmp(opt,'magphase')
 end
 
 if ~strcmp(opt,'mag')
-    set(ha(1), 'ColorOrder', col, 'NextPlot', 'replacechildren');
+    set(gca, 'ColorOrder', col, 'NextPlot', 'replacechildren');
     semilogx(w,real(tpl),'linewidth',linespec.width,'linestyle',linespec.style);
     %if strcmp(CASE,'all') || strcmp(CASE,'nom')
     %    phase=real(t_nom);
