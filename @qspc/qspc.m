@@ -46,8 +46,7 @@ classdef qspc
             %   w       frequnecy vector
             %   upper   upper bound can be
             %           Real numeric scalar/vector in dB. must be a vector of same lenght as w or a
-            %           Complex numeric scalar/vector. must be a vector of same lenght as w or a
-            %           Transfer Function (tf)
+            %           LTI (tf , zpk)
             %           Frequency Response data (frd)
             %   lower   lower bound in dB.
             %Example
@@ -65,16 +64,14 @@ classdef qspc
                 error('w must be a vector of positive values');
             end
             if isa(upper,'frd')
-                upperType = 3;
-            elseif isa(upper,'tf')
                 upperType = 2;
+            elseif isa(upper,'lti')
+                upperType = 1;
             else
-                if isa(upper,'numeric') && ~isreal(upper) % Complex
-                    upperType = 1;
-                elseif isa(upper,'numeric') && isreal(upper) % Real
+                if isa(upper,'numeric') && isreal(upper) % Real
                     upperType = 0;
                 else
-                    error('upper bound must be a numeric or tf or frd');
+                    error('upper bound must be a numeric or lti or frd');
                 end
             end
             if ~isnumeric(lower), error('lower bound must be a numeric scalar'); end
@@ -86,24 +83,18 @@ classdef qspc
                     elseif  length(upper)~=length(w)
                         error('upper spec must be scalar or a vector of same length as w');
                     end
-                case 1 % Complex
-                    upper = squeeze(20*log10(abs(upper)))';
-                    if isscalar(upper)
-                        upper = upper*ones(1,length(w));
-                    elseif  length(upper)~=length(w)
-                        error('upper spec must be scalar or a vector of same length as w');
-                    end
-                case 2 % Transfer function tf
+                case 1 % lti
                     FilterResponse = freqresp(upper, w);
                     upper = squeeze(20*log10(abs(FilterResponse)))';
-                case 3 % frd
+                case 2 % frd
                     if strcmp(upper.FrequencyUnit,'Hz') % Convert frequencies to rad/sec
                         upper.f = upper.f*2*pi;
                     end
                     if length(intersect(w,upper.f)) ~= length(w)
                         error('The frd does not contain the same input frequencies')
                     end
-                    upper = squeeze(20*log10(abs(upper.r)))';
+                    [~,~,ind] = intersect(w,upper.f);
+                    upper = squeeze(20*log10(abs(upper.r(ind))))';
             end
             
             if ~isempty(lower)
@@ -134,7 +125,5 @@ classdef qspc
         [spec_w,spec_t,tab] = spc_od2(spc_tab,w,dt,plt,n)
         [spec_w,spec_t,tab] = spc_od3(spc_tab,w,dt,plt,n)
         [spec_w,spec_t,tab] = spc_od31(spc_tab,w,dt,plt,n)
-    end
-    
-    
+    end 
 end
