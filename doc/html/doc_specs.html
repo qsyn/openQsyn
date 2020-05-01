@@ -1,0 +1,153 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Specifications</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-01"><meta name="DC.source" content="doc_specs.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Specifications</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Frequency Domain Specifications</a></li><li><a href="#11">Time Domain Specifications</a></li></ul></div><p>A control design is dectated by design specification. In QFT, the so called Horowitz-Sidi bounds, used for loop-shaping, are computed such that the closed-loop staisfies the design specifications (if the designer knows what he is doing). In QFT all specifications must be finally formulated in the frequency domain, and those that are originally given in the time domain must be translated to the frequency domain. The specification generation and conversion from time to frequency domain is facilitated by the <a href="matlab:doc('qspc')"><tt>qspc</tt></a> class.</p><h2 id="2">Frequency Domain Specifications</h2><p>The usual syntex is</p><pre class="language-matlab">spec = qspc(name,frequency,upper);
+</pre><p>where <tt>name</tt> string gives the specifcation alias, <tt>frequency</tt> the vector of frequencies over which the specifcation is to be computed, and <tt>upper</tt> is the upper bound in [dB].</p><p>There are three options to determine the upper bound of the specifications:</p><div><ol><li>Upper bound given by real numeric scalar/vector in dB. If the upper bound is a vector it must be the same length as w.</li><li>Upper bound given by LTI (TF , ZPK, FRD). This option is used when the upper bound is given as an LTI object. In case of an FRD object, the frequency inside it must include the frequencies in the vector supplied to <tt>qspc</tt>.</li></ol></div><p><b>Exmaple 1</b>: A 6db sensitiveity specificaiton in the range [0.1 100] rad/s is given as</p><pre class="codeinput">spec = qspc(<span class="string">'odsrs'</span>,logspace(-1,2,20),6);
+</pre><p>Note the naming <tt>odsrs</tt> which stands for "output disturbance step response specification".</p><p><b>Exmaple 2</b>: Sometimes the specifications are given by a transfer function. Lets say that the noise is known to lay under the transfer function</p><p><img src="doc_specs_eq00038005900874463185.png" alt="$$ F(s) = \frac{2 s}{s + 0.07} $$" style="width:102px;height:32px;"></p><p>The specfication may be defined as follows</p><pre class="codeinput">w = logspace(-2,3,100);
+TF = 2*tf([1 0],[1 0.07]); <span class="comment">%tf</span>
+UpperBound = 20*log10(abs(squeeze(freqresp(TF,w))));
+sens_spc = qspc(<span class="string">'odsrs'</span>,w,UpperBound);
+sens_spc.show
+</pre><img vspace="5" hspace="5" src="doc_specs_01.png" alt=""> <p>Alternatively, one may input the transfer function directly as a Control System Toolbox TF, ZPK, or FRD object. This simplifies the previous exmaple (by one line) to</p><pre class="codeinput">TF = 2*tf([1 0],[1 0.07]); <span class="comment">%tf</span>
+sens_spc = qspc(<span class="string">'odsrs'</span>,w,TF);
+</pre><h2 id="11">Time Domain Specifications</h2><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Specifications 
+% 
+
+%%
+% A control design is dectated by design specification. 
+% In QFT, the so called Horowitz-Sidi bounds, used for loop-shaping, are
+% computed such that the closed-loop staisfies the design specifications 
+% (if the designer knows what he is doing). 
+% In QFT all specifications must be finally formulated in the frequency 
+% domain, and those that are originally given in the time domain must be
+% translated to the frequency domain.
+% The specification generation and conversion from time to frequency domain
+% is facilitated by the <matlab:doc('qspc') |qspc|> class. 
+
+%% Frequency Domain Specifications 
+% The usual syntex is 
+% 
+%   spec = qspc(name,frequency,upper);
+% 
+%%
+% where |name| string gives the specifcation alias, |frequency| the vector
+% of frequencies over which the specifcation is to be computed, and |upper|
+% is the upper bound in [dB].
+
+%%
+% There are three options to determine the upper bound of the
+% specifications: 
+%
+% # Upper bound given by real numeric scalar/vector in dB. 
+% If the upper bound is a vector it must be the same length as w.
+% # Upper bound given by LTI (TF , ZPK, FRD). 
+% This option is used when the upper bound is given as an LTI object. 
+% In case of an FRD object, the frequency inside it must include the frequencies in the vector supplied to |qspc|. 
+
+%% 
+% *Exmaple 1*: 
+% A 6db sensitiveity specificaiton in the range [0.1 100] rad/s is given as 
+
+spec = qspc('odsrs',logspace(-1,2,20),6);
+
+%%
+% Note the naming |odsrs| which stands for "output disturbance step response 
+% specification". 
+
+%%
+% *Exmaple 2*: 
+% Sometimes the specifications are given by a transfer function. 
+% Lets say that the noise is known to lay under the transfer function 
+%%
+% 
+% $$ F(s) = \frac{2 s}{s + 0.07} $$
+% 
+%%
+% The specfication may be defined as follows 
+
+w = logspace(-2,3,100);
+TF = 2*tf([1 0],[1 0.07]); %tf
+UpperBound = 20*log10(abs(squeeze(freqresp(TF,w))));
+sens_spc = qspc('odsrs',w,UpperBound);
+sens_spc.show
+
+%% 
+% Alternatively, one may input the transfer function directly as
+% a Control System Toolbox TF, ZPK, or FRD object. This simplifies the
+% previous exmaple (by one line) to 
+
+TF = 2*tf([1 0],[1 0.07]); %tf
+sens_spc = qspc('odsrs',w,TF);
+
+%% Time Domain Specifications 
+% 
+
+##### SOURCE END #####
+--></body></html>
