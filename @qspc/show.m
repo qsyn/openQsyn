@@ -1,7 +1,7 @@
 function [varargout]=show(obj,plot_op,linespec,phandle)
 %SHOWSPC    displays a single specification 
 %               
-%[phandle]=showspc(spcfile,spec,plot_op,color,phandle)
+% [phandle_new] = showspc(spcObject,plot_op,linespec,phandle)
 %
 %   OUTPUTS:
 %   
@@ -42,9 +42,9 @@ if nargin==0
    return
 end
 
-if nargin<4, phandle=[]; end
-if nargin<5, linespec=[]; end
-if nargin<2, plot_op=[]; end
+if ~exist('phandle','var'), phandle=[]; end
+if ~exist('linespec','var'), linespec=[]; end
+if ~exist('plot_op','var'), plot_op=[]; end
 
 if isempty(plot_op); plot_op='both'; end
 if isempty(linespec); linespec='r-'; end
@@ -54,7 +54,7 @@ if isempty(phandle) %new figure
 else
 	figure(phandle)
     phandle_new = phandle; 
-	axis(axis);
+	axis(axis); hold on
 end
 
 if isempty(obj.timeres)

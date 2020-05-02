@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Specifications</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-01"><meta name="DC.source" content="doc_specs.m"><style type="text/css">
+      --><title>Adding specifications</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-02"><meta name="DC.source" content="doc_specs.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,22 +66,63 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Specifications</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Frequency Domain Specifications</a></li><li><a href="#11">Time Domain Specifications</a></li></ul></div><p>A control design is dectated by design specification. In QFT, the so called Horowitz-Sidi bounds, used for loop-shaping, are computed such that the closed-loop staisfies the design specifications (if the designer knows what he is doing). In QFT all specifications must be finally formulated in the frequency domain, and those that are originally given in the time domain must be translated to the frequency domain. The specification generation and conversion from time to frequency domain is facilitated by the <a href="matlab:doc('qspc')"><tt>qspc</tt></a> class.</p><h2 id="2">Frequency Domain Specifications</h2><p>The usual syntex is</p><pre class="language-matlab">spec = qspc(name,frequency,upper);
-</pre><p>where <tt>name</tt> string gives the specifcation alias, <tt>frequency</tt> the vector of frequencies over which the specifcation is to be computed, and <tt>upper</tt> is the upper bound in [dB].</p><p>There are three options to determine the upper bound of the specifications:</p><div><ol><li>Upper bound given by real numeric scalar/vector in dB. If the upper bound is a vector it must be the same length as w.</li><li>Upper bound given by LTI (TF , ZPK, FRD). This option is used when the upper bound is given as an LTI object. In case of an FRD object, the frequency inside it must include the frequencies in the vector supplied to <tt>qspc</tt>.</li></ol></div><p><b>Exmaple 1</b>: A 6db sensitiveity specificaiton in the range [0.1 100] rad/s is given as</p><pre class="codeinput">spec = qspc(<span class="string">'odsrs'</span>,logspace(-1,2,20),6);
-</pre><p>Note the naming <tt>odsrs</tt> which stands for "output disturbance step response specification".</p><p><b>Exmaple 2</b>: Sometimes the specifications are given by a transfer function. Lets say that the noise is known to lay under the transfer function</p><p><img src="doc_specs_eq00038005900874463185.png" alt="$$ F(s) = \frac{2 s}{s + 0.07} $$" style="width:102px;height:32px;"></p><p>The specfication may be defined as follows</p><pre class="codeinput">w = logspace(-2,3,100);
-TF = 2*tf([1 0],[1 0.07]); <span class="comment">%tf</span>
-UpperBound = 20*log10(abs(squeeze(freqresp(TF,w))));
-sens_spc = qspc(<span class="string">'odsrs'</span>,w,UpperBound);
-sens_spc.show
-</pre><img vspace="5" hspace="5" src="doc_specs_01.png" alt=""> <p>Alternatively, one may input the transfer function directly as a Control System Toolbox TF, ZPK, or FRD object. This simplifies the previous exmaple (by one line) to</p><pre class="codeinput">TF = 2*tf([1 0],[1 0.07]); <span class="comment">%tf</span>
+  </style></head><body><div class="content"><h1>Adding specifications</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#2">Frequency Domain Specifications</a></li><li><a href="#9">Time Domain Specifications</a></li></ul></div><h2 id="1">Overview</h2><p>A control design is dectated by design specification. In QFT, the so called Horowitz-Sidi bounds, used for loop-shaping, are computed such that the closed-loop staisfies the design specifications (if the designer knows what he is doing). In QFT all specifications must be finally formulated in the frequency domain, and those that are originally given in the time domain must be translated to the frequency domain. The specification generation and conversion from time to frequency domain is facilitated by the <a href="matlab:doc('qspc')"><tt>qspc</tt></a> class.</p><p>Next the plant and specsifications are used to from a qdesign object which facilitates the design stages, including bound computations.</p><h2 id="2">Frequency Domain Specifications</h2><p>The usual syntex is</p><pre class="language-matlab">spec = qspc(name,frequency,upper);
+</pre><p>where <tt>name</tt> string gives the specifcation alias, <tt>frequency</tt> the vector of frequencies over which the specifcation is to be computed, and <tt>upper</tt> is the upper bound in [dB].</p><p>The specification can be viewd by the <tt>qspc.show()</tt> command.</p><p>There are two options to determine the upper bound of the specifications:</p><div><ol><li>Upper bound given by real numeric scalar/vector in dB. If the upper bound is a vector it must be the same length as w.</li><li>Upper bound given by an LTI (TF , ZPK, FRD). This option is used when the upper bound is given as an LTI object. In case of an FRD object, the frequency inside it must include the frequencies in the vector supplied to <tt>qspc</tt>.</li></ol></div><p><b>Exmaple 1</b>: A 6db sensitiveity specificaiton in the range [0.1 100] rad/s is given as</p><pre class="codeinput">spec = qspc(<span class="string">'odsrs'</span>,logspace(-1,2,20),6);
+</pre><p>Note the naming <tt>odsrs</tt> which stands for "output disturbance step response specification".</p><p><b>Exmaple 2</b>: upper bound given by the transfer function <img src="doc_specs_eq18420454379142045418.png" alt="$Q(s) = \frac{2 s}{s + 0.07}$" style="width:82px;height:19px;"> over the range <img src="doc_specs_eq10709031639784734484.png" alt="$\omega \in [0.01,100]$" style="width:89px;height:15px;">.</p><pre class="codeinput">w = logspace(-2,2,50);                  <span class="comment">% assign the frequency vector</span>
+Q =  qfr([2 0],[1 0.07],w);             <span class="comment">% compute frequenct response $Q(j\omega)$</span>
+sens = qspc(<span class="string">'odsrs'</span>,w,Q.mag);           <span class="comment">% construct qspc object</span>
+show(sens)                              <span class="comment">% display specification</span>
+</pre><img vspace="5" hspace="5" src="doc_specs_01.png" alt=""> <p>Alternatively, one may input the transfer function as a Control System Toolbox TF, ZPK, or FRD object:</p><pre class="codeinput">TF = 2*tf([1 0],[1 0.07]); <span class="comment">%tf</span>
 sens_spc = qspc(<span class="string">'odsrs'</span>,w,TF);
-</pre><h2 id="11">Time Domain Specifications</h2><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
-##### SOURCE BEGIN #####
-%% Specifications 
-% 
+</pre><h2 id="9">Time Domain Specifications</h2><p><b>Open Qsyn</b> readily supports three types of time-domain specifications:</p><div><ul><li>RSRS -- reference step response spec. (servo)</li><li>ODSRS -- output disturbance step response spec.</li><li>IDSRS -- input disturbance step response spec.</li></ul></div><p>All of which are accessed using dot notation throuhgt <tt>qspc</tt> class.</p><p><b>Exmaple 3</b>: Add servo specifications with at most 10% overshoot, maximum settling time of 1.5 seconds, and rise time between 0.2 and 1.2 seconds.</p><pre class="codeinput">w_spc = logspace(-1,2); <span class="comment">% frequecny vector for transformation</span>
+servo_spc = qspc.rsrs([1.2 0.2],10,1.5,[],w_spc,2.85,3.1)
+</pre><pre class="codeoutput">Creating array of size 4x6000
+Reducing to 4x2916
+Reducing to 4x2286
+Reducing to 4x1547
+Reducing to 4x1216
+Reducing to 4x983
+Reducing to 4x974
+Reducing to 4x960
+Number of good step-responses: 960
 
-%%
-% A control design is dectated by design specification. 
+servo_spc = 
+
+  qspc with properties:
+
+         name: 'rsrs'
+    frequency: [50&times;1 double]
+        upper: [50&times;1 double]
+        lower: [50&times;1 double]
+      timespc: [8&times;3 double]
+      timeres: [109&times;3 double]
+
+</pre><img vspace="5" hspace="5" src="doc_specs_02.png" alt=""> <p>The first argument, [1.2 0.2], defines maximum and minimum rise times (90%); 10 stands for allowed overshoot; 1.5 denotes the maximum settling time; 4th argument stand for delay time which is unspecified (set to zero); w_spc gives the frequency range [rad/s]; 2.85 rad/s is demanded cut-off frequency for the lower frequency domain specification; 3.1 is an instruction that both 2nd and 3rd order approximants of the closed loop transfer function are to be used in a way defined in Horowitz (1993), page 48. More about <tt>rsrs</tt> can be found by typing <tt>help qspc.rsrs</tt>.</p><p>The computed lower and upper bounds are stored in the <tt>qspc</tt> object 'servo_spc' under the <tt>lower</tt> and <tt>upper</tt> fields. Note that the 2.85 rad/s cut-off is not marked in the above autogenerated plot, but showing the computation results, gives the correct frequency specification:</p><pre class="codeinput">servo_spc.show
+</pre><img vspace="5" hspace="5" src="doc_specs_03.png" alt=""> <p><b>Exmaple 4 (Filtered disturbance)</b>: It is desired that the output disturbance will be attenuated with a maximum of 50% undershoot, 1.5 seconds settling time, and between 0.1 to 0.3 seconds to attenuate first 50%. Assume it is known that the output step disturbance enters after some filterring <img src="doc_specs_eq16125409180681382715.png" alt="$H(s) = \frac{1}{s/25+1}$" style="width:86px;height:21px;">.</p><pre class="codeinput">w_spc = logspace(-1,2);             <span class="comment">% frequecny vector for transformation</span>
+H = qfr([1],[1/25 1],w_spc);        <span class="comment">% define the filter as a qfr object</span>
+Hmag = imag(H.response);            <span class="comment">% take the magnitude</span>
+dist_spc = qspc.odsrs([0.3 0.1 50],50,1.5,[],w_spc,2);
+figure, bodeplot(H,<span class="string">'PhaseVisible'</span>,0);   <span class="comment">% show the filter</span>
+dist_spc.show(<span class="string">'freq'</span>,<span class="string">'--r'</span>,gcf);    <span class="comment">% show bounds w/o the filter</span>
+dist_spc.upper = dist_spc.upper - Hmag; <span class="comment">% we only care about the upper bound</span>
+dist_spc.show(<span class="string">'freq'</span>,[],gcf);       <span class="comment">%show bounds after adding the filter</span>
+legend(<span class="string">'H(s)'</span>,<span class="string">'converted specs'</span>,<span class="string">'filtered specs'</span>,<span class="string">'location'</span>,<span class="string">'SE'</span>)
+</pre><pre class="codeoutput">Creating array of size 2x1600
+Reducing to 2x1211
+Reducing to 2x1200
+Reducing to 2x764
+Reducing to 2x695
+Reducing to 2x550
+Reducing to 2x478
+Reducing to 2x421
+Number of good disturbance step-responses: 421
+Plotting...
+</pre><img vspace="5" hspace="5" src="doc_specs_04.png" alt=""> <img vspace="5" hspace="5" src="doc_specs_05.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Adding specifications
+
+%% Overview 
+% A control design is dectated by design specification.                         
 % In QFT, the so called Horowitz-Sidi bounds, used for loop-shaping, are
 % computed such that the closed-loop staisfies the design specifications 
 % (if the designer knows what he is doing). 
@@ -89,7 +130,10 @@ sens_spc = qspc(<span class="string">'odsrs'</span>,w,TF);
 % domain, and those that are originally given in the time domain must be
 % translated to the frequency domain.
 % The specification generation and conversion from time to frequency domain
-% is facilitated by the <matlab:doc('qspc') |qspc|> class. 
+% is facilitated by the <matlab:doc('qspc') |qspc|> class.
+%
+% Next the plant and specsifications are used to from a qdesign object
+% which facilitates the design stages, including bound computations.
 
 %% Frequency Domain Specifications 
 % The usual syntex is 
@@ -100,16 +144,19 @@ sens_spc = qspc(<span class="string">'odsrs'</span>,w,TF);
 % where |name| string gives the specifcation alias, |frequency| the vector
 % of frequencies over which the specifcation is to be computed, and |upper|
 % is the upper bound in [dB].
+%
+% The specification can be viewd by the |qspc.show()| command.
 
 %%
-% There are three options to determine the upper bound of the
+% There are two options to determine the upper bound of the
 % specifications: 
 %
 % # Upper bound given by real numeric scalar/vector in dB. 
 % If the upper bound is a vector it must be the same length as w.
-% # Upper bound given by LTI (TF , ZPK, FRD). 
+% # Upper bound given by an LTI (TF , ZPK, FRD). 
 % This option is used when the upper bound is given as an LTI object. 
-% In case of an FRD object, the frequency inside it must include the frequencies in the vector supplied to |qspc|. 
+% In case of an FRD object, the frequency inside it must include the frequencies 
+% in the vector supplied to |qspc|. 
 
 %% 
 % *Exmaple 1*: 
@@ -123,31 +170,79 @@ spec = qspc('odsrs',logspace(-1,2,20),6);
 
 %%
 % *Exmaple 2*: 
-% Sometimes the specifications are given by a transfer function. 
-% Lets say that the noise is known to lay under the transfer function 
-%%
-% 
-% $$ F(s) = \frac{2 s}{s + 0.07} $$
-% 
-%%
-% The specfication may be defined as follows 
+% upper bound given by the transfer function $Q(s) = \frac{2 s}{s + 0.07}$
+% over the range $\omega \in [0.01,100]$.
 
-w = logspace(-2,3,100);
-TF = 2*tf([1 0],[1 0.07]); %tf
-UpperBound = 20*log10(abs(squeeze(freqresp(TF,w))));
-sens_spc = qspc('odsrs',w,UpperBound);
-sens_spc.show
+w = logspace(-2,2,50);                  % assign the frequency vector
+Q =  qfr([2 0],[1 0.07],w);             % compute frequenct response $Q(j\omega)$
+sens = qspc('odsrs',w,Q.mag);           % construct qspc object 
+show(sens)                              % display specification 
 
 %% 
-% Alternatively, one may input the transfer function directly as
-% a Control System Toolbox TF, ZPK, or FRD object. This simplifies the
-% previous exmaple (by one line) to 
+% Alternatively, one may input the transfer function as
+% a Control System Toolbox TF, ZPK, or FRD object:
 
 TF = 2*tf([1 0],[1 0.07]); %tf
 sens_spc = qspc('odsrs',w,TF);
 
 %% Time Domain Specifications 
+% *Open Qsyn* readily supports three types of time-domain specifications:
 % 
+% * RSRS REPLACE_WITH_DASH_DASH reference step response spec. (servo)
+% * ODSRS REPLACE_WITH_DASH_DASH output disturbance step response spec.
+% * IDSRS REPLACE_WITH_DASH_DASH input disturbance step response spec.
+%
+% All of which are accessed using dot notation throuhgt |qspc| class.
+
+%%
+% *Exmaple 3*: Add servo specifications with at most 10% overshoot,
+% maximum settling time of 1.5 seconds, and rise time between 0.2 and 1.2
+% seconds.
+
+w_spc = logspace(-1,2); % frequecny vector for transformation
+servo_spc = qspc.rsrs([1.2 0.2],10,1.5,[],w_spc,2.85,3.1)
+
+%%
+% The first argument, [1.2 0.2], defines maximum and minimum rise times (90%);
+% 10 stands for allowed overshoot; 1.5 denotes the maximum settling time;
+% 4th argument stand for delay time which is unspecified (set to zero);
+% w_spc gives the frequency range [rad/s];
+% 2.85 rad/s is demanded cut-off frequency for the lower frequency domain 
+% specification; 3.1 is an instruction that both 2nd and 3rd order approximants
+% of the closed loop transfer function are to be used in a way
+% defined in Horowitz (1993), page 48. 
+% More about |rsrs| can be found by typing |help qspc.rsrs|. 
+
+%%
+% The computed lower and upper bounds are
+% stored in the |qspc| object 'servo_spc' under the |lower| and |upper| fields.
+% Note that the 2.85 rad/s cut-off is not marked in the above autogenerated plot, 
+% but showing the computation results, gives the correct frequency
+% specification:
+
+servo_spc.show
+
+%%
+% *Exmaple 4 (Filtered disturbance)*: 
+% It is desired that the output disturbance will be attenuated with a maximum 
+% of 50% undershoot, 1.5 seconds settling time, and between 0.1 to 0.3 seconds 
+% to attenuate first 50%. 
+% Assume it is known that the output step disturbance enters after some
+% filterring $H(s) = \frac{1}{s/25+1}$. 
+
+w_spc = logspace(-1,2);             % frequecny vector for transformation 
+H = qfr([1],[1/25 1],w_spc);        % define the filter as a qfr object
+Hmag = imag(H.response);            % take the magnitude
+dist_spc = qspc.odsrs([0.3 0.1 50],50,1.5,[],w_spc,2);
+figure, bodeplot(H,'PhaseVisible',0);   % show the filter
+dist_spc.show('freq','REPLACE_WITH_DASH_DASHr',gcf);    % show bounds w/o the filter
+dist_spc.upper = dist_spc.upper - Hmag; % we only care about the upper bound
+dist_spc.show('freq',[],gcf);       %show bounds after adding the filter
+legend('H(s)','converted specs','filtered specs','location','SE')
+
+
+
+
 
 ##### SOURCE END #####
 --></body></html>

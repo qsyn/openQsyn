@@ -20,7 +20,7 @@
 % # <matlab:web('doc_tplcomp.html') Computating  templates> -- the set of all plant responses over the Nichols
 % chart at specified frequencies
 % # <matlab:web('doc_specs.html') Inserting the design specfications>
-% # Computing bounds over the Nichols chart that give constraint to the loop
+% # <matlab:web('doc_bounds.html') Computing bounds> over the Nichols chart that give constraint to the loop
 % shaping of the open-loop $L(s) = P(s) K(s)$
 % # Designing the feedback compensator $K(s)$ which satisfy the bounds
 % # Designing the pre-filter (if needed) to shape the reference such that closed-loop

@@ -5,6 +5,8 @@
         <tocitem>SISO Design Steps
             <tocitem target="doc_modeling.html">Modeling of uncertain plants</tocitem>
             <tocitem target="doc_tplcomp.html">Tempalte computation</tocitem>
+			<tocitem target="doc_specs.html">Adding specifications</tocitem>
+			<tocitem target="doc_bounds.html">Computing Bounds</tocitem>
         </tocitem>    
     <tocitem>Exmaples 
             <tocitem target="example.html">Basic SISO Exmaple</tocitem>

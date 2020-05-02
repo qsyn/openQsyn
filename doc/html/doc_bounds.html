@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Computing Horowitz-Sidi bounds</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-05-01"><meta name="DC.source" content="doc_bounds.m"><style type="text/css">
+      --><title>Computing Horowitz-Sidi bounds</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-02"><meta name="DC.source" content="doc_bounds.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,73 +66,30 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Computing Horowitz-Sidi bounds</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Overview</a></li><li><a href="#2">Creating specifications</a></li></ul></div><h2 id="1">Overview</h2><p>The third stage in SISO QFT design is to compute the so called H-S bounds from templates and specifications.</p><p>The specifications are first stored in a dedicated <a href="matlab:doc('qspc')">qspc</a> objects. If nedded, qspc also facilitates translation of the specifications from time to frequency domian, if needed.</p><p>Next the plant and specsifications are used to from a qdesign object which facilitates the design stages, including bound computations.</p><h2 id="2">Creating specifications</h2><p>To store a frequency resposne specification use</p><pre class="language-matlab">spc = qspc(name,w,upper,lower)
-</pre><p>where <tt>name</tt> is the specification name, <tt>w</tt> is a vector of frequencies, and <tt>upper</tt>, <tt>lower</tt> are upper and lower magnitude response bouds, respectively.</p><p>The specification can be viewd by the <tt>qspc.show()</tt> command.</p><p><b>Example</b>: 6 [db] sensitivity specifications over the range of <img src="doc_bounds_eq10709031639784734484.png" alt="$\omega \in [0.01,100]$"> is stored by</p><pre class="codeinput">sens = qspc(<span class="string">'sens'</span>,[0.01 100],6)
-</pre><pre class="codeoutput">
-sens = 
-
-  qspc with properties:
-
-         name: 'sens'
-    frequency: [0.0100 100]
-        upper: [6 6]
-        lower: []
-      timespc: []
-      timeres: []
-
-</pre><p><b>Example</b>: upper bound given by the transfer function <img src="doc_bounds_eq13409000480862269675.png" alt="$Q(s)=\frac{2s}{s+1}$"> over the range <img src="doc_bounds_eq10709031639784734484.png" alt="$\omega \in [0.01,100]$">.</p><pre class="codeinput">w = logspace(-2,2,50);                  <span class="comment">% assign the frequency vector</span>
-Q =  qfr([2 0],[1 1],w);                <span class="comment">% compute frequenct response $Q(j\omega)$</span>
-sens = qspc(<span class="string">'sens'</span>,w,Q.mag);            <span class="comment">% construct qspc object</span>
-show(sens)                              <span class="comment">% display specification</span>
-</pre><img vspace="5" hspace="5" src="doc_bounds_01.png" alt=""> <p>If for some reason it is preffered to use Control Systems Toolbox <tt>tf</tt> to represent the transfer function it take a little more writing:</p><pre class="codeinput">Qtf =  2*tf([1 0],[1 1]);               <span class="comment">% assign transfer function</span>
-mag = bode(Qtf,w);                      <span class="comment">% compute magnitude response</span>
-ubound = squeeze(mag);                  <span class="comment">% squeeze dimensions</span>
-sens = qspc(<span class="string">'sens'</span>,w,20*log10(ubound)); <span class="comment">% construct qspc object</span>
-</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+  </style></head><body><div class="content"><h1>Computing Horowitz-Sidi bounds</h1><p>After all specification are inserted into <tt>qspc</tt> objects, and all templates are calculated, we may finally proceed calculating the Horowitz-Sidi bounds. This is done using the <a href="matlab:doc('qdesign')"><tt>qdesign</tt></a> class, constructed as</p><pre class="language-matlab">des = qdesign(P,sepcs);
+</pre><p>where P is a <tt>qplant</tt> object with computed nominal response and templates, and <tt>specs</tt> is an array of all <tt>qspc</tt> objects storing the specifications.</p><p>Following, each bound is computed using the command <tt>cbnd</tt>:</p><pre>  des.cbnd(name)</pre><p>with <tt>name</tt> a string giving the specification to compute</p><p>To show a computed bound use <tt>des.show(name)</tt>. To plot all dominant bound use <tt>des.show('dom')</tt>.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Computing Horowitz-Sidi bounds
-%% Overview 
-% The third stage in SISO QFT design is to compute the so called H-S bounds
-% from templates and specifications. 
+% After all specification are inserted into |qspc| objects, and all templates
+% are calculated, we may finally proceed calculating the Horowitz-Sidi bounds.
+% This is done using the <matlab:doc('qdesign') |qdesign|> class,
+% constructed as
 %
-% The specifications are first stored in a dedicated <matlab:doc('qspc') qspc>
-% objects. If nedded, qspc also facilitates translation of the specifications 
-% from time to frequency domian, if needed.
+%   des = qdesign(P,sepcs);
+% 
+% where P is a |qplant| object with computed nominal response and
+% templates, and |specs| is an array of all |qspc| objects storing the specifications. 
 %
-% Next the plant and specsifications are used to from a qdesign object
-% which facilitates the design stages, including bound computations.
-
-%% Creating specifications 
-% To store a frequency resposne specification use
+% Following, each bound is computed using the command |cbnd|:
 %
-%   spc = qspc(name,w,upper,lower)
+%    des.cbnd(name)
 %
-% where |name| is the specification name, |w| is a vector of frequencies,
-% and |upper|, |lower| are upper and lower magnitude response bouds, respectively.  
+% with |name| a string giving the specification to compute 
 %
-% The specification can be viewd by the |qspc.show()| command.
+% To show a computed bound use |des.show(name)|. 
+% To plot all dominant bound use |des.show('dom')|.
 
-%% 
-% *Example*: 6 [db] sensitivity specifications over the range of
-% $\omega \in [0.01,100]$ is stored by 
 
-sens = qspc('sens',[0.01 100],6)
-
-%% 
-% *Example*: upper bound given by the transfer function $Q(s)=\frac{2s}{s+1}$
-% over the range $\omega \in [0.01,100]$.
-w = logspace(-2,2,50);                  % assign the frequency vector
-Q =  qfr([2 0],[1 1],w);                % compute frequenct response $Q(j\omega)$
-sens = qspc('sens',w,Q.mag);            % construct qspc object 
-show(sens)                              % display specification
-
-%%
-% If for some reason it is preffered to use Control Systems Toolbox |tf| to
-% represent the transfer function it take a little more writing:
-Qtf =  2*tf([1 0],[1 1]);               % assign transfer function 
-mag = bode(Qtf,w);                      % compute magnitude response
-ubound = squeeze(mag);                  % squeeze dimensions
-sens = qspc('sens',w,20*log10(ubound)); % construct qspc object 
 
 ##### SOURCE END #####
 --></body></html>
