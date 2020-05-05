@@ -107,8 +107,7 @@ nconst=(qmin==qmax) | n==1;  % The constant parameters!  --> deprecated
         T=wrap([T T1]);
         disp('    ADGRID: A singularity occured (imaginary pole or zero?), no pruning performed')
     end
-    disp(['# function evaluations = ',num2str(Nfun)]);
-    disp(['Final Border Size = ',num2str(length(T))]);
+    fprintf('# function evaluations = %i; Final Border Size = %i.\n',Nfun,length(T));
 % end
 %if plot_on;  close; end;
 %pause

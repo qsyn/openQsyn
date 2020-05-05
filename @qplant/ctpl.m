@@ -26,7 +26,7 @@ function obj = ctpl(obj,method,w,varargin)
 %
 %       plotOn      plots during the computation. 0 (def) | 1.
 %       accuracy    set accurcy for computation as [deg_accuracy , dB_accuracy]
-%                   for recgrid, recedge and rff methods; def = [5 3];
+%                   for recgrid, recedge and rff methods; def = [3 2];
 %       union       unite new tpls with existing ones. 0 (def) | 1
 %       parameters  parameter set for cases method
 %       size        size of grid for methods 'grid', 'rngrid' and 'random' 
@@ -41,7 +41,7 @@ addRequired(p,'method',@(x) validateattributes(x,{'char'},{'nonempty'}));
 addRequired(p,'w',@(x) validateattributes(x,{'numeric'},{'vector','positive','real'}));
 addParameter(p,'plotOn',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
 addParameter(p,'union',0,@(x) validateattributes(x,{'numeric'},{'scalar','binary'}));
-addParameter(p,'accuracy',[5 3],@(x) validateattributes(x,{'numeric'},{'size',[1 2],'positive','real'}));
+addParameter(p,'accuracy',[3 2],@(x) validateattributes(x,{'numeric'},{'size',[1 2],'positive','real'}));
 addParameter(p,'parameters',[],@(x) validateattributes(x,{'numeric'},{'2d'}));
 addParameter(p,'size',[],@(x) validateattributes(x,{'numeric'},{'2d'}));
 parse(p,method,w,varargin{:})

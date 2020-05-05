@@ -55,7 +55,7 @@ for kw=1:length(w)
     amax=max(a);
     C = amax.*exp(1i*theta); % complex form w.r.t to (-1)
     BND = c2n(C-1);          % shift to (-1) an trasfrom into Nichols form
-    figure(1), plot(real(BND),imag(BND),'color',obj.col(kw,:)); hold on    
+    %figure(1), plot(real(BND),imag(BND),'color',obj.col(kw,:)); hold on    
     dombnd.c{kw} = BND;
     dombnd.c{kw} = closecontour(BND);
 end

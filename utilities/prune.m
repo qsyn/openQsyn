@@ -72,12 +72,31 @@ if nargin==0
 end
 if nargin<2 || isempty(Tacc), Tacc=[5,5]; end % empty input case added (DR 6-June-2016)
 if nargin<3, upper=0; end
+
+
+for count = 1:10
+    try
+        [T,t_index] = main_prune(t,Tacc,upper);
+        return % return at first success
+    catch 
+        warning('Accuracy [%g %g] too small for pruning, trying Accuracy=[%g %g]',Tacc(1),Tacc(2),Tacc(1)+1,Tacc(2)+1);
+        Tacc = Tacc+[1 1];
+    end
+end
+
+error('Pruninig failed :( please try again with different accuracy values')
+
+end
+
+function [T,t_index]=main_prune(t,Tacc,upper)
+
 relacc=25;
 if length(t)<3
 	t_index=1:length(t);
 	T=t;
 	return;
 end
+
 %%Tacc=Tacc*4; % The diameter, not the radius, stupid ??
 maxr=relacc+1; %add 1 to compensate for roundoff errors
 t1=floor((rem(real(t(:))+5*360,360))*(relacc/Tacc(1))+1+j*imag(t(:))*(relacc/Tacc(2))); %scale with accuracy
@@ -166,4 +185,6 @@ if min(imag(T))>1 & upper==0,   %% Phase uncertainty > 360
 else
 	T=t(t_index);  % Take the original exact values!!
 end 
+
+end
 

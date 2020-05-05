@@ -51,7 +51,7 @@ for kw = 1:length(w)
     
     if prune_on && numel(T)>3
         %idx=boundary(real(T)',imag(T)',0.4); % replaces PRUNE (introduced in R2014b)
-        [~,idx] = prune(T,[2 2]);
+        [~,idx] = prune(T,options.Tacc);
     else
         idx=1:length(T);
     end
