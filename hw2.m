@@ -34,19 +34,19 @@ des.showbnd('rsrs',h,[0.4 0.5 1]);
 s = zpk(0,[],1);
 set(s,'DisplayFormat','Frequency');
 
-G_Lead = Clead(40,10,1)*Clead(42,30,1);
-G_Lag = Clag(50,1000);
+% G_Lead = Clead(40,10,1)*Clead(42,30,1);
+% G_Lag = Clag(50,1000);
 
-curr_G= 2.5*(1/s)*G_Lead*G_Lag;
+curr_G= (1/(s+1));%*G_Lead*G_Lag;
 G =curr_G;
-des.loopnic(G)
+% des.loopnic(G)
 ngrid
 
-spec2.show('freq');
-des.clmag(G,1)
-ylim([-55 10])
+% spec2.show('freq');
+% des.clmag(G,1/(0.5*s+1))
+% ylim([-55 10])
 %% Filter Design - F
-F = (1)/(0.3*s+1);
+F = 1/(0.5*s+1);
 spec2.show('freq');
 des.clmag(G,F)
 ylim([-55 10])
