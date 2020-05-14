@@ -1,0 +1,290 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Working without Control System Toolbox</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-14"><meta name="DC.source" content="doc_qctrl.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Working without Control System Toolbox</h1><!--introduction--><p>No Control System Toolbox? no worries! Open Qsyn provide two native classes that can performs all basic CST operations (and more):</p><div><ul><li><a href="matlab:doc('ctrl')"><tt>qctrl</tt></a>: replaces the zpk and tf classes</li><li><a href="matlab:doc('qfr')"><tt>qfr</tt></a>: replaces the FRD class</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Dynamic Controllers</a></li><li><a href="#6">Frequency Response</a></li><li><a href="#8">Conversion from Control System Toolbox</a></li></ul></div><h2 id="1">Dynamic Controllers</h2><p><a href="matlab:doc('ctrl')"><tt>qctrl</tt></a> objects function as LTI objects in CST, and is suitable for designning feedback compensators and filters in QFT. Basic generation is using a zeros-poles-gain (ZPK) format</p><pre class="language-matlab">C = qctrl(z,p,k)
+</pre><p>For exmaple:  consturct the controller</p><p><span class="MathJax_Preview"><img src="doc_qctrl_eq14155793268344868868.png" alt="$$ C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} $$"></span><script type="math/tex"> C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} </script></p><pre class="codeinput">z = [-5 -1];                        <span class="comment">% zeros</span>
+p = [0 roots([1/9 1.8/3 1]).' -5];   <span class="comment">% poles</span>
+k = 10;
+C = qctrl(z,p,k)
+</pre><pre class="codeoutput">
+C = 
+
+             (s/5+1)(s+1)       
+   10---------------------------
+      s(s^2/9+1.8*s/3+1)(s/5+1) 
+
+Continuous-time openQsyn QCTRL object
+
+</pre><p>The output display indicates that the parameters were correctly inserted. We notice that the pole and zero at -5 cancels. To obtain a minimal realization use <tt>minreal</tt> (as you would do in CST),</p><pre class="codeinput">C = minreal(C)
+</pre><pre class="codeoutput">
+C = 
+
+             (s+1)       
+   10--------------------
+      s(s^2/9+1.8*s/3+1) 
+
+Continuous-time openQsyn QCTRL object
+
+</pre><p>Other functionallities of CST are supported. For example, a Bode plot:</p><pre class="codeinput">w = logspace(-2,3,500);
+bodeplot(C,w)
+</pre><pre class="codeoutput">
+ans = 
+
+  1&times;2 Axes array:
+
+    Axes    Axes
+
+</pre><img vspace="5" hspace="5" src="doc_qctrl_01.png" alt=""> <p>Another functionality of the <tt>qctrl</tt> class is to easily generate elementry controllers such as lead compensators, lag compensators, PID controllers, etc. For exmaple, a 30 degrees lead compensator with max phase lead at 10 rad/s can be generated as follows</p><pre class="codeinput">Clead = qctrl.lead(30,10)
+</pre><pre class="codeoutput">
+Clead = 
+
+           (1-s/5.95871)
+   2.81641---------------
+           (1-s/16.7822) 
+
+Continuous-time openQsyn QCTRL object
+
+</pre><p>A serial connection is done by the <tt>series</tt> command, or a simple <tt>*</tt>. For exmaple, if we wich to add an integrator to our lead compensator:</p><pre class="codeinput">Cint = qctrl([],0,1);
+Cfull = Clead*Cint
+bodeplot(Clead,w,<span class="string">'color'</span>,[0 0 1]); hold <span class="string">on</span>
+bodeplot(Cint,w,<span class="string">'color'</span>,[1 0 0]);
+bodeplot(Cfull,w,<span class="string">'color'</span>,[0.1 0.7 0.1]);
+legend(<span class="string">'lead'</span>,<span class="string">'integrator'</span>,<span class="string">'combined'</span>,<span class="string">'location'</span>,<span class="string">'w'</span>)
+</pre><pre class="codeoutput">
+Cfull = 
+
+            (1-s/5.95871) 
+   2.81641----------------
+           (1-s/16.7822)s 
+
+Continuous-time openQsyn QCTRL object
+
+
+ans = 
+
+  1&times;2 Axes array:
+
+    Axes    Axes
+
+
+ans = 
+
+  1&times;2 Axes array:
+
+    Axes    Axes
+
+
+ans = 
+
+  1&times;2 Axes array:
+
+    Axes    Axes
+
+</pre><img vspace="5" hspace="5" src="doc_qctrl_02.png" alt=""> <h2 id="6">Frequency Response</h2><p>The second class the is used for CST-like operation is <a href="matlab:doc('qfr')"><tt>qfr</tt></a>. An object of this class simply stores the freqeuncy response data along a given freqeuncy vector. Note that for a conviniant use in QFT design, the response data is stored in Nichols form [deg+i*db], and the frequency in rad/s. This class is used for exmaple for representing a nominal response inside a <tt>qplant</tt>.</p><p>A <tt>qfr</tt> object is typically constracted using the syntax</p><pre class="language-matlab">f = qfr(response,frequency)
+</pre><p>where reposne in Nichols form, and frequency in rad/s. For example, generating a <tt>qfr</tt> from the previously constructed <tt>Cfull</tt>,</p><pre class="codeinput">res = nfr(Cfull,w); <span class="comment">% extract the Nichols form frequency response</span>
+f = qfr(res,w);
+</pre><p>Alterantively, we could have just write the one line</p><pre class="codeinput">f = qfr(Cfull,w);
+</pre><h2 id="8">Conversion from Control System Toolbox</h2><p>If you do have CST, but wish to work in (the superior) openQsyn native classes, an easy conversion can be done from any CST LTI object to either a <tt>qctrl</tt> or a <tt>qfr</tt>. For exmaple</p><pre class="codeinput">G = tf([4 5 6],[1 34 6 55],0.1); <span class="comment">% some random tf</span>
+Q = qctrl(G)
+q = qfr(G,w)
+</pre><pre class="codeoutput">
+Q = 
+
+                    (s^2/1.5+1.02062*s/1.22474+1)         
+   0.15625-------------------------------------------------
+           (s/33.8708+1)(s^2/1.62382+0.101391*s/1.27429+1) 
+
+Discrete-time openQsyn QCTRL object, sample time: 0.1
+
+
+q = 
+
+  qfr with properties:
+
+    frequency: [500&times;1 double]
+     response: [500&times;1 double]
+
+</pre><p>Going backwords is also possible:</p><pre class="codeinput">G1 = tf(Q)
+G2 = zpk(Q)
+</pre><pre class="codeoutput">
+G1 =
+ 
+  0.1563 z^2 + 0.1953 z + 0.2344
+  ------------------------------
+     z^3 + 34 z^2 + 6 z + 55
+ 
+Sample time: 0.1 seconds
+Discrete-time transfer function.
+
+
+G2 =
+ 
+     0.15625 (z^2 + 1.25z + 1.5)
+  ---------------------------------
+  (z+33.87) (z^2 + 0.1292z + 1.624)
+ 
+Sample time: 0.1 seconds
+Discrete-time zero/pole/gain model.
+
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Working without Control System Toolbox
+% No Control System Toolbox? no worries! Open Qsyn provide two native classes
+% that can performs all basic CST operations (and more):
+%
+% * <matlab:doc('ctrl') |qctrl|>: replaces the zpk and tf classes
+% * <matlab:doc('qfr') |qfr|>: replaces the FRD class 
+%
+
+%% Dynamic Controllers  
+% <matlab:doc('ctrl') |qctrl|> objects function as LTI objects in CST, and is
+% suitable for designning feedback compensators and filters in QFT.
+% Basic generation is using a zeros-poles-gain (ZPK) format 
+% 
+%   C = qctrl(z,p,k) 
+%       
+% For exmaple:  consturct the controller
+% 
+% $$ C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} $$
+% 
+
+z = [-5 -1];                        % zeros
+p = [0 roots([1/9 1.8/3 1]).' -5];   % poles
+k = 10;
+C = qctrl(z,p,k)
+     
+%% 
+% The output display indicates that the parameters were correctly inserted.
+% We notice that the pole and zero at -5 cancels. To obtain a minimal realization
+% use |minreal| (as you would do in CST),
+
+C = minreal(C)
+
+%%
+% Other functionallities of CST are supported. For example, a Bode plot:
+w = logspace(-2,3,500);
+bodeplot(C,w)
+ 
+%%
+% Another functionality of the |qctrl| class is to easily generate elementry 
+% controllers such as lead compensators, lag compensators, PID controllers,
+% etc. For exmaple, a 30 degrees lead compensator with max phase lead at 10 
+% rad/s can be generated as follows
+
+Clead = qctrl.lead(30,10)
+
+%%
+% A serial connection is done by the |series| command, or a simple |*|. For
+% exmaple, if we wich to add an integrator to our lead compensator:
+
+Cint = qctrl([],0,1);
+Cfull = Clead*Cint
+bodeplot(Clead,w,'color',[0 0 1]); hold on
+bodeplot(Cint,w,'color',[1 0 0]);
+bodeplot(Cfull,w,'color',[0.1 0.7 0.1]);
+legend('lead','integrator','combined','location','w')
+
+%% Frequency Response 
+% The second class the is used for CST-like operation is <matlab:doc('qfr') |qfr|>.
+% An object of this class simply stores the freqeuncy response data along a
+% given freqeuncy vector. Note that for a conviniant use in QFT design, the
+% response data is stored in Nichols form [deg+i*db], and the frequency in rad/s.
+% This class is used for exmaple for representing a nominal response inside
+% a |qplant|. 
+% 
+% A |qfr| object is typically constracted using the syntax
+%
+%   f = qfr(response,frequency) 
+%
+% where reposne in Nichols form, and frequency in rad/s. 
+% For example, generating a |qfr| from the previously constructed |Cfull|, 
+
+res = nfr(Cfull,w); % extract the Nichols form frequency response 
+f = qfr(res,w);
+
+%%
+% Alterantively, we could have just write the one line
+
+f = qfr(Cfull,w);
+
+%% Conversion from Control System Toolbox
+% If you do have CST, but wish to work in (the superior) openQsyn native
+% classes, an easy conversion can be done from any CST LTI object to either
+% a |qctrl| or a |qfr|. For exmaple
+
+G = tf([4 5 6],[1 34 6 55],0.1); % some random tf
+Q = qctrl(G)
+q = qfr(G,w)
+
+%%
+% Going backwords is also possible:
+G1 = tf(Q)
+G2 = zpk(Q)
+
+##### SOURCE END #####
+--></body></html>

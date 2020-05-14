@@ -25,18 +25,16 @@ if strcmp(opt,'magphase')
 end
 
 if ~strcmp(opt,'phase')
-    for k=1:N
-        semilogx(w,imag(tpl(k,:)),'Color',col(k,:),'Tag',num2str(k),...
-            'linewidth',linespec.width,'linestyle',linespec.style);
-        hold on
-    end
+    hold on
+    set(gca, 'ColorOrder', col, 'NextPlot', 'add','XScale','log');
+    semilogx(w,imag(tpl),'linewidth',linespec.width,'linestyle',linespec.style);  
     %if strcmp(CASE,'all') || strcmp(CASE,'nom')
     %    [w_nom,t_nom]=gettpl(tplf,'nom');
     %    semilogx(w_nom,imag(t_nom),'--k','linewidth',2);
     %end
     xlim([w(1) w(end)])
     ylabel('Mag [db]')
-    
+    box on
 end
 
 % phase
@@ -45,16 +43,9 @@ if strcmp(opt,'magphase')
 end
 
 if ~strcmp(opt,'mag')
-    for k=1:N
-        phase=real(tpl(k,:));
-        %phase=unwrap(phase*pi/180)*180/pi;
-        %if phase(1) > 5
-        %    phase=phase-360;
-        %end
-        semilogx(w,phase,'Color',col(k,:),'Tag',num2str(k),...
-             'linewidth',linespec.width,'linestyle',linespec.style); 
-         hold on
-    end
+    hold on
+    set(gca, 'ColorOrder', col, 'NextPlot', 'add','XScale','log');
+    semilogx(w,real(tpl),'linewidth',linespec.width,'linestyle',linespec.style);
     %if strcmp(CASE,'all') || strcmp(CASE,'nom')
     %    phase=real(t_nom);
     %    phase=unwrap(phase*pi/180)*180/pi;
@@ -63,6 +54,7 @@ if ~strcmp(opt,'mag')
     %end
     xlim([w(1) w(end)])
     ylabel('Phase [deg]')
+    box on
 end
 
 xlabel('Frequency [rad/s]')
