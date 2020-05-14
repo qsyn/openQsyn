@@ -34,7 +34,7 @@ if ~strcmp(opt,'phase')
     %end
     xlim([w(1) w(end)])
     ylabel('Mag [db]')
-    
+    box on
 end
 
 % phase
@@ -54,6 +54,7 @@ if ~strcmp(opt,'mag')
     %end
     xlim([w(1) w(end)])
     ylabel('Phase [deg]')
+    box on
 end
 
 xlabel('Frequency [rad/s]')

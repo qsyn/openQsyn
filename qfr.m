@@ -12,10 +12,11 @@ classdef qfr
             %
             % Usage:
             %
-            %   F = QFR(G)   constructs a qfr object F from the frd object G
+            %   F = QFR(G)   constructs a qfr object F from the FRD object G
             %
-            %   F = QFR(G,w)   constructs a qfr object F from the LTI object
-            %   G and the freqeucny vector w
+            %   F = QFR(G,w)   constructs a qfr object F from the transfer function 
+            %   G (either from Control Toolbox or a QCTRL object) and the freqeucny 
+            %   vector w
             %
             %   F = QFR(response,w)   constructs a qfr object F with given response
             %   and frequency vector
@@ -35,13 +36,17 @@ classdef qfr
                 case 2 % input is either lti+freq or a freq+response 
                     if isa(varargin{1},'lti') && isscalar(varargin{1}) ...
                             && isnumeric(varargin{2}) && isvector(varargin{2})
-                           res = c2n(squeeze(freqresp( varargin{1},varargin{2})));
-                           w = varargin{2};
+                        w = varargin{2};
+                        res = c2n(squeeze(freqresp( varargin{1},w)));
+                    elseif isa(varargin{1},'qctrl') && isscalar(varargin{1}) ...
+                            && isnumeric(varargin{2}) && isvector(varargin{2})
+                        w = varargin{2};
+                        res = nfr(varargin{1},w);
                     elseif isnumeric(varargin{1}) && isvector(varargin{1}) ...
-                             && isnumeric(varargin{2}) && isvector(varargin{2})
-                         if length(varargin{1})==length(varargin{1})
-                             res = varargin{1};
-                             w = varargin{2};
+                            && isnumeric(varargin{2}) && isvector(varargin{2})
+                        if length(varargin{1})==length(varargin{1})
+                            res = varargin{1};
+                            w = varargin{2};
                          else
                              error('qfr(response,frequecny) -- both inputs must be of same size')
                          end
