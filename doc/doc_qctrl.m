@@ -49,7 +49,8 @@ Clead = qctrl.lead(30,10)
 
 Cint = qctrl([],0,1);
 Cfull = Clead*Cint
-bodeplot(Clead,w,'color',[0 0 1]); hold on
+figure(), hold on
+bodeplot(Clead,w,'color',[0 0 1]);
 bodeplot(Cint,w,'color',[1 0 0]);
 bodeplot(Cfull,w,'color',[0.1 0.7 0.1]);
 legend('lead','integrator','combined','location','w')
@@ -69,7 +70,7 @@ legend('lead','integrator','combined','location','w')
 % where reposne in Nichols form, and frequency in rad/s. 
 % For example, generating a |qfr| from the previously constructed |Cfull|, 
 
-res = nfr(Cfull,w); % extract the Nichols form frequency response 
+res = nicresp(Cfull,w); % extract the Nichols form frequency response 
 f = qfr(res,w);
 
 %%

@@ -27,7 +27,10 @@ classdef qctrl < matlab.mixin.CustomDisplay
             if nargin ==1 && isa(p.Results.input1,'lti')
                 obj.zeros = zero(p.Results.input1);
                 obj.poles = pole(p.Results.input1);
-                obj.gain = dcgain(p.Results.input1);
+                nint = sum(obj.poles==0); % number of integratores
+                ndif = sum(obj.zeros==0); % number of deifferentiators
+                T0 = tf([1 zeros(1,nint)],[1 zeros(1,ndif)]); % remove integratros/differentiators 
+                obj.gain = dcgain(p.Results.input1*T0);
                 if isdt(p.Results.input1)
                     obj.sampleTime = p.Results.input1.Ts;
                 end
@@ -50,13 +53,17 @@ classdef qctrl < matlab.mixin.CustomDisplay
         end
         function [num,den] = tfdata(obj)
             %TFDATA computes numerator and denominator tf data
-            num = poly(obj.zeros);
-            den = poly(obj.poles);
+            Idiff = obj.zeros==0;
+            Iint = obj.poles==0;
+            num = poly(obj.zeros(~Idiff));
+            den = poly(obj.poles(~Iint));
             num = num/num(end)*obj.gain;
             den = den/den(end);
+            num = [num zeros(1,sum(Idiff))];
+            den = [den zeros(1,sum(Iint))];
         end
-        function res = nfr(obj,frequency)
-            %FREQRESP returns the frequeny reponse in Nichols format
+        function res = nicresp(obj,frequency)
+            %NICRESP returns the frequeny reponse in Nichols format
             
             p = inputParser;
             p.addRequired('frequency',@(x) validateattributes(x,...
@@ -64,10 +71,14 @@ classdef qctrl < matlab.mixin.CustomDisplay
             p.parse(frequency);
             w = p.Results.frequency;
             s = frequency*1i;
-            num = poly(obj.zeros);
-            den = poly(obj.poles);
-            res = c2n(obj.gain*polyval(num,s)./polyval(den,s),-180);
+            [num,den] = tfdata(obj);
+            res = c2n(polyval(num,s)./polyval(den,s),-180);
             
+        end
+        function q = qfr(obj,frequency)
+           %QFR converts qctrl object into a qfr object with specified frequency
+           res = nicresp(obj,frequency);
+           q = qfr(res,frequency);
         end
         function str = print(obj)
             %PRINT prints as string in dc form
@@ -203,7 +214,7 @@ classdef qctrl < matlab.mixin.CustomDisplay
            if ~exist('frequency','var')
                frequency = logspace(-2,3,200);
            end
-           res = nfr(obj,frequency);
+           res = nicresp(obj,frequency);
            QFR = qfr(res,frequency);
            bodeplot(QFR,varargin{:});
         end
