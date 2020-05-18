@@ -25,6 +25,9 @@ C = qctrl(z,p,k)
      
 %% 
 % The output display indicates that the parameters were correctly inserted.
+% Note that all parameters are inseted in "dc-form", in which each pole/zere 
+% element has a dc value of zero. Hence, the dc gain of C is not the same as
+% a CST |zpk(z,p,k)| which is in "hf-form" (each zero/pole element gain is zero at infinite frequency).  
 % We notice that the pole and zero at -5 cancels. To obtain a minimal realization
 % use |minreal| (as you would do in CST),
 
