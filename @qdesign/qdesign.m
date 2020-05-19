@@ -12,7 +12,7 @@ classdef qdesign  < handle
     
     methods
         function obj = qdesign(plant,specs)
-            %QLD Construct an instance of the QDESIGN class
+            %QDESIGN Construct an instance of the QDESIGN class
             %   
             %Usage: 
             %
@@ -31,31 +31,45 @@ classdef qdesign  < handle
         function [] = clmag(obj,C,F)
             %CLMAG computes closed loop magnitude response
             %
-            %   obj     qdesign object 
+            %Usage: 
             %
-            %   C       feedback compensator in LTI foramt or an abolute
-            %           gain; Default C=1.
+            %   CLMAG(DES,C,F)   shows magniatude response for P*C*F/(1+C*P)
+            %   with feedback C and pre-filter F. 
+            %   
+            %Inputs:
             %
-            %   F       prefilter in in LTI foramt or an abolute
-            %           gain. Default F=1.
+            %   DES     qdesign object 
+            %
+            %   C       feedback compensator given as a openQsyn QFR or QCTRL object, 
+            %           a Control System Toolbox LTI object, or a constant gain. Default C=1. 
+            %
+            %   F       prefilter in given as a openQsyn QFR or QCTRL object, 
+            %           a Control System Toolbox LTI object, or a constant gain. Default F=1.
             %
             %   Replaces Qsyn command FDESIGN
             
             if nargin<3, F=[]; end
             if isempty(F), F=1; end
             
-            if isnumeric(C), C=tf(C); end
-            if isnumeric(F), F=tf(F); end
+            %if isnumeric(C), C=tf(C); end
+            %if isnumeric(F), F=tf(F); end
             
+
             % compute nominal
+            %wnom = obj.nom.frequency;
+            %Cwnom = squeeze(freqresp(C,wnom)); % in complex plain
+            %Fwnom = squeeze(freqresp(F,wnom)); % in complex plain
+            %Pnom = n2c(obj.nom.response);
+            %Lnom = Cwnom.*Pnom;
+            %Tnom = Fwnom.*Lnom./(1+Lnom);
+            
             wnom = obj.nom.frequency;
-            Cwnom = squeeze(freqresp(C,wnom)); % in complex plain
-            Fwnom = squeeze(freqresp(F,wnom)); % in complex plain
-            Pnom = n2c(obj.nom.response);
+            Pnom = n2c(nicresp(obj.nom,wnom));
+            Cwnom = n2c(nicresp(C,wnom));
+            Fwnom = n2c(nicresp(F,wnom));
             Lnom = Cwnom.*Pnom;
             Tnom = Fwnom.*Lnom./(1+Lnom);
-            
-            qfr_nom = qfr(c2n(Tnom),wnom);
+            qfr_nom = qfr(c2n(Tnom,-180),wnom);
             bodeplot(qfr_nom,'PhaseVisible','off')
             hold on
             
@@ -69,9 +83,24 @@ classdef qdesign  < handle
             scatter(w,mag_min,'bo')
             scatter(w,mag_max,'bo')
         end
-        function varargin = loopnic(obj,C)
+        function varargout = loopnic(obj,C)
             %LOOPNIC plots the open-loop on a Nichols chart
-            
+            %
+            %Usage: 
+            %
+            %   LOOPNIC(DES,C)   plots the nominal open-loop Nichols for a 
+            %   given qdesign object DES, and a feedback compensator C 
+            %
+            %   h = LOOPNIC(DES,C)   also outputs a figure handle
+            %
+            %Inputs:
+            %
+            %   des     qdesign object with computed bounds 
+            %
+            %   C       feedback compensator given as a openQsyn QFR or QCTRL object, 
+            %           a Control System Toolbox LTI object, or a constant gain.  
+            %
+             
             % defaults
             linecolor = 'k'; 
             %t_color = distinguishable_colors(length(obj.tpl)); 
@@ -94,7 +123,7 @@ classdef qdesign  < handle
                     sprintf(' %g',obj.tpl(k).frequency),'clipping','on') % single space added
             end
             
-            if nargout==1, varargin{1}=h; end
+            if nargout==1, varargout{1}=h; end
             
         end
     end

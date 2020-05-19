@@ -25,6 +25,9 @@ C = qctrl(z,p,k)
      
 %% 
 % The output display indicates that the parameters were correctly inserted.
+% Note that all parameters are inseted in "dc-form", in which each pole/zere 
+% element has a dc value of zero. Hence, the dc gain of C is not the same as
+% a CST |zpk(z,p,k)| which is in "hf-form" (each zero/pole element gain is zero at infinite frequency).  
 % We notice that the pole and zero at -5 cancels. To obtain a minimal realization
 % use |minreal| (as you would do in CST),
 
@@ -49,7 +52,8 @@ Clead = qctrl.lead(30,10)
 
 Cint = qctrl([],0,1);
 Cfull = Clead*Cint
-bodeplot(Clead,w,'color',[0 0 1]); hold on
+figure(), hold on
+bodeplot(Clead,w,'color',[0 0 1]);
 bodeplot(Cint,w,'color',[1 0 0]);
 bodeplot(Cfull,w,'color',[0.1 0.7 0.1]);
 legend('lead','integrator','combined','location','w')
@@ -69,7 +73,7 @@ legend('lead','integrator','combined','location','w')
 % where reposne in Nichols form, and frequency in rad/s. 
 % For example, generating a |qfr| from the previously constructed |Cfull|, 
 
-res = nfr(Cfull,w); % extract the Nichols form frequency response 
+res = nicresp(Cfull,w); % extract the Nichols form frequency response 
 f = qfr(res,w);
 
 %%

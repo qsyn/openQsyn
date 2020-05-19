@@ -12,6 +12,7 @@
             <tocitem target="example.html">Basic SISO Exmaple</tocitem>
             <tocitem target="ex_unsunc.html">Unstructured Uncertainty</tocitem>
             <tocitem target="ex_rff.html">Real Factored Form</tocitem>
+            <tocitem target="doc_qctrl.html">Working without Control System Toolbox</tocitem>
             <tocitem target="ex_blackBox.html">Black Box Plant</tocitem>
         </tocitem>
 

@@ -87,8 +87,7 @@ classdef qfr
             %BODE plots a bode plot
             %G = obj.frd();
             bodeplot(obj);
-        end
-        
+        end        
         function [] = bodeplot(obj,varargin)
             %BODEPLOT plots a bode plot with additional options
             
@@ -111,7 +110,7 @@ classdef qfr
                 error('PhaseVisible option must be a boolian scalar');
             end
             
-            bodeplotter(obj.response.',p.Results.w,opt,p.Results.color)
+            bodeplotter(obj.response.',p.Results.w,opt,p.Results.color);
         end
         function G = frd(obj)
             %FRD converts qfr to a Control Systems Toolbox FRD object
@@ -132,7 +131,11 @@ classdef qfr
                case {'tf','zpk','ss','frd'}
                    Bfr = squeeze(freqresp(B,w)).';
                    Bnic = c2n(Bfr.',-180);
-                   G =  qfr(A.response+Bnic,w);
+                   G = qfr(A.response+Bnic,w);
+               case 'qctrl'
+                   Bnic = nicresp(B,w);
+                   Gw = qfr(A.response+Bnic,w);
+                   G = unwrap(Gw);
                case 'double'
                    %if ~isscalar(B), error('a numeric value must be a scalar'); end
                    Gw = qfr(A.response+B,w);
@@ -141,11 +144,12 @@ classdef qfr
                    error('seconf input must be an QFR object, LTI, or a double')
            end
         end
-        function t = freqresp(obj,w)
-            %FREQRESP returns the frequency resposne at selected frequency
-            %If w is not in obj.frequency, FREQRES interpolates
+        function t = nicresp(obj,w)
+            %NICRESP returns the frequency resposne at selected frequency
+            %If w is not in obj.frequency, NICRESP interpolates
                         
-            t = interp1(obj.frequency,obj.response,w);
+            ti = interp1(obj.frequency,obj.response,w);
+            t = reshape(ti,[],1);
             
         end
         function m = mag(obj,w)
@@ -158,7 +162,7 @@ classdef qfr
            %    m = mag(qfr,w)   returns magniautde response at specific frequencies
            %
            if exist('w','var')
-               t = freqresp(obj,w);
+               t = nicresp(obj,w);
                m = imag(t);
            else
                m = imag(obj.response);
@@ -166,7 +170,7 @@ classdef qfr
             
         end
         function m = phase(obj,w)
-           %MAG returns phase response
+           %PHASE returns phase response
            %
            % Usage:
            %
@@ -175,7 +179,7 @@ classdef qfr
            %    m = phase(qfr,w)   returns phase response at specific frequencies
            %
            if exist('w','var')
-               t = freqresp(obj,w);
+               t = nicresp(obj,w);
                m = real(t);
            else
                m = real(obj.response);
@@ -201,7 +205,7 @@ classdef qfr
                 error('second input must be a numeric vector')
             end
             
-            Gfr = freqresp(Glti,Frequency);
+            Gfr = nicresp(Glti,Frequency);
             Gnic = c2n(Gfr,'unwrap');
             Gqfr = qfr(Gnic,Frequency);
         end

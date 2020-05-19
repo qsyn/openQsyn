@@ -14,7 +14,8 @@ function [ T ] = cpop( A,B,opr,varargin )
 %   B           one of the following: 
 %               * qtpl array with same frequenciers as A
 %               * numeric array of frequency response points in complex form
-%               * Matlab control toolboxz LTI siso object 
+%               * Matlab control toolbox LTI siso object
+%               * qctrl object
 %               * qfr object               
 %   opr         operation: '+'|'-'|'*'|'/'|'sens'|'comp'
 %   pruning    optional pruning option: 0 (def) | 1  | 2 
@@ -71,9 +72,10 @@ if isnumeric(B)
     t2.template = c2n(B);
     t2.parameters =[];
     tplB = repmat(t2,N,1);
-elseif isa(B,'qfr') || isa(B,'lti')
-    t2c = squeeze(freqresp(B,w));
-    t2n = c2n(t2c,'unwrap');
+elseif isa(B,'qfr') || isa(B,'lti') || isa(B,'qctrl')
+    %t2c = squeeze(freqresp(B,w));
+    %t2n = c2n(t2c,'unwrap');
+    t2n = nicresp(B,w);
     tplB = struct('template',t2n,'parameters',[]);
     for k=1:N
         tplB(k).template = t2n(k);
