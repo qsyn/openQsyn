@@ -13,7 +13,7 @@ function obj = ctpl(obj,method,w,varargin)
 %
 %       method  template computation method. one of the following:
 %               'grid'      uniform grid over parameter
-%               'rngrid'    random grid over the parameters
+%               'rndgrid'    random grid over the parameters
 %               'random'    random sample points
 %               'recgrid'   recurcive grid
 %               'recedge'   recurcive edge grid
@@ -71,7 +71,7 @@ switch method
     case 'random', tpl=obj.cgrid(w,2,N);
     case 'recgrid', tpl=obj.recgrid(w,options);
     case 'recedge', tpl=obj.recedge(w,options);
-    case 'cases', tpl=obj.cases2tpl(options,w);
+    case 'cases', tpl=obj.cases2tpl(options.pars,w);
     case 'rff', tpl=obj.crff(w,options);
     otherwise, error('unrecognized method!')
 end
@@ -83,8 +83,8 @@ tnom = cases(obj,pnom,w);
 for k=1:length(w)
     tpl(k).parNames = pname;                    % add names
     tpl(k)=add2tpl(tpl(k),tnom(k),pnom,'x');    % add nominal point
-    tpl(k).unwrap;                              % unwrap according to nominal point
 end
+tpl = unwrap(tpl);                              % unwrap according to nominal point
 
 % adds uncetin poles/zeros
 if any(strcmp({obj.pars.name},'uncint_par'))

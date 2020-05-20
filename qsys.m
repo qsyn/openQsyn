@@ -214,10 +214,8 @@ classdef qsys
                     else
                         T{k} = n2c(blk.cases(par{kp},w));
                     end
-                elseif isnumeric(blk)
-                    T{k} = blk;
-                else % LTI object 
-                    T{k} = squeeze(freqresp(blk,w));
+                else
+                    T{k} = n2c(nicresp(blk,w)).';
                 end
             end
             f = qsys2func(obj);

@@ -227,7 +227,7 @@ classdef qplant < handle
                 %C{end}=1j*w(k);
                 %nyq = f(C{:});               % in complex form
                 T = obj.funcval(f,pck,1j*w(k));
-                tpl(k)=qtpl(w(k),T.',pgrid);
+                tpl(k)=qtpl(w(k),T,pgrid);
                 %scatter(real(T),imag(T),10,col(k,:)); hold on
             end
         end
@@ -259,7 +259,7 @@ classdef qplant < handle
             tpl = qtpl(length(w)); % pre-allocating
             for k=1:length(w)
                 T = obj.funcval(f,p,1j*w(k));
-                tpl(k)=qtpl(w(k),T.',par);
+                tpl(k)=qtpl(w(k),T,par);
             end
         end
         function h = qplant2func(obj)
@@ -459,7 +459,7 @@ classdef qplant < handle
                 w = obj.nominal.frequency;
             end
             
-            w = reshape(w,[],1); % make sure w is a column vector.
+            w = reshape(w,1,[]); % make sure w is a row vector.
             
             f = obj.qplant2func();
             if isempty(par)
@@ -566,7 +566,7 @@ classdef qplant < handle
         function c = pack(par)
             %PACK returns a cell array containning all parameters in PAR
             %and leaves one additional spot empty
-            c = num2cell(par,2);
+            c = num2cell(par.',1);
             c{end+1}=0;
         end
         function T = funcval(f,c,s)
@@ -578,9 +578,9 @@ classdef qplant < handle
             
             %this part is not needed for Matlab 2016a or later
             for k=1:length(c)-1
-                c{k} = repmat(c{k},[size(s,1) 1]);
+                c{k} = repmat(c{k},1,size(s,1));
             end
-            c{end} = repmat(s,[1 size(c{1},2)]);
+            c{end} = repmat(s,size(c{1},2),1);
             
             nyq  = f(c{:});
             T=c2n(nyq,'unwrap');
