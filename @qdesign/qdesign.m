@@ -51,6 +51,16 @@ classdef qdesign  < handle
             if nargin<3, F=[]; end
             if isempty(F), F=1; end
             
+            if ~isscalar(C), error('C must be a scalar'); end
+            if isnumeric(C)
+                if ~isreal(C), error('C must be real'); end
+                C = 1i*C; % C is a gain
+            end
+            if ~isscalar(F), error('F must be a scalar'); end
+            if isnumeric(F)
+                if ~isreal(F), error('F must be real'); end
+                F = 1i*F; % F is a gain
+            end
             %if isnumeric(C), C=tf(C); end
             %if isnumeric(F), F=tf(F); end
             
@@ -98,7 +108,7 @@ classdef qdesign  < handle
             %   des     qdesign object with computed bounds 
             %
             %   C       feedback compensator given as a openQsyn QFR or QCTRL object, 
-            %           a Control System Toolbox LTI object, or a constant gain.  
+            %           a Control System Toolbox LTI object, or a constant real gain.  
             %
              
             % defaults
@@ -107,6 +117,11 @@ classdef qdesign  < handle
             t_color = obj.col;
             hold on
             
+            if ~isscalar(C), error('C must be a scalar'); end
+            if isnumeric(C)
+                if ~isreal(C), error('C must be real'); end
+                C = 1i*C; % C is a gain!
+            end
             Lnom = series(obj.nom,C);
             h = Lnom.show('color',linecolor);
             
