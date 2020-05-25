@@ -5,7 +5,7 @@ str_4comp_lead = sprintf('#%d - lead',cont_num);
 str_4comp_lag = sprintf('#%d - lag',cont_num);
 str_4comp_pid = sprintf('#%d - pid',cont_num);
 str_4comp_notch = sprintf('#%d - notch',cont_num);
-str_4comp_zero = sprintf('#%d - zero',cont_num);
+str_4comp_zero = sprintf('#%d - pz',cont_num);
 
 counter = 0;
 n_gain = length(controllers.gain);
@@ -49,7 +49,7 @@ switch cont_str{1}
         end
     case str_4comp_zero
         for i = 1 : cont_num
-            if strcmp(list(i),sprintf('#%d - zero',i)) || strcmp(list(i),sprintf('---Deleted PZ---'))
+            if strcmp(list(i),sprintf('#%d - pz',i)) || strcmp(list(i),sprintf('---Deleted PZ---'))
                 counter = counter +1;
             end
         end
