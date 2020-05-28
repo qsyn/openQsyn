@@ -74,8 +74,8 @@ function c = cbnd1(tpls,spcfunc,spec)
 %CBND1 computes a single bound at all frequencies
 
 %default initial grid
-gphase0=-360:10:0;
-gmag0=-50:5:60;
+gphase0=-360:7:0;
+gmag0=-50:5:80;
 
 w = [tpls.frequency]';
 upper = interp1(spec.frequency,spec.upper,w);

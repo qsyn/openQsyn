@@ -29,7 +29,7 @@ classdef qfr
                 case 1 % input must be frd
                     if isa(varargin{1},'frd') && isscalar(varargin{1})
                         w = varargin{1}.Frequency;
-                        res = c2n(squeeze(varargin{1}.ResponseData));
+                        res = c2n(squeeze(varargin{1}.ResponseData),-180);
                     else
                         error('A single input argument to qfr must be a siso frd')
                     end
@@ -37,7 +37,7 @@ classdef qfr
                     if isa(varargin{1},'lti') && isscalar(varargin{1}) ...
                             && isnumeric(varargin{2}) && isvector(varargin{2})
                         w = varargin{2};
-                        res = c2n(squeeze(freqresp( varargin{1},w)));
+                        res = c2n(squeeze(freqresp( varargin{1},w)),-180);
                     elseif isa(varargin{1},'qctrl') && isscalar(varargin{1}) ...
                             && isnumeric(varargin{2}) && isvector(varargin{2})
                         w = varargin{2};
@@ -60,7 +60,7 @@ classdef qfr
                         
                         num = polyval(varargin{1},1i*varargin{3});
                         den = polyval(varargin{2},1i*varargin{3});
-                        res = c2n(num./den);
+                        res = c2n(num./den,-180);
                         w = varargin{3};
                     else
                         error('qfr(num,den,freqeucny) but something is wrong')
@@ -123,10 +123,16 @@ classdef qfr
            switch class(B)
                case 'qfr'
                    if all(w == B.frequency)
-                       G = qfr(A.response+B.response,A.frequency);
+                       G = qfr(A.response+B.response,w);
+                   elseif isscalar(w)
+                       Bres = interp1(B.frequency,B.response,w);
+                       G = qfr(A.response+Bres,w);
+                   elseif isscalar(B.frequency)
+                       Ares = interp1(w,A.response,B.frequency);
+                       G = qfr(B.response+Ares,B.frequency);
                    else
                        error(['series connection of QFR object require that both ',...
-                           'objects have identical frequency vector']); 
+                           'objects have identical frequency vector, or that one is scalar']); 
                    end
                case {'tf','zpk','ss','frd'}
                    Bfr = squeeze(freqresp(B,w)).';

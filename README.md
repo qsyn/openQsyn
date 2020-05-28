@@ -56,18 +56,7 @@ The toolbox is regulary tested on Matlab 2015b,2017a,2017b.
 For complete functionality the Control Systems Toolbox is required. 
 
 ### To-Do list:
-- qplant:
-  - ~~unstructured uncertainty~~
-  - ~~nominal case interoplation~~ 
-  - real factored form 
-  - import from Robust Control Toolbox
-- qtpl:  
-  - ~~template union~~
-- qpar:
-  - import from Robust Control Toolbox
-- qdesign:
-  - make template input possible 
-  - interpolate nominal if not exist (prompt user?)
+- import/export from\to Robust Control Toolbox
 - cascade design support
 - MIMO design support
 

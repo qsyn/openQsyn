@@ -11,11 +11,11 @@ bnd = obj.bnd;
 w = unique([bnd.w]);
 
 dombnd = struct('name','dombnd','w',w,'c',[]);
-N = 360; % number of points along contour
+N = 360*6; % number of points along contour
 
 for kw=1:length(w)
     a = zeros(length(bnd),N);
-    theta = linspace(-2*pi+0.01,-0.01,N);
+    theta = linspace(-2*pi+0.005,-0.005,N);
     for k = 1:length(bnd)
         [~,idx ] = ismember(w(kw),bnd(k).w);
         if isempty(idx) 
