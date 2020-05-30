@@ -1,10 +1,10 @@
 %% Digital Control Design
 %%
 % In this example we will attempt to design a digital feedback controller for our
-% <matlab:web('example.htmll') basic SISO example>. We quickly compute the
+% <matlab:web('example.html') basic SISO example>. We quickly compute the
 % plant, the templates and the bounds as follows:
 %%
-% 
+% % 
 %     % plant
 %     k=qpar('k',2,2,5,8);
 %     a=qpar('a',3,1,3,8);

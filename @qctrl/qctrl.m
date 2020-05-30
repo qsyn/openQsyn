@@ -75,6 +75,29 @@ classdef qctrl < matlab.mixin.CustomDisplay
             res = c2n(polyval(num,s)./polyval(den,s),-180);
             
         end
+        function nichols(obj,frequency,varargin)
+           %NICHOLS plots Nichols chart for qctrl objects
+           %
+           %Usage: 
+           %    NICHOLS(C)   plots Nichols chart for QCTRL object C over
+           %    defualt frequency grid
+           %
+           %    NICHOLS(C,W)   specify the frequency vector
+           %
+           %    NICHOLS(C,W,LineSpec)   sets the line style, marker symbol, 
+           %    and color
+           %    
+           %    plot(___,Name,Value)   specifies line properties using one 
+           %    or more Name,Value pair arguments.
+           
+           if ~exist('frequency','var'), frequency=[]; end
+           if isempty(frequency), frequency=logspace(-2,2,200); end
+           
+           res = nicresp(obj,frequency);
+           fr = qfr(res,frequency);
+           show(fr,varargin{:});
+                   
+        end
         function q = qfr(obj,frequency)
            %QFR converts qctrl object into a qfr object with specified frequency
            res = nicresp(obj,frequency);

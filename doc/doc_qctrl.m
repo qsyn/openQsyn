@@ -34,10 +34,16 @@ C = qctrl(z,p,k)
 C = minreal(C)
 
 %%
-% Other functionallities of CST are supported. For example, a Bode plot:
+% Other functionallities of CST are supported. For example, a Nichols plot:
 w = logspace(-2,3,500);
-bodeplot(C,w);
- 
+nichols(C,w);
+qngrid
+
+%%
+% Note the usage of <matlab:doc('qngrid') |qngrid|>, which replaces Control 
+% System Toolbox |ngrid| function and allows extended user control over the
+% generated grid curves.   
+
 %%
 % Another functionalities of the |qctrl| class is to easily generate elementry 
 % controllers such as lead compensators, lag compensators, PID controllers,
