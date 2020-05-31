@@ -214,8 +214,8 @@ classdef qsys
                     else
                         T{k} = n2c(blk.cases(par{kp},w));
                     end
-                else 
-                    T {k}= n2c(nicresp(blk,w));
+                else
+                    T{k} = n2c(nicresp(blk,w)).';
                 end
             end
             f = qsys2func(obj);

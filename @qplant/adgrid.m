@@ -92,7 +92,7 @@ nconst=(qmin==qmax) | n==1;  % The constant parameters!  --> deprecated
     qg=Nmul*qgrid(2*ones(size(qmin)),qmin,qmax)+qconst*ones(1,2^length(n));
     %T=c2n(feval(trfun,qg,s));
     c = qplant.pack(qg);
-    T = qplant.funcval(trf,c,s);
+    T = qplant.funcval(trf,c,s).';
     Qpar=qg;
     Told=T;
     [T1,Q1,Nfun,prune_on]=recgrid1(trf,s,n,qmin,qmax,T,Tacc,phandle,indgrid,Nmul,qconst);
@@ -165,7 +165,7 @@ Qgrid=Nmul*qg(:,logical(Irest))+qconst*ones(1,sum(logical(Irest)));
 Qpar=Nmul*qg(:,logical(Irest))+qconst*ones(1,sum(logical(Irest)));  %New parameter combinations
 %Tnew=c2n(feval(trfun,Qpar,s));
 c = qplant.pack(Qpar);
-Tnew = qplant.funcval(trfun,c,s);
+Tnew = qplant.funcval(trfun,c,s).';
 T(logical(Irest))=Tnew;   % New values needed
 Nfun=Nfun+length(Irest)-length(Igrid);
 n0=n0+1;

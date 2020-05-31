@@ -203,7 +203,11 @@ classdef qtpl
                 nomPhase = real(unom(k));
                 meanPhase = mean(real(A(k).template(2:end)));
                 r = round((nomPhase - meanPhase)/360);
-                B(k).template = A(k).template+r*360;
+                if unom(k) == A(k).template(1)
+                    B(k).template(2:end) = A(k).template(2:end)+r*360;
+                else
+                    B(k).template = A(k).template+r*360;
+                end
             end
             
         end
