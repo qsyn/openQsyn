@@ -1,7 +1,7 @@
 function [obj] = rsrs( Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n )
 %RSRS    Reference Step Response Specification Calculation
 %
-%[spec_w,spec_t,tab]=rsrs(spcfile,specname,Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n)
+%[spc]=rsrs(Tr,M,Ts,Td,w,wco,ordr,Ks,tf,plt,dt,n)
 %
 %        Transfers time-domain reference step specifications
 %        to the frequency domain, using simulations of 2:nd or 3:rd
