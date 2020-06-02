@@ -27,7 +27,7 @@ des.cbnd('odsrs')
 
 des.showbnd('odsrs')
 des.showbnd('rsrs')
-%% loop shaping - G
+ 
 h = des.showbnd('odsrs',[],[3 5 7 10 20 50]);
 des.showbnd('rsrs',h,[0.4 0.5 1]);
 
@@ -37,7 +37,7 @@ set(s,'DisplayFormat','Frequency');
 % G_Lead = Clead(40,10,1)*Clead(42,30,1);
 % G_Lag = Clag(50,1000);
 
-curr_G= (1/(s^2 +s +1));%*G_Lead*G_Lag;
+curr_G= ((s+0.01)/(s^2 +s +1));%*G_Lead*G_Lag;
 G =curr_G;
 des.loopnic(G)
 ngrid
