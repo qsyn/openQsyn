@@ -1,0 +1,16 @@
+# Contributing to OpenQsyn
+
+## How to 
+* **Bug reports**: Open an issue or send an email. Please chekc that issue is not open already.
+* **Patchs**: If you wish to submite a patch correcting some bug open a GitHub pull request. You will need to fork openQsyn if you didn't already.
+* **Enhancments**: In case you wish to write a new peace of code that added a new feature contact by email and start coding!
+
+## Basic coding guidlines
+* Do use in-code comments 
+* Do not use any Matlab function related to any Toolbox other than OpenQsyn, unless you are working on a converter to/from that toolbox.
+* Accompany new features with a dedicated demo script file, preferably with Matlab Markup style commnets
+* Avoid using the evil `eval` and `evalin` functions ([This is way](https://www.mathworks.com/help/matlab/matlab_prog/string-evaluation.html))  
+* Do not use global variables
+* Fully test your code by running all dependancies and all input options
+* Use `1i` or `ij` to represent a complex number; Do not use `i` or `j` as variable names
+* Handle improper inputs; throw errors and warnnings as needed
