@@ -122,7 +122,7 @@ classdef qdesign  < handle
                 if ~isreal(C), error('C must be real'); end
                 C = 1i*C; % C is a gain!
             end
-            Lnom = series(obj.nom,C);
+            Lnom = unwrap(series(obj.nom,C));
             h = Lnom.show('color',linecolor);
             
             for k=1:length(obj.tpl)

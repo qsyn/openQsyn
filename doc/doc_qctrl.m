@@ -18,7 +18,7 @@
 % $$ C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} $$
 % 
 
-z = [-5 -1];                        % zeros
+z = [-5 -1];                         % zeros
 p = [0 roots([1/9 1.8/3 1]).' -5];   % poles
 k = 10;
 C = qctrl(z,p,k)
@@ -34,6 +34,11 @@ C = qctrl(z,p,k)
 C = minreal(C)
 
 %%
+% For a discrete-time controller, we simply add the sample time as 4th
+% argument:
+Gd = qctrl(1,[-0.1+0.2i -0.1-0.2i],1,0.01)
+
+%%
 % Other functionallities of CST are supported. For example, a Nichols plot:
 w = logspace(-2,3,500);
 nichols(C,w);
@@ -42,7 +47,14 @@ qngrid
 %%
 % Note the usage of <matlab:doc('qngrid') |qngrid|>, which replaces Control 
 % System Toolbox |ngrid| function and allows extended user control over the
-% generated grid curves.   
+% generated grid curves. To extract a frequency response (in Nichols format)
+% use |res=nicresp(C,w)|. 
+
+%%
+% One may also use the, more flexible, "symbolic" form of use. 
+% For example:
+s = qctrl(0,[],1); % create a transfe rfunction s (a pure zero)
+F = 1/(s^2/100+2*0.7*s/10+1)
 
 %%
 % Another functionalities of the |qctrl| class is to easily generate elementry 

@@ -6,7 +6,7 @@
    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Working without Control System Toolbox</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-30"><meta name="DC.source" content="doc_qctrl.m"><style type="text/css">
+      --><title>Working without Control System Toolbox</title><meta name="generator" content="MATLAB 9.3"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-06-04"><meta name="DC.source" content="doc_qctrl.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,8 +66,8 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Working without Control System Toolbox</h1><!--introduction--><p>No Control System Toolbox? no worries! Open Qsyn provide two native classes that can performs all basic CST operations (and more):</p><div><ul><li><a href="matlab:doc('ctrl')"><tt>qctrl</tt></a>: replaces the zpk and tf classes</li><li><a href="matlab:doc('qfr')"><tt>qfr</tt></a>: replaces the FRD class</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Dynamic Controllers</a></li><li><a href="#7">Frequency Response</a></li><li><a href="#9">Conversion from Control System Toolbox</a></li></ul></div><h2 id="1">Dynamic Controllers</h2><p><a href="matlab:doc('ctrl')"><tt>qctrl</tt></a> objects function as LTI objects in CST, and is suitable for designing feedback compensators and filters in QFT. Basic generation is using a zeros-poles-gain (ZPK) format</p><pre class="language-matlab">C = qctrl(z,p,k)
-</pre><p>For example:  construct the controller</p><p><span class="MathJax_Preview"><img src="doc_qctrl_eq14155793268344868868.png" alt="$$ C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} $$"></span><script type="math/tex"> C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} </script></p><pre class="codeinput">z = [-5 -1];                        <span class="comment">% zeros</span>
+  </style></head><body><div class="content"><h1>Working without Control System Toolbox</h1><!--introduction--><p>No Control System Toolbox? no worries! Open Qsyn provide two native classes that can performs all basic CST operations (and more):</p><div><ul><li><a href="matlab:doc('ctrl')"><tt>qctrl</tt></a>: replaces the zpk and tf classes</li><li><a href="matlab:doc('qfr')"><tt>qfr</tt></a>: replaces the FRD class</li></ul></div><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Dynamic Controllers</a></li><li><a href="#9">Frequency Response</a></li><li><a href="#11">Conversion from Control System Toolbox</a></li></ul></div><h2 id="1">Dynamic Controllers</h2><p><a href="matlab:doc('ctrl')"><tt>qctrl</tt></a> objects function as LTI objects in CST, and is suitable for designing feedback compensators and filters in QFT. Basic generation is using a zeros-poles-gain (ZPK) format</p><pre class="language-matlab">C = qctrl(z,p,k)
+</pre><p>For example:  construct the controller</p><p><span class="MathJax_Preview"><img src="doc_qctrl_eq14155793268344868868.png" alt="$$ C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} $$"></span><script type="math/tex"> C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} </script></p><pre class="codeinput">z = [-5 -1];                         <span class="comment">% zeros</span>
 p = [0 roots([1/9 1.8/3 1]).' -5];   <span class="comment">% poles</span>
 k = 10;
 C = qctrl(z,p,k)
@@ -75,8 +75,8 @@ C = qctrl(z,p,k)
 C = 
 
              (s/5+1)(s+1)       
-   10---------------------------
-      s(s^2/9+1.8*s/3+1)(s/5+1) 
+   10----------------------------
+      s (s^2/9+1.8*s/3+1)(s/5+1) 
 
 Continuous-time openQsyn QCTRL object
 
@@ -85,15 +85,36 @@ Continuous-time openQsyn QCTRL object
 C = 
 
              (s+1)       
-   10--------------------
-      s(s^2/9+1.8*s/3+1) 
+   10---------------------
+      s (s^2/9+1.8*s/3+1) 
 
 Continuous-time openQsyn QCTRL object
+
+</pre><p>For a discrete-time controller, we simply add the sample time as 4th argument:</p><pre class="codeinput">Gd = qctrl(1,[-0.1+0.2i -0.1-0.2i],1,0.01)
+</pre><pre class="codeoutput">
+Gd = 
+
+                  (1-z)              
+   ----------------------------------
+    (z^2/0.05+0.894427*z/0.223607+1) 
+
+Discrete-time openQsyn QCTRL object, sample time: 0.01
 
 </pre><p>Other functionallities of CST are supported. For example, a Nichols plot:</p><pre class="codeinput">w = logspace(-2,3,500);
 nichols(C,w);
 qngrid
-</pre><img vspace="5" hspace="5" src="doc_qctrl_01.png" alt=""> <p>Note the usage of <a href="matlab:doc('qngrid')"><tt>qngrid</tt></a>, which replaces Control System Toolbox <tt>ngrid</tt> function and allows extended user control over the generated grid curves.</p><p>Another functionalities of the <tt>qctrl</tt> class is to easily generate elementry controllers such as lead compensators, lag compensators, PID controllers, etc. For exmaple, a 30 degrees lead compensator with max phase lead at 10 rad/s can be generated as follows</p><pre class="codeinput">Clead = qctrl.lead(30,10)
+</pre><img vspace="5" hspace="5" src="doc_qctrl_01.png" alt=""> <p>Note the usage of <a href="matlab:doc('qngrid')"><tt>qngrid</tt></a>, which replaces Control System Toolbox <tt>ngrid</tt> function and allows extended user control over the generated grid curves. To extract a frequency response (in Nichols format) use <tt>res=nicresp(C,w)</tt>.</p><p>One may also use the, more flexible, "symbolic" form of use. For example:</p><pre class="codeinput">s = qctrl(0,[],1); <span class="comment">% create a transfe rfunction s (a pure zero)</span>
+F = 1/(s^2/100+2*0.7*s/10+1)
+</pre><pre class="codeoutput">
+F = 
+
+                    1                
+   -----------------------------------
+    (s^2/93.0961+1.45098*s/9.64863+1) 
+
+Continuous-time openQsyn QCTRL object
+
+</pre><p>Another functionalities of the <tt>qctrl</tt> class is to easily generate elementry controllers such as lead compensators, lag compensators, PID controllers, etc. For exmaple, a 30 degrees lead compensator with max phase lead at 10 rad/s can be generated as follows</p><pre class="codeinput">Clead = qctrl.lead(30,10)
 </pre><pre class="codeoutput">
 Clead = 
 
@@ -114,16 +135,16 @@ legend(<span class="string">'lead'</span>,<span class="string">'integrator'</spa
 Cfull = 
 
             (1-s/5.95871) 
-   2.81641----------------
-           (1-s/16.7822)s 
+   2.81641-----------------
+           s (1-s/16.7822) 
 
 Continuous-time openQsyn QCTRL object
 
-</pre><img vspace="5" hspace="5" src="doc_qctrl_02.png" alt=""> <h2 id="7">Frequency Response</h2><p>The second class the is used for CST-like operation is <a href="matlab:doc('qfr')"><tt>qfr</tt></a>. An object of this class simply stores the freqeuncy response data along a given freqeuncy vector. Note that for a conviniant use in QFT design, the response data is stored in Nichols form [deg+i*db], and the frequency in rad/s. This class is used for exmaple for representing a nominal response inside a <tt>qplant</tt>.</p><p>A <tt>qfr</tt> object is typically constracted using the syntax</p><pre class="language-matlab">f = qfr(response,frequency)
+</pre><img vspace="5" hspace="5" src="doc_qctrl_02.png" alt=""> <h2 id="9">Frequency Response</h2><p>The second class the is used for CST-like operation is <a href="matlab:doc('qfr')"><tt>qfr</tt></a>. An object of this class simply stores the freqeuncy response data along a given freqeuncy vector. Note that for a conviniant use in QFT design, the response data is stored in Nichols form [deg+i*db], and the frequency in rad/s. This class is used for exmaple for representing a nominal response inside a <tt>qplant</tt>.</p><p>A <tt>qfr</tt> object is typically constracted using the syntax</p><pre class="language-matlab">f = qfr(response,frequency)
 </pre><p>where reposne in Nichols form, and frequency in rad/s. For example, generating a <tt>qfr</tt> from the previously constructed <tt>Cfull</tt>,</p><pre class="codeinput">res = nicresp(Cfull,w); <span class="comment">% extract the Nichols form frequency response</span>
 f = qfr(res,w);
 </pre><p>Alterantively, we could have just write the one line</p><pre class="codeinput">f = qfr(Cfull,w);
-</pre><h2 id="9">Conversion from Control System Toolbox</h2><p>If you do have CST, but wish to work in (the superior) openQsyn native classes, an easy conversion can be done from any CST LTI object to either a <tt>qctrl</tt> or a <tt>qfr</tt>. For example</p><pre class="codeinput">G = tf([4 5 6],[1 34 6 55]); <span class="comment">% some random tf</span>
+</pre><h2 id="11">Conversion from Control System Toolbox</h2><p>If you do have CST, but wish to work in (the superior) openQsyn native classes, an easy conversion can be done from any CST LTI object to either a <tt>qctrl</tt> or a <tt>qfr</tt>. For example</p><pre class="codeinput">G = tf([4 5 6],[1 34 6 55]); <span class="comment">% some random tf</span>
 Q = qctrl(G)
 q = qfr(G,w)
 </pre><pre class="codeoutput">
@@ -185,7 +206,7 @@ Continuous-time zero/pole/gain model.
 % $$ C(s) = 10\frac{(s+5)(s+1)}{s(s^2/9+1.8s/3+1)(s+5)} $$
 % 
 
-z = [-5 -1];                        % zeros
+z = [-5 -1];                         % zeros
 p = [0 roots([1/9 1.8/3 1]).' -5];   % poles
 k = 10;
 C = qctrl(z,p,k)
@@ -201,6 +222,11 @@ C = qctrl(z,p,k)
 C = minreal(C)
 
 %%
+% For a discrete-time controller, we simply add the sample time as 4th
+% argument:
+Gd = qctrl(1,[-0.1+0.2i -0.1-0.2i],1,0.01)
+
+%%
 % Other functionallities of CST are supported. For example, a Nichols plot:
 w = logspace(-2,3,500);
 nichols(C,w);
@@ -209,7 +235,14 @@ qngrid
 %%
 % Note the usage of <matlab:doc('qngrid') |qngrid|>, which replaces Control 
 % System Toolbox |ngrid| function and allows extended user control over the
-% generated grid curves.   
+% generated grid curves. To extract a frequency response (in Nichols format)
+% use |res=nicresp(C,w)|. 
+
+%%
+% One may also use the, more flexible, "symbolic" form of use. 
+% For example:
+s = qctrl(0,[],1); % create a transfe rfunction s (a pure zero)
+F = 1/(s^2/100+2*0.7*s/10+1)
 
 %%
 % Another functionalities of the |qctrl| class is to easily generate elementry 

@@ -80,7 +80,11 @@ classdef qctrl < matlab.mixin.CustomDisplay
                 {'numeric'},{'nonnegative','real','finite','increasing','vector'}));
             p.parse(frequency);
             w = p.Results.frequency;
-            s = frequency*1i;
+            if obj.sampleTime==0
+                s = w*1i;
+            else
+                s = exp(obj.sampleTime*w*1i);
+            end
             [num,den] = tfdata(obj);
             res = c2n(polyval(num,s)./polyval(den,s),-180);
             
@@ -231,10 +235,11 @@ classdef qctrl < matlab.mixin.CustomDisplay
     
     methods(Access = protected)
         function displayScalarObject(obj)
-            disp(obj.print)
             if obj.sampleTime==0
+                disp(obj.print)
                 fprintf('\nContinuous-time openQsyn QCTRL object\n\n')
             else
+                disp(strrep(obj.print,'s','z'));
                 fprintf('\nDiscrete-time openQsyn QCTRL object, sample time: %g\n\n',obj.sampleTime);
             end
         end

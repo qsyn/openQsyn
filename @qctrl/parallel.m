@@ -1,7 +1,6 @@
 function C = parallel(A,B)
 %PARALLEL connection
 
-
 if isa(A,'qctrl') && isa(B,'qctrl')
     if A.sampleTime ~= B.sampleTime
         error('sample time must agree')

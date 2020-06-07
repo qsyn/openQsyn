@@ -109,8 +109,8 @@ classdef qfr
             else
                 error('PhaseVisible option must be a boolian scalar');
             end
-            
-            bodeplotter(obj.response.',p.Results.w,opt,p.Results.color);
+            uwobj = unwrap(obj);
+            bodeplotter(uwobj.response.',p.Results.w,opt,p.Results.color);
         end
         function G = frd(obj)
             %FRD converts qfr to a Control Systems Toolbox FRD object
