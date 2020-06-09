@@ -10,6 +10,6 @@ switch Order
     case {1}
         Clead = (sqrt(a)*s+wn)/(s+sqrt(a)*wn);
     case {2}
-       Clead = (sqrt(a)*s+wn)/(s+sqrt(a)*wn); % still need to fix this 
+        Clead = (sqrt(a)*s+wn)/(s+sqrt(a)*wn); % still need to fix this 
 end
 end
