@@ -37,8 +37,8 @@ set(s,'DisplayFormat','Frequency');
 % G_Lead = Clead(40,10,1)*Clead(42,30,1);
 % G_Lag = Clag(50,1000);
 
-curr_G= ((s+0.01)/(s*(s^2 +s +1)));%*G_Lead*G_Lag;
-G =curr_G;
+% curr_G= ((s+5)/(s*(s^2 +s +1)));%*G_Lead*G_Lag;
+G = qctrl(-1,[0 -1 -2],1);
 des.loopnic(G)
 ngrid
 
