@@ -1,4 +1,4 @@
-function Cpz = Cpz(a,b,c,d,flag)
+function Cpz = Qpz(a,b,c,d,flag)
 s = qctrl(0,[],1);
 Cpz = 1;
 switch flag
