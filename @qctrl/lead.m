@@ -11,7 +11,7 @@ function obj = lead(Phase,Freq,Damping)
 %
 
 wm = Freq;
-Pm = Phase*pi/190;
+Pm = Phase*pi/180;
 if nargin==2 % order=1
     z = wm*(1-sin(Pm))/cos(Pm);
     p = wm*(1+sin(Pm))/cos(Pm);

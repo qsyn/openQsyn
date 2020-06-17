@@ -46,20 +46,10 @@ classdef qctrl < matlab.mixin.CustomDisplay
         end
         function newobj = minreal(obj)
             %MINREAL
-            %[Lia,Locb] = ismember(obj.poles,obj.zeros);
+            [Lia,Locb] = ismember(obj.poles,obj.zeros);
             newobj = obj;
-            k=1;
-            while k<=length(newobj.poles)
-                [~,I] = ismember(newobj.poles(k),newobj.zeros);
-                if I>0
-                    newobj.poles(k)=[];
-                    newobj.zeros(I)=[];
-                else
-                    k=k+1;
-                end
-            end
-            %newobj.poles(Lia) = [];
-            %newobj.zeros(Locb(Locb>0))= [];
+            newobj.poles(Lia) = [];
+            newobj.zeros(Locb(Locb>0))= [];
         end
         function [num,den] = tfdata(obj)
             %TFDATA computes numerator and denominator tf data
@@ -80,71 +70,112 @@ classdef qctrl < matlab.mixin.CustomDisplay
                 {'numeric'},{'nonnegative','real','finite','increasing','vector'}));
             p.parse(frequency);
             w = p.Results.frequency;
-            if obj.sampleTime==0
-                s = w*1i;
-            else
-                s = exp(obj.sampleTime*w*1i);
-            end
+            s = frequency*1i;
             [num,den] = tfdata(obj);
             res = c2n(polyval(num,s)./polyval(den,s),-180);
             
-        end
-        function nichols(obj,frequency,varargin)
-           %NICHOLS plots Nichols chart for qctrl objects
-           %
-           %Usage: 
-           %    NICHOLS(C)   plots Nichols chart for QCTRL object C over
-           %    defualt frequency grid
-           %
-           %    NICHOLS(C,W)   specify the frequency vector
-           %
-           %    NICHOLS(C,W,LineSpec)   sets the line style, marker symbol, 
-           %    and color
-           %    
-           %    plot(___,Name,Value)   specifies line properties using one 
-           %    or more Name,Value pair arguments.
-           
-           if ~exist('frequency','var'), frequency=[]; end
-           if isempty(frequency), frequency=logspace(-2,2,200); end
-           
-           res = nicresp(obj,frequency);
-           fr = qfr(res,frequency);
-           show(fr,varargin{:});
-                   
         end
         function q = qfr(obj,frequency)
            %QFR converts qctrl object into a qfr object with specified frequency
            res = nicresp(obj,frequency);
            q = qfr(res,frequency);
         end
+        function str = print(obj)
+            %PRINT prints as string in dc form
+            %
+            if obj.gain==1
+                s1=[];
+            else
+                s1 = sprintf('%g',obj.gain);
+            end
+            s2 = [];
+            s3 = [];
+            if isempty(obj.zeros)
+                s2 = '1';
+            end
+            k=1;
+            while k <= length(obj.zeros)
+                z = obj.zeros(k);
+                if isreal(z)
+                    if z==0 
+                        s2 = [s2,'s'];
+                    elseif z==1
+                        s2 = [s2,'(1-s)'];
+                    elseif z==-1
+                        s2 = [s2,'(s+1)'];
+                    elseif z>0
+                        s2 = [s2,sprintf('(1-s/%g)',z)];
+                    else
+                        s2 = [s2,sprintf('(s/%g+1)',-z)];
+                    end
+                    k=k+1;
+                else
+                    wn = abs(z);
+                    zeta = real(z)/wn;
+                    if zeta<0
+                        zeta = -zeta;
+                        wn = -wn;
+                    end
+                    s2 = [s2,sprintf('(s^2/%g+%g*s/%g+1)',wn^2,2*zeta,-wn)];
+                    k=k+2;
+                end
+            end
+            %if length(s2)>1
+            %    s2 = s2(1:end-1);
+            %end
+            k=1;
+            while k <= length(obj.poles)
+                p = obj.poles(k);
+                if isreal(p)
+                    if p==0 
+                        s3 = [s3,'s'];
+                    elseif p==-1
+                        s3 = [s3,'(s+1)'];
+                    elseif p==1
+                        s3 = [s3,'(1-s)'];
+                    elseif p>0
+                        s3 = [s3,sprintf('(1-s/%g)',p)];
+                    else
+                        s3 = [s3,sprintf('(s/%g+1)',-p)];
+                    end
+                    k=k+1;
+                else
+                    wn = abs(p);
+                    zeta = real(p)/wn;
+                    if zeta<0
+                        zeta = -zeta;
+                        wn = -wn;
+                    end
+                    s3 = [s3,sprintf('(s^2/%g+%g*s/%g+1)',wn^2,2*zeta,-wn)];
+                    k=k+2;
+                end
+            end
+            %if ~isempty(s3)
+            %    s3 = s3(1:end-1);
+            %end
+            [L,I] = max([length(s2) length(s3)]);
+            sline = repmat('-',1,L+2);
+            pad1 = repmat(' ',1,length(s1));
+            pad2 = repmat(' ',1,ceil(abs(length(s2)-length(s3))/2));
+            if I==1
+                s3 = [pad2,s3,pad2];
+            else
+                s2 = [pad2,s2,pad2];
+            end
+            
+            str = sprintf('    %s%s\n   %s%s\n   %s %s ',pad1,s2,s1,sline,pad1,s3);
+        end
         function B = inv(A)
             %INV inverts a qctrl object
             B = qctrl(A.poles,A.zeros,1/A.gain);
             B.sampleTime = A.sampleTime;
-        end
-        function B = uplus(A)
-           %UPLUS unitary plus (+)
-           B = A;
-        end
-        function B = uminus(A)
-           %UMINUS unitary minus (-)
-           B = A;
-           B.gain = -B.gain;
-        end
-        function C = plus(A,B)
-            %PLUS addition of qctrl objects, a parallel connection
-            C = parallel(A,B);
-        end
-        function C = minus(A,B)
-            %MINUS substruction of qctrl objects, a parallel connection
-            C = parallel(A,-B);
         end
         function C = series(A,B)
             %SERIES connection
             
             if isa(A,'qctrl') && isa(B,'qctrl')
                 if A.sampleTime ~= B.sampleTime
-                    error('sample time must agree')
+                    error('sample time must bbe the same')
                 end
                 C = qctrl([A.zeros.' B.zeros.'],[A.poles.' B.poles.'],A.gain*B.gain);
                 C.sampleTime = A.sampleTime;
@@ -154,10 +185,8 @@ classdef qctrl < matlab.mixin.CustomDisplay
             elseif isnumeric(A) && isa(B,'qctrl')
                 C = qctrl(B.zeros,B.poles,B.gain*A);
                 C.sampleTime = B.sampleTime;
-            elseif isa(B,'qsys') || isa(B,'qplant')
-                C = series(B,A);
             else
-                error('qctrl object may only be connected to objects of class qctrl, qplant, qsys, or numerical scalars')
+                error('illigal inputs!')
             end
             
         end
@@ -176,20 +205,6 @@ classdef qctrl < matlab.mixin.CustomDisplay
             %MRDIVIDE returns A/B
             C = series(A,inv(B));
         end
-        function C = mpower(A,b)
-           %MPOWER power, ^
-           p=inputParser;
-           p.addRequired('b',@(x) validateattributes(x,{'numeric'},{'scalar','integer','real'}))
-           p.parse(b);
-           C = qctrl([],[],1);
-           
-           for k = 1:abs(p.Results.b)
-               C = series(A,C);
-           end
-           if p.Results.b<0
-            C = 1/C;
-           end
-        end
         function bodeplot(obj,frequency,varargin)
            %BODEPLOT Bode plot of qctrl objects 
            %
@@ -205,17 +220,13 @@ classdef qctrl < matlab.mixin.CustomDisplay
         end
         function T = zpk(obj)
            %ZPK converts qctrl to zpk class
-           Idiff = obj.zeros==0;
-           Iint = obj.poles==0;
+           %k = obj.gain/obj.zeros(end)*obj.poles(end);
            if obj.sampleTime == 0
-               T0 = zpk(obj.zeros(~Idiff),obj.poles(~Iint),1,'displayformat','frequency');
+               T0 = zpk(obj.zeros,obj.poles,1,'displayformat','frequency');
            else
-               T0 = zpk(obj.zeros(~Idiff),obj.poles(~Iint),1,...
-                   obj.sampleTime,'displayformat','frequency');
+               T0 = zpk(obj.zeros,obj.poles,1,obj.sampleTime,'displayformat','frequency');
            end
-           % adjust dc gain
-           Tadj = obj.gain/dcgain(T0)*T0; 
-           T = Tadj*zpk(zeros(1,sum(Idiff)),zeros(1,sum(Iint)),1);
+           T = obj.gain/dcgain(T0)*T0; % adjust dc gain
         end
         function T = tf(obj)
             %TF converts qctrl to tf class
@@ -231,15 +242,17 @@ classdef qctrl < matlab.mixin.CustomDisplay
     
     methods(Static)
         obj = lead(Phase,Freq,Damping)
+        obj = lag(Freq,beta)
+        obj = notch(wn,wd,zn,zd)
+        obj = PID(Phase,Freq,Damping)
     end
     
     methods(Access = protected)
         function displayScalarObject(obj)
+            disp(obj.print)
             if obj.sampleTime==0
-                disp(obj.print)
                 fprintf('\nContinuous-time openQsyn QCTRL object\n\n')
             else
-                disp(strrep(obj.print,'s','z'));
                 fprintf('\nDiscrete-time openQsyn QCTRL object, sample time: %g\n\n',obj.sampleTime);
             end
         end
