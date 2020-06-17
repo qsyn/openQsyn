@@ -12,11 +12,11 @@ function obj = lead(Phase,Freq,Damping)
 
 wm = Freq;
 Pm = Phase*pi/180;
-if nargin==2 % order=1
+if Damping == 100 % order=1
     z = wm*(1-sin(Pm))/cos(Pm);
     p = wm*(1+sin(Pm))/cos(Pm);
     obj = qctrl(z,p,p/z);
-elseif nargin==3 % order=2
+else
     zeta=Damping;
     if zeta>=1 || zeta<=0
         error('damping ratio must be between 0 and 1')
@@ -26,7 +26,5 @@ elseif nargin==3 % order=2
     z = [-zeta*wz+1j*wz*sqrt(1-zeta^2) -zeta*wz-1j*wz*sqrt(1-zeta^2)];
     p = [-zeta*wp+1j*wp*sqrt(1-zeta^2) -zeta*wp-1j*wp*sqrt(1-zeta^2)];
     obj = qctrl(z,p,wp^2/wz^2);
-else
-    error('incorrect number of arguments')
 end
 end
