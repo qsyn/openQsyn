@@ -15,7 +15,7 @@ Pm = Phase*pi/180;
 if Damping == 100 % order=1
     p = -wm*sqrt((1+sin(Pm))/(1-sin(Pm)));
     z = -wm/sqrt((1+sin(Pm))/(1-sin(Pm)));
-    obj = qctrl(z,p,p/z);
+    obj = qctrl(z,p,1);
 else
     zeta=Damping;
     if zeta>=1 || zeta<=0
