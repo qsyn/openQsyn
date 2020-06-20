@@ -1,4 +1,4 @@
-function obj = PID(kp, ki, kd, flag, Tf, Ti, Td, N) 
+function obj = PID(kp, ki, kd, Tf, Ti, Td, N, flag) 
 
 % kp: Proportional gain
 % ki: Integral gain
@@ -11,23 +11,18 @@ function obj = PID(kp, ki, kd, flag, Tf, Ti, Td, N)
 
 s = qctrl(0,[],1);
 
-%% PID
+%PID
 
 if flag == 0
-    if nargin < 5 
-        Tf = 0; % the controller has no filter on the derivative action 
-    end
     obj = kp + ki/s + (kd*s)/(Tf*s +1); % with 1st order derivative filter
 end
 
-%% Standard PID
+%Standard PID
 
 if flag == 1
-    if nargin > 4
     obj = kp*(1 + 1/(Ti*s) + Td*s/((Td/N)*s+1));
-    end
-else
+end
+if flag ~=1 && flag ~=0
     error('not enough arguments')
 end
-
 end

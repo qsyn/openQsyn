@@ -234,6 +234,7 @@ classdef qctrl < matlab.mixin.CustomDisplay
         obj = Qpz(a,b,c,d,flag)
         obj = notch(wn,wd,zn,zd)
         obj = lag(Freq,beta)
+        obj = PID(kp, ki, kd, flag, Tf, Ti, Td, N) 
     end
     
     methods(Access = protected)
