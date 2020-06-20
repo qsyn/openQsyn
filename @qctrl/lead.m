@@ -13,8 +13,8 @@ function obj = lead(Phase,Freq,Damping)
 wm = Freq;
 Pm = Phase*pi/180;
 if Damping == 100 % order=1
-    z = wm*(1-sin(Pm))/cos(Pm);
-    p = wm*(1+sin(Pm))/cos(Pm);
+    p = -wm*sqrt((1+sin(Pm))/(1-sin(Pm)));
+    z = -wm/sqrt((1+sin(Pm))/(1-sin(Pm)));
     obj = qctrl(z,p,p/z);
 else
     zeta=Damping;
