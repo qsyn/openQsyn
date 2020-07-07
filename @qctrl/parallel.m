@@ -1,5 +1,11 @@
 function C = parallel(A,B)
-%PARALLEL connection
+%parallel returns a QCTRL parrallel connection between two qctrl elements
+%or qctrl element and numeruc element
+%
+% Usage:
+%
+% ab_parallel = qctrl.parallel(A,B)  returns a parallel connection between
+% A and B.
 
 if isa(A,'qctrl') && isa(B,'qctrl')
     if A.sampleTime ~= B.sampleTime

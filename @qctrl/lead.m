@@ -3,12 +3,19 @@ function obj = lead(Phase,Freq,Damping)
 %
 % Usage:
 %
-% clead = QCTRL.LEAD(Phase,W)  returns a 1st oreder lead compensator
+% clead = qctrl.lead(Phase,W)  returns a 1st oreder lead compensator
 % with a given phase-lead at frequeny W.
 %
-% clead = QCTRL.LEAD(Phase,W,damping) returns a 2nd order lead compensator
+% clead = qctrl.lead(Phase,W,damping) returns a 2nd order lead compensator
 % with a given phase-lead at frequeny W and specified damping
-%
+
+if nargin == 2
+    Damping = -1;
+end
+
+if nargin ~= 2 && nargin ~=3
+    error('Wrong number of input arguments')
+end
 
 wm = Freq;
 Pm = Phase*pi/180;

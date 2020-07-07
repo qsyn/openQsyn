@@ -3,7 +3,7 @@ function obj = lag(Freq,beta)
 %
 % Usage:
 %
-% clag = QCTRL.LAG(Phase,W)  returns a 1st oreder lag compensator
+% clag = qctl.lag(Phase,W)  returns a 1st oreder lag compensator
 % with a given phase-lag at frequeny W.
 %
 if nargin==2 % order=1
