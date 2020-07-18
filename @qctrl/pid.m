@@ -1,13 +1,21 @@
 function obj = pid(kp, ki, kd, Tf, Ti, Td, N, flag)
-%pid returns a qctrl pid compensator
+%PID returns a qctrl pid compensator
 %
 % Usage:
 %
-% cpid = qctrl.pid(kp, ki, kd, Tf, Ti, Td, N)  returns a pid compensator,
-% based on the input values. there are two cases: pid with kp,ki,kd and Tf
-% or standard pid with Ti,Td and N. It is allow to create only PI for
-% example, with qctrl.pid(kp,ki).
-% the inputs are:
+% cpid = QCTRL.PID(kp, ki, kd, Tf)  returns a PID compensator in
+% parrallel form  
+%
+%         ki     kd*s
+%   kp + ---- + ------
+%          s    Tf*s+1
+%
+% cpid =  QCTRL.PID(kp, Ti, Td, N) returns a PID compensator in
+% standard form
+%                 1          Td*s
+%   Kp * ( 1 + ------ + ------------ )
+%                Ti*s    (Td/N)*s+1
+ 
 % kp: Proportional gain
 % ki: Integral gain
 % kd: Derivative gain

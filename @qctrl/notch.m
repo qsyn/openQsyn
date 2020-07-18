@@ -1,9 +1,9 @@
 function obj = notch(wn,wd,zn,zd)
-%notch returns a QCTRL notch compensator
+%NOTCH returns a QCTRL notch compensator
 %
 % Usage:
 %
-% cnotch = qctrl.notch(wn,wd,zn,zd)  returns a notch compensator
+% cnotch = QCTRL.NOTCH(wn,wd,zn,zd)  returns a notch compensator
 % at a given frequency.
 %
 % notch:zd > zn
