@@ -57,6 +57,7 @@ else
     axObjs = figureHandle.Children;
     flag = 1;
 end
+
 if flag
     Ylim(1) = max(figureHandle.YLim(1),-160);
     if Ylim(1) > -20

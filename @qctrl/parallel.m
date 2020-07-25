@@ -1,5 +1,11 @@
 function C = parallel(A,B)
-%PARALLEL connection
+%parallel returns a QCTRL parrallel connection between two qctrl elements
+%or qctrl element and numeruc element
+%
+% Usage:
+%
+% ab_parallel = qctrl.parallel(A,B)  returns a parallel connection between
+% A and B.
 
 if isa(A,'qctrl') && isa(B,'qctrl')
     if A.sampleTime ~= B.sampleTime
@@ -47,9 +53,9 @@ C0 = qctrl(Z,P,1);
 
 if polyval(num,0)==0 || polyval(den,0)==0
     K1 = 10^(imag(nicresp(C0,1))/20);
-    C = C0*K1*polyval(num,1)/polyval(den,1);
+    C = C0/K1*abs(polyval(num,1i)/polyval(den,1i));
 else
-    C = C0*polyval(num,0)/polyval(den,0);
+    C = C0*abs(polyval(num,0)/polyval(den,0));
 end
 
 

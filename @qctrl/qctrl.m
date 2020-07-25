@@ -231,6 +231,11 @@ classdef qctrl < matlab.mixin.CustomDisplay
     
     methods(Static)
         obj = lead(Phase,Freq,Damping)
+        obj = qpz(a,b,c,d,flag)
+        obj = notch(wn,wd,zn,zd)
+        obj = lag(Freq,beta)
+        obj = pid(kp, ki, kd, Tf) 
+        obj = pidstd(kp,Ti, Td, N)
     end
     
     methods(Access = protected)
@@ -246,4 +251,3 @@ classdef qctrl < matlab.mixin.CustomDisplay
     end
     
 end
-
