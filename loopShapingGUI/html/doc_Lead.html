@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>PID controller</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-06-13"><meta name="DC.source" content="doc_PID.m"><style type="text/css">
+      --><title>Lead</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-06-13"><meta name="DC.source" content="doc_Lead.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,17 +66,17 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>PID controller</h1><p>A proportional-integral-derivative is a control loop mechanism which continuously calculates an error value (the difference between a reference signal and feedback from the output) and applies correction based on its PID terms.</p><p>This submenu enables the user to choose the controller terms, and see its magnitude and phase via bode plot. Once the user is satisfied with the result, the save &amp; exit button can be pressed. Doing so concatenates the PID controller inside the QFT controller.</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+  </style></head><body><div class="content"><h1>Lead</h1><p>Lead compensator is used to add phase to the open loop, but using it will increase the gain at high frequencies.</p><p>This submenu enables the user to choose the desired gain increase at a given frequency, and see the resulted magnitude and phase of the compensator via bode plot. Once the user is satisfied with the result, the save &amp; exit button can be pressed. Doing so concatenates the lead compensator inside the QFT controller.</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% PID controller
-% A proportional-integral-derivative is a control loop mechanism which 
-% continuously calculates an error value (the difference between a reference
-% signal and feedback from the output) and applies correction based on its
-% PID terms.
+%% Lead
+% Lead compensator is used to add phase to the open loop,
+% but using it will increase the gain at high frequencies.
 %
-% This submenu enables the user to choose the controller terms, and see its
-% magnitude and phase via bode plot. Once the user is satisfied with the 
-% result, the save & exit button can be pressed. Doing so concatenates the
-% PID controller inside the QFT controller.
+% This submenu enables the user to choose the desired gain increase at a 
+% given frequency, and see the resulted magnitude and phase of the compensator
+% via bode plot. Once the user is satisfied with the result, the save & exit
+% button can be pressed. Doing so concatenates the lead compensator inside 
+% the QFT controller.
+
 ##### SOURCE END #####
 --></body></html>

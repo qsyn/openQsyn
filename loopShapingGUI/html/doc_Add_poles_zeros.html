@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Lead</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-06-13"><meta name="DC.source" content="doc_Lead.m"><style type="text/css">
+      --><title>Add poles/zeros</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-06-13"><meta name="DC.source" content="doc_Add_poles_zeros.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,17 +66,16 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Lead</h1><p>Lead compensator is used to add phase to the open loop, but using it will increase the gain at high frequencies.</p><p>This submenu enables the user to choose the desired gain increase at a given frequency, and see the resulted magnitude and phase of the compensator via bode plot. Once the user is satisfied with the result, the save &amp; exit button can be pressed. Doing so concatenates the lead compensator inside the QFT controller.</p><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+  </style></head><body><div class="content"><h1>Add poles/zeros</h1><!--introduction--><p>This submenu enables the user to manually add poles and zeros to the developed controller in several ways:</p><!--/introduction--><div><ul><li>Add an integral or derivative term to the controller. This is done by pressing the switch to choose one of the two.</li><li>Predefined structures, which can be edited by dragging the cursor across the bar.</li><li>Editing a predefined first order transfer function.</li></ul></div><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% Lead
-% Lead compensator is used to add phase to the open loop,
-% but using it will increase the gain at high frequencies.
+%% Add poles/zeros
+% This submenu enables the user to manually add poles and zeros to the 
+% developed controller in several ways:
+%%
 %
-% This submenu enables the user to choose the desired gain increase at a 
-% given frequency, and see the resulted magnitude and phase of the compensator
-% via bode plot. Once the user is satisfied with the result, the save & exit
-% button can be pressed. Doing so concatenates the lead compensator inside 
-% the QFT controller.
+% *     Add an integral or derivative term to the controller. This is done by pressing the switch to choose one of the two. 
+% *     Predefined structures, which can be edited by dragging the cursor across the bar.
+% *     Editing a predefined first order transfer function. 
 
 ##### SOURCE END #####
 --></body></html>
