@@ -14,6 +14,7 @@ fullpath=mfilename('fullpath');
 homepath=fullpath(1:end-9);
 addpath([homepath,'utilities'])
 addpath(genpath([homepath,'doc']))
+addpath(homepath,'loopShapingGUI');
 
 builddocsearchdb([homepath,'\doc\html'])
 
