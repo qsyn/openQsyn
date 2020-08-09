@@ -1,15 +1,5 @@
-<<<<<<< HEAD
 function obj = pid(kp, ki, kd, Tf)
 %pid returns a qctrl pid compensator
-=======
-<<<<<<< HEAD:@qctrl/pid.m
-function obj = pid(kp, ki, kd, Tf, Ti, Td, N, flag)
-%PID returns a qctrl pid compensator
-=======
-function obj = pid(kp, ki, kd, Tf)
-%pid returns a qctrl pid compensator
->>>>>>> 83829a2... std pid and pid in two functions instead of 1, sync with LoopShapinfGui:@qctrl/PID.m
->>>>>>> tests
 %
 % Usage:
 %

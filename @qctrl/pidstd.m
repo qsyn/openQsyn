@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-function obj = pidstd(K,Ti, Td, N)
-=======
 function obj = pidstd(kp,Ti, Td, N)
->>>>>>> tests
 %pid returns a qctrl pid compensator
 %
 % Usage:
 %
-<<<<<<< HEAD
 % cpid =  QCTRL.PIDSTD(K, Ti, Td, N) returns a PID compensator in
 % standard form
 %                 1          Td*s
@@ -15,20 +10,16 @@ function obj = pidstd(kp,Ti, Td, N)
 %                Ti*s    (Td/N)*s+1
 %
 % K: gain
-=======
 % cpid = qctrl.pidstd(Ti, Td, N)  returns a standard pid compensator,
 % based on the input values.
 % the inputs are:
->>>>>>> tests
 % Ti: Integrator time
 % Td: Derivative time
 % N: Derivative filter divisor
 
-<<<<<<< HEAD
-kp_f = K;
-=======
+
+
 kp_f = kp;
->>>>>>> tests
 Ti_f = Ti;
 Td_f = Td;
 N_f = N;
