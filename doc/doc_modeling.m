@@ -140,6 +140,19 @@ P = qplant(num,den)
 pargrid=grid(P.pars,8);
 bodcases(P,pargrid)
 
+%% Adding delay and unstructured uncertainty
+% In addition to the numerator and denominator polynominals, a |qplant| can
+% also include 
+%
+% * *unstructured uncertainty* is added to an existing |qplant| using the |aunstruc| 
+%   command. For more details see <matlab:web('ex_unsunc.html') full exmaple>.
+% * *known/uncertain delay* is added to an existing |qplant| using the |adelay| command, 
+%   for exmaple 
+% 
+%         h = qpar('h',0,0,0.1,3);
+%         adelay(P,h)
+%
+
 %%
 % This is the time to move forward to 
 % <matlab:web('doc_ctpl.html') Step 2: Template Computation>  
