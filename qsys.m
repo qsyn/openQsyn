@@ -29,7 +29,7 @@ classdef qsys
             
             nq=0; %qplant counter
             for k=1:length(obj.blocks)
-                blk = obj.blocks{1};
+                blk = obj.blocks{k}; %correct the index
                 if isa(blk,'qplant')
                     nq = nq+1;
                 elseif isa(blk,'qsys')
