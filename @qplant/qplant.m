@@ -478,27 +478,94 @@ classdef qplant < handle
                 error('too many outputs!')
             end
         end
-        function step(obj,pars,tfinal)
-            %STEP computes step response for plant cases
-            if nargin<3, tfinal=[]; end
-            if nargin<2, pars=[]; end
-            
-            if isempty(pars)
-                pgrid = grid(obj.pars,0);
-            else
-                pgrid = pars;
+        function varargout=step(varargin)
+            % STEP is used to calculate and plot the step response of a
+            % QPLANT object for a given set of parameters and a time
+            % vector.
+            %  Usage: 
+            %           y = STEP(obj,pars,t)   computes the m step
+            %           responses of obj for the m different cases of the n
+            %           uncertain parameters given by the nXm matrix
+            %           "pars", for the time vector t. STEP(obj,pars,t)
+            %
+            %  Inputs:
+            %           obj     a QPLANT object representing an
+            %                   uncertain plant
+            %
+            %           pars    an array with n rows, each corresponds to
+            %                   a QPAR object, and m colums each
+            %                   corresponds to a test case to be simulated.
+            %                   For example if the uncertain plant is
+            %                   denoted P with P.pars.name a,k,wn,z, then
+            %                   pars would have 4 rows. If pars is empty,
+            %                   the nominal values will be simulated.
+            %            
+            %           t       a time vector for the simulation, i.e.
+            %                   t=0:0.1:30. If no time vector is supplied,
+            %                   the default is 0:0.1:10
+            defaultT=0:0.1:10;
+			nomPars=1;
+			switch nargin
+				case 1
+					obj=varargin{1};
+					assert(isa(obj,'qplant'),'Must input a qplant object!')
+					t=defaultT;
+					pars=nomPars;
+				case 2
+					obj=varargin{1};
+					assert(isa(obj,'qplant'),'Must input a qplant object!')
+					if (isrow(varargin{2}))
+						t=varargin{2};
+						pars=nomPars;
+					else
+						pars=varargin{2};
+						t=defaultT;
+					end
+				case 3
+					obj=varargin{1};
+					pars=varargin{2};
+					t=varargin{3};
+			end
+			if isscalar(pars)
+				num_n=cases(obj.num);
+				den_n=cases(obj.den);
+                [a,b,c,d] = qplant.Local_tf2ss(num_n,den_n);
+                x0=zeros(length(a),1);
+                [t x] = ode45(@(t,x) odeFun(t,x,a,b), t, x0);
+                y(:) = c*x'+d;
+			else
+				[numpars,denpars]=Prase_params(obj,pars);
+                num=obj.num;
+                den=obj.den;
+                [~,nPars]=size(pars);
+                y=zeros(length(t),nPars);
+                for ii=1:nPars
+                    num_n=cases(num,numpars(:,ii));
+                    den_n=cases(den,denpars(:,ii));
+                    [a,b,c,d] = qplant.Local_tf2ss(num_n,den_n);
+                    x0=zeros(length(a),1);
+                    [t x] = ode45(@(t,x) odeFun(t,x,a,b), t, x0);
+                    y(:,ii) = c*x'+d;
+                end
             end
-            
-            for k=1:size(pgrid,2)
-                Pk = tf(obj,pgrid(:,k));
-                [y,t]=step(Pk,tfinal);
-                plot(t,y);
+            col=lines(nCases);
+            linespec = struct('width',1,'style','-');
+            figure
                 hold on
+                set(gca, 'ColorOrder', col, 'NextPlot', 'add')
+                plot(t,y,'linewidth',linespec.width,'linestyle',linespec.style);
+                xlabel('Time [s]');
+                ylabel('Amplitude');
+                title('Step Response')
+                axis tight
+                hold off
+            if nargout
+                varargout{1}=y;
             end
-            xlabel('Time [s]');
-            ylabel('Amplitude');
-            axis tight
-            hold off
+            function dxdt = odeFun(t,x,A,B)
+            u = 1; % for step input
+            dxdt = A*x+B; % simply write the equation
+            end
         end
         function [tpl,par] = gettpl(obj,idx,w)
             %GETTPL get tpl point(s) from a plant
@@ -528,6 +595,74 @@ classdef qplant < handle
             %FEEDBACK connect qplant objects by negative feedback
             sys = qsys({A,B},'1/(1+B{1}*B{2})');
         end
+        function [numpars,denpars]=Prase_params(obj,pars)
+            % PARSE_PARAMS returns two parameter matrices shuffeld such that
+            % the parameters are in the correct order for obj.num and
+            % obj.den
+            %
+            %  Usage:
+            %  [numpars,denpars] = PARSE_PARAMS(obj,pars)   internal
+            %  function called within timedomain simulations involving
+            %  QPLANT objects (QSYS.STEP, QPLAT.STEP)
+            %
+            %  Inputs:
+            %  obj      a qplant object with n parameters (obj.pars)
+            %  pars     an nXm array sorted such that the ith row
+            %           corresponds to the ith entery of obj.pars
+            
+            numpars=pars;
+            denpars=pars;
+            P_args=sprintf('%s,',obj.pars.name);
+            num_args=sprintf('%s,',obj.num.pars.name);
+            den_args=sprintf('%s,',obj.den.pars.name);
+            n=length(obj.pars);
+            ind_n=[(1:n)',zeros(n,1)];
+            ind_d=[(1:n)',zeros(n,1)];
+            jj=0;
+            kk=0;
+            for ii=1:n
+                temp=round((strfind(num_args,obj.pars(ii).name)/2));
+                if isempty(temp)
+                    ind_n(ii-jj,:)=[];
+                    jj=jj+1;
+                else
+                   ind_n(ii-jj,2)=temp; 
+                end
+
+                temp=round((strfind(den_args,obj.pars(ii).name)/2));
+                if isempty(temp)
+                    ind_d(ii-kk,:)=[];
+                    kk=kk+1;
+                else
+                   ind_d(ii-kk,2)=temp; 
+                end
+
+            end
+            Bool=ind_n(:,1)==ind_n(:,2);
+            ind=find(Bool);
+            ind_n(ind,:)=[];
+
+            Bool=ind_d(:,1)==ind_d(:,2);
+            ind=find(Bool);
+            ind_d(ind,:)=[];
+
+            if(~isempty(ind_n))
+                m=size(ind_n);
+                for ii=1:m(1)
+                    swapI=ind_n(ii,:);
+                    numpars(swapI,:)=numpars(swapI([2,1]),:);
+                end
+            end
+
+            if(~isempty(ind_d))
+                m=size(ind_d);
+                for ii=1:m(1)
+                    swapI=ind_d(ii,:);
+                    denpars(swapI,:)=denpars(swapI([2,1]),:);
+                end
+            end
+        end  
+    
     end
     
     methods(Static)
@@ -586,6 +721,93 @@ classdef qplant < handle
             T=c2n(nyq,'unwrap');
         end
         [T,Qpar] = adgrid(trf,s,qpar,Tacc,n,plot_on)
+        function [a,b,c,d] = Local_tf2ss(num,den)
+        %   LOCAL_TF2SS  Transfer function to state-space conversion
+        %   without the Control System Toolbox.
+        %
+        %   Usage:
+        %   [A,B,C,D] = LOCAL_TF2SS (NUM,DEN)  calculates the state-space
+        %   representation: 
+        %       x = Ax + Bu
+        %       y = Cx + Du
+        %   of the single input, single output system:
+        %               NUM(s)
+        %       P(s) = -------
+        %               DEN(s)
+        %
+        %   Inputs:
+        %   NUM      is a row vector containing the coefficients of the
+        %            numerator in descending powers of s.
+        %   DEN      is a row vector containing the coefficients of the
+        %            denominator in descending powers of s.
+        
+            % Cast to enforce single precision rules
+            if isa(num,'single') || isa(den,'single')
+                nums = single(num);
+                dens = single(den);
+            else
+                nums = num;
+                dens = den;
+            end
+            %check if null system  (both numerator and denominator are empty)
+            if isempty(nums) && isempty(dens)
+                a = zeros(0,'like',nums);
+                b = zeros(0,'like',nums);
+                c = zeros(0,'like',nums);
+                d = zeros(0,'like',nums);
+            else
+                assert(ismatrix(nums) && ismatrix(dens),'Inputs should be two-dimensional.');
+                if(min(size(dens)) > 1)
+                    error('Denominator must be a row vector.');
+                end
+                denRow = dens(:).';
+                % Index of first non zero element of denominator
+                startIndexDen = find(denRow,1);
+                % Denominator should not be zero or empty
+                if isempty(startIndexDen)
+                    error('Denominator cannot be zero.');
+                end
+                % Strip denominator of leading zeros
+                denStrip = denRow(startIndexDen(1):end);
+                [mnum,nnum] = size(nums);
+                nden = size(denStrip,2);
+                % Check for proper numerator
+                if (nnum > nden)
+                    if any(nums(:,1:(nnum - nden)) ~= 0,'all')
+                        error('Transfer function must be proper!');
+                    end
+                    % Try to strip leading zeros to make proper
+                    numStrip = nums(:,(nnum-nden+1):nnum);
+                else
+                    % Pad numerator with leading zeroes, to make it have same number of
+                    % Columns as the denominator
+                    numStrip = [zeros(mnum,nden-nnum) nums];
+                end
+
+                % Normalize numerator and denominator such that first element of
+                % Denominator is one
+                numNormalized = numStrip./denStrip(1);
+                denNormalized = denStrip./denStrip(1);
+                if mnum == 0
+                    d = zeros(0,'like',numNormalized);
+                    c = zeros(0,'like',numNormalized);
+                else
+                    d = numNormalized(:,1);
+                    c = numNormalized(:,2:nden) - numNormalized(:,1) * denNormalized(2:nden);
+                end
+
+                if nden == 1
+                    a = zeros(0,'like',numNormalized);
+                    b = zeros(0,'like',numNormalized);
+                    c = zeros(0,'like',numNormalized);
+                else
+                    a = [-denNormalized(2:nden);eye(nden-2,nden-1)];
+                    b = eye(nden-1,1,'like',numNormalized);
+                end
+            end
+
+            end
+
     end
     
 end
