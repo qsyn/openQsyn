@@ -29,13 +29,13 @@ classdef qsys
             
             nq=0; %qplant counter
             for k=1:length(obj.blocks)
-                blk = obj.blocks{1};
+                blk = obj.blocks{k}; %correct the index
                 if isa(blk,'qplant')
                     nq = nq+1;
                 elseif isa(blk,'qsys')
                     nq = nq + blk.nqplant;
-                elseif ~any([isa(blk,'qfr') isa(blk,'lti') (isnumeric(blk) && isreal(blk))])
-                    error('qsys accepts only qplants, qfr, lti, and real scalar blocks')
+                elseif ~any([isa(blk,'qfr') isa(blk,'lti') isa(blk,'qctrl') (isnumeric(blk) && isreal(blk))])
+                    error('qsys accepts only qplants, qctrl, qfr, lti, and real scalar blocks')
                 end
             end
             if nq==0
