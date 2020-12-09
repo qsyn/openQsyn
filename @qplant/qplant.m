@@ -529,10 +529,11 @@ classdef qplant < handle
 			if isscalar(pars)
 				num_n=cases(obj.num);
 				den_n=cases(obj.den);
-                [a,b,c,d] = qplant.Local_tf2ss(num_n,den_n);
+                [a,b,c,d] = Local_tf2ss(num_n,den_n);
                 x0=zeros(length(a),1);
                 [t x] = ode45(@(t,x) odeFun(t,x,a,b), t, x0);
                 y(:) = c*x'+d;
+                nPars=1;
 			else
 				[numpars,denpars]=Prase_params(obj,pars);
                 num=obj.num;
@@ -548,7 +549,7 @@ classdef qplant < handle
                     y(:,ii) = c*x'+d;
                 end
             end
-            col=lines(nCases);
+            col=lines(nPars);
             linespec = struct('width',1,'style','-');
             figure
                 hold on

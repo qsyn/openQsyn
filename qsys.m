@@ -7,6 +7,7 @@ classdef qsys
         blocks          % cell array containing all blocks
         connections     % describe connections between blocks
         nqplant         % number of qplant blocks
+        delay           % maximal internal delay
     end
     
     methods
@@ -32,8 +33,18 @@ classdef qsys
                 blk = obj.blocks{k}; %correct the index
                 if isa(blk,'qplant')
                     nq = nq+1;
+                    if ~isempty(blk.delay)
+                        if (isempty(obj.delay) || blk.delay>obj.delay)
+                            obj.delay=blk.delay;
+                        end
+                    end
                 elseif isa(blk,'qsys')
                     nq = nq + blk.nqplant;
+                    if ~isempty(blk.delay)
+                        if (isempty(obj.delay) || blk.delay>obj.delay)
+                            obj.delay=blk.delay;
+                        end
+                    end
                 elseif ~any([isa(blk,'qfr') isa(blk,'lti') isa(blk,'qctrl') (isnumeric(blk) && isreal(blk))])
                     error('qsys accepts only qplants, qctrl, qfr, lti, and real scalar blocks')
                 end
@@ -42,6 +53,9 @@ classdef qsys
                 error('qsys requires at least 1 block element to be a qplant object')
             end
             obj.nqplant = nq;
+            if isempty(obj.delay)
+                obj.delay=0;
+            end
         end
         function obj = series(A,B)
             %SERIES series connection of a qsys object
@@ -243,32 +257,33 @@ classdef qsys
             sys = qsys({A,B},'1/(1+B{1}*B{2})');
         end
         function varargout = step(varargin)
-            % STEP is used to calculate and plot the step response of a
-            % QSYS object for a given set of parameters and a time vector.
-            %  Usage: 
-            %           y = STEP(obj,pars,t)   computes the m step
-            %           responses of obj for the m different cases of the n
-            %           uncertain parameters given by the nXm matrix
-            %           "pars", for the time vector t. 
-            %
-            %           STEP(obj,pars,t)        plots the responses
-            %
-            %  Inputs:
-            %           obj     a QSYS object representing an
-            %                   interconnection of systems.
-            %
-            %           pars    an array with n rows, each corresponds to
-            %                   a QPAR object, and m colums each
-            %                   corresponds to a test case to be simulated.
-            %                   For example if the uncertain plant inside
-            %                   is denoted P with P.pars.name a,k,wn,z,
-            %                   then pars would have 4 rows. If pars is
-            %                   empty, the nominal values will be
-            %                   simulated.
-            %
-            %           t       a time vector for the simulation, i.e.
-            %                   t=0:0.1:30. If no time vector is supplied,
-            %                   the default is 0:0.1:10
+        % STEP is used to calculate and plot the step response of a
+        % QSYS object for a given set of parameters and a time vector.
+        %  Usage: 
+        %           y = STEP(obj,pars,t)   computes the m step
+        %           responses of obj for the m different cases of the n
+        %           uncertain parameters given by the nXm matrix
+        %           "pars", for the time vector t. If a delay is present
+        %           everything is discretized and the delay is absorbed.
+        %
+        %           STEP(obj,pars,t)        plots the responses
+        %
+        %  Inputs:
+        %           obj     a QSYS object representing an
+        %                   interconnection of systems.
+        %
+        %           pars    an array with n rows, each corresponds to
+        %                   a QPAR object, and m colums each
+        %                   corresponds to a test case to be simulated.
+        %                   For example if the uncertain plant inside
+        %                   is denoted P with P.pars.name a,k,wn,z,
+        %                   then pars would have 4 rows. If pars is
+        %                   empty, the nominal values will be
+        %                   simulated.
+        %
+        %           t       a time vector for the simulation, i.e.
+        %                   t=0:0.1:30. If no time vector is supplied,
+        %                   the default is 0:0.1:10
             defaultT=0:0.1:10;
             nomPars=1;
             switch nargin
@@ -292,14 +307,33 @@ classdef qsys
                     pars=varargin{2};
                     t=varargin{3};
             end
+            h=obj.delay;
             [~,nCases]=size(pars);
-            y=zeros(length(t),nCases);
-            for ii=1:nCases
-                [sysNum,sysDen]=CoeffExtract(obj,pars(:,ii));
-                [a,b,c,d] = qplant.Local_tf2ss(sysNum,sysDen);
-                x0=zeros(length(a),1);
-                [t x] = ode45(@(t,x) odeFun(t,x,a,b), t, x0);
-                y(:,ii) = c*x'+d;
+            if h == 0
+                y=zeros(length(t),nCases);
+                for ii=1:nCases
+                    [sysNum,sysDen]=CoeffExtract(obj,pars(:,ii),h);
+                    [a,b,c,d] = Local_tf2ss(sysNum,sysDen);
+                    x0=zeros(length(a),1);
+                    [t x] = ode45(@(t,x) odeFun(t,x,a,b), t, x0);
+                    y(:,ii) = c*x'+d;
+                end
+            else
+               	nu=20; % Integer multipile of delay
+                Ts=h/nu;
+                t=0:Ts:max(t);
+                for ii=1:nCases
+                    [sysNum,sysDen]=CoeffExtract(obj,pars(:,ii),h);
+                    [a,b,c,d] = Local_tf2ss(sysNum,sysDen);
+                    x0=zeros(length(a),1);
+                    x(:,1) = a*x0 + b.*1;
+                    y(:,1) = c*x(:,1);
+                % x(k + 1) = A*x(k) + B*u(k)
+                    for jj = 2:length(t)
+                        x(:,jj) = a*x(:,jj-1) + b*1;
+                        y(:,jj)=c*x(:,jj)+d*1;
+                    end
+                end
             end
             col=lines(nCases);
             linespec = struct('width',1,'style','-');
@@ -319,38 +353,125 @@ classdef qsys
             u = 1; % for step input
             dxdt = A*x+B; % simply write the equation
             end 
-            end
-        function [sysNum,sysDen]=CoeffExtract(obj,pars)
-            % COEFFEXTRACT is used to extract the numerator/denominator
-            % coefficient vectors of the form
-            %               NUM(s)
-            %       H(s) = -------
-            %               DEN(s)
-            % from a QSYS object for time domain simulations.
-            %  Usage: 
-            %           [SYSNUM,SYSDEN] = COEFFEXTRACT(obj,pars)
-            %           recursively finds the basic QSYS interconnection
-            %           involving one QPLANT and antoher system and calls
-            %           for REDUCEDSOLVER which solves the base case.
-            %
-            %  Inputs:
-            %           obj     a qsys object representing an
-            %                   interconnection of systems.
-            %
-            %           pars    an array with n rows, each corresponds to
-            %                   a QPAR object, and m colums each
-            %                   corresponds to a test case to be simulated.
-            %                   For example if the uncertain plant inside
-            %                   is denoted P with P.pars.name a,k,wn,z,
-            %                   then pars would have 4 rows. If pars is
-            %                   empty, the nominal values will be
-            %                   simulated. 
+        end
+        function varargout = lsim(obj,pars,t,u)
+        % LSIM is used to calculate and plot the linear response of a
+        % QSYS object for a given set of parameters, an input and a time vector.
+        %  Usage: 
+        %           y = LSIM(obj,pars,t,u)   computes the m linear responses of obj
+        %           to a forcing signal u. There are m different cases of the n
+        %           uncertain parameters given by the nXm matrix "pars", for the
+        %           time vector t. If a delay is present everything is discretized
+        %           and the delay is absorbed into the parameters.
+        %
+        %           LSIM(obj,pars,t,u)        plots the responses
+        %
+        %  Inputs:
+        %           obj     a QSYS object representing an
+        %                   interconnection of systems.
+        %
+        %           pars    an array with n rows, each corresponds to
+        %                   a QPAR object, and m colums each
+        %                   corresponds to a test case to be simulated.
+        %                   For example if the uncertain plant inside
+        %                   is denoted P with P.pars.name a,k,wn,z,
+        %                   then pars would have 4 rows. If pars is
+        %                   empty, the nominal values will be
+        %                   simulated.
+        %
+        %           t       a time vector for the simulation, i.e.
+        %                   t=0:0.1:30. If no time vector is supplied,
+        %                   the default is 0:0.1:10
+        %
+        %           u       a vector representation of a user generated signal.
+
+        %assert((isa(obj,'qsys') && isa(pars,'numeric')),'Input must be (qsys,numeric)')
+                defaultT=0:0.1:10;
+                nomPars=1;
+        % TO DO: Need to parse input to account for missing arguments
+                % original code
+                [~,nCases]=size(pars);
+                h=obj.delay;
+                if h==0
+                    y=zeros(length(t),nCases);
+                    tt=t;
+                    for ii=1:nCases
+                        [sysNum,sysDen]=CoeffExtract(obj,pars(:,ii));
+                        [a,b,c,d] = Local_tf2ss(sysNum,sysDen);
+                        x0=zeros(length(a),1);
+                        [t x] = ode45(@(t,x) odeFun(t,x,a,b,tt,u), t, x0);
+                        y(:,ii) = c*x'+d*u;
+                    end
+                else
+                    nu=20; % Integer multipile of delay
+                    Ts=h/nu;
+                    t2=0:Ts:max(t);
+                    for ii=1:nCases
+                        [sysNum,sysDen]=CoeffExtract(obj,pars(:,ii),h);
+                        [a,b,c,d] = Local_tf2ss(sysNum,sysDen);
+                        x0=zeros(length(a),1);
+                        x(:,1) = a*x0 + b.*interp1(t,u,t2(1));
+                        y(:,1) = c*x(:,1)+d.*interp1(t,u,t2(1));
+                    % x(k + 1) = A*x(k) + B*u(k)
+                        for jj = 2:length(t2)
+                            x(:,jj) = a*x(:,jj-1) + b.*interp1(t,u,t2(jj));
+                            y(:,jj)=c*x(:,jj)+d.*interp1(t,u,t2(jj));
+                        end
+                    end
+                end
+                col=lines(nCases);
+                linespec = struct('width',1,'style','-');
+                figure
+                    hold on
+                    set(gca, 'ColorOrder', col, 'NextPlot', 'add')
+                    plot(t,y,'linewidth',linespec.width,'linestyle',linespec.style);
+                    xlabel('Time [s]');
+                    ylabel('Amplitude');
+                    title('Linear Simulation Result')
+                    axis tight
+                    hold off
+                if nargout
+                    varargout{1}=y;
+                end
+            function dxdt = odeFun(t,x,A,B,tt,u)
+                 % for step input
+                intU = interp1(tt,u,t);
+                dxdt = A*x+B*intU; % simply write the equation
+                end 
+        end
+        function [sysNum,sysDen]=CoeffExtract(obj,pars,h)
+        % COEFFEXTRACT is used to extract the numerator/denominator
+        % coefficient vectors of the form
+        %               NUM(s)
+        %       H(s) = -------
+        %               DEN(s)
+        % from a QSYS object for time domain simulations.
+        %  Usage: 
+        %           [SYSNUM,SYSDEN] = COEFFEXTRACT(obj,pars,h)
+        %           recursively finds the basic QSYS interconnection
+        %           involving one QPLANT and antoher system and calls
+        %           for REDUCEDSOLVER which solves the base case.
+        %
+        %  Inputs:
+        %           obj     a qsys object representing an
+        %                   interconnection of systems.
+        %
+        %           pars    an array with n rows, each corresponds to
+        %                   a QPAR object, and m colums each
+        %                   corresponds to a test case to be simulated.
+        %                   For example if the uncertain plant inside
+        %                   is denoted P with P.pars.name a,k,wn,z,
+        %                   then pars would have 4 rows. If pars is
+        %                   empty, the nominal values will be
+        %                   simulated.
+        %           h       the maximal delay of the compound qsys object.
             connection=obj.connections;
+            h=obj.delay;
             if isa(obj.blocks{1},'qsys')
-                [numBlk1,denBlk1]=CoeffExtract(obj.blocks{1},pars);
+                [numBlk1,denBlk1]=CoeffExtract(obj.blocks{1},pars,h);
             end
             if isa(obj.blocks{2},'qsys')
-                [numBlk2,denBlk2]=CoeffExtract(obj.blocks{2},pars);
+                [numBlk2,denBlk2]=CoeffExtract(obj.blocks{2},pars,h);
             end
 
             Bool1=exist('numBlk1','var');
@@ -372,36 +493,41 @@ classdef qsys
                 Blk1=qplant(numBlk1,denBlk1);
                 obj=qsys({Blk1,Blk2},connection);
             end
-
-            [sysNum,sysDen]=ReducedSolver(obj,pars);
+            nu=20; % Integer multipile of delay
+            Ts=h/nu;
+            [sysNum,sysDen]=ReducedSolver(obj,pars,Ts);
         end
-        function [sysNum,sysDen]=ReducedSolver(obj,pars)
-            % REDUCEDSOLVER solves the base-case of a QSYS object involving
-            % a single QPLANT object and another QCTRL/TF/ZPK/DOUBLE
-            % object. It outputs the numerator/denominator data of the form
-            %               NUM(s)
-            %       H(s) = -------
-            %               DEN(s)
-            % for the interconnected object.            
-            %  Usage: 
-            %           [SYSNUM,SYSDEN] = REDUCEDSOLVER(obj,pars)
-            %           finds the basic QSYS interconnection
-            %           involving one QPLANT and antoher system. It solves
-            %           the base case of COEFFEXTRACT
-            %  Inputs:
-            %           obj     a QSYS object representing an
-            %                   interconnection of systems.
-            %
-            %           pars    an array with n rows, each corresponds to
-            %                   a QPAR object, and m colums each
-            %                   corresponds to a test case to be simulated.
-            %                   For example if the uncertain plant inside
-            %                   is denoted P with P.pars.name a,k,wn,z,
-            %                   then pars would have 4 rows. If pars is
-            %                   empty, the nominal values will be
-            %                   simulated. 
-            assert((isa(obj,'qsys') && isa(pars,'numeric')),'Input must be (qsys,numeric)')
-
+        function [sysNum,sysDen]=ReducedSolver(obj,pars,Ts)
+        % REDUCEDSOLVER solves the base-case of a QSYS object involving
+        % a single QPLANT object and another QCTRL/TF/ZPK/DOUBLE
+        % object. It outputs the numerator/denominator data of the form
+        %               NUM(s)
+        %       H(s) = -------
+        %               DEN(s)
+        % for the interconnected object. If a delay is present the data
+        % is discretized and the delay is absorbed as poles at the origin.
+        % Currently supports only delays which are integer multiples of Ts.
+        % 
+        %  Usage: 
+        %           [SYSNUM,SYSDEN] = REDUCEDSOLVER(obj,pars,Ts)
+        %           finds the basic QSYS interconnection
+        %           involving one QPLANT and antoher system. It solves
+        %           the base case of COEFFEXTRACT
+        %  Inputs:
+        %           obj     a QSYS object representing an
+        %                   interconnection of systems.
+        %
+        %           pars    an array with n rows, each corresponds to
+        %                   a QPAR object, and m colums each
+        %                   corresponds to a test case to be simulated.
+        %                   For example if the uncertain plant inside
+        %                   is denoted P with P.pars.name a,k,wn,z,
+        %                   then pars would have 4 rows. If pars is
+        %                   empty, the nominal values will be
+        %                   simulated. 
+        %           Ts      desired sample time for discretization
+        %                   if 0, system is continuous.
+        %    assert((isa(obj,'qsys') && isa(pars,'numeric')),'Input must be (qsys,numeric)')
             feedCon='1/(1+B{1}*B{2})';
             serCon='B{1}*B{2}';
             for k=1:length(obj.blocks)
@@ -435,6 +561,35 @@ classdef qsys
                 numP=Plant.num;
                 denP=Plant.den;
             end
+            % account for discretization/delays
+            if ~(Ts == 0)
+                % First for the plants
+                if ~isempty(Plant.delay)
+                    [num_d,den_d]=AbsorbDelay(numP,denP,Plant.delay,Ts);
+                    numP=num_d;
+                    denP=den_d;
+                else 
+                    [Phi,Gamma,c,d]=Local_c2d(numP,denP,Ts);
+                    [num_d,den_d]=Local_ss2tf(Phi,Gamma,c,d,'d');
+                    numP=num_d;
+                    denP=den_d;
+                end
+                % Second for the controller (also gain fix)
+                [Phi,Gamma,c,d]=Local_c2d(num,den,Ts);
+                [num_d,den_d]=Local_ss2tf(Phi,Gamma,c,d,'d');
+                if (isscalar(num_d)&&isscalar(den_d))
+                    if num_d==den_d
+                        K=1;
+                    else
+                       K=d+c*inv(Phi)*Gamma; 
+                    end
+                else
+                    K=d+c*inv(Phi)*Gamma;
+                end
+                num=K*num_d;
+                den=den_d;		
+            end
+            %
             numProd=conv(numP,num);
             denProd=conv(denP,den);
             padSize=length(denProd)-length(numProd);
@@ -449,7 +604,7 @@ classdef qsys
                     sysDen=denProd;
             end
         end
-        
+
     end
 end
 
