@@ -5,26 +5,26 @@
 % plant, the templates and the bounds as follows:
 %%
 % % 
-%     % plant
-%     k=qpar('k',2,2,5,8);
-%     a=qpar('a',3,1,3,8);
-%     z=qpar('z',0.6,0.3,0.6,8);
-%     wn=qpar('wn',4,4,8,8);
-%     num = [qrff('hf',a) qrff('gain',k)];
-%     den = qrff('dc',wn,z);
-%     P = qplant(num,den);
-%     % templates
-%     w = [0.2 0.5 1 2 3 5 7 10 20 50];
-%     w_nom = logspace(-2,2.2,300);  
-%     P.cnom(w_nom);
-%     P.ctpl('rff',w,'accuracy',[0.25 1])
-%     % specifications
-%     spec1 = qspc('odsrs',w,6);
-%     spec2 = qspc.rsrs([1.2 0.2],10,1.5,[],logspace(-1,2),2.85,3.1);
-%     des = qdesign(P,[spec1 spec2]);
-%     % bounds
-%     des.cbnd('odsrs');
-%     des.cbnd('rsrs');
+    % plant
+    k=qpar('k',2,2,5,8);
+    a=qpar('a',3,1,3,8);
+    z=qpar('z',0.6,0.3,0.6,8);
+    wn=qpar('wn',4,4,8,8);
+    num = [qrff('hf',a) qrff('gain',k)];
+    den = qrff('dc',wn,z);
+    P = qplant(num,den);
+    % templates
+    w = [0.2 0.5 1 2 3 5 7 10 20 50];
+    w_nom = logspace(-2,2.2,300);  
+    P.cnom(w_nom);
+    P.ctpl('rff',w,'accuracy',[0.25 1])
+    % specifications
+    spec1 = qspc('odsrs',w,6);
+    spec2 = qspc.rsrs([1.2 0.2],10,1.5,[],logspace(-1,2),2.85,3.1);
+    des = qdesign(P,[spec1 spec2]);
+    % bounds
+    des.cbnd('odsrs');
+    des.cbnd('rsrs');
 
 %% 
 % Assume that a digital controller with sampling period $T_s = 0.02$ seconds is to be used, i.e.
@@ -68,6 +68,7 @@ bode(HA,logspace(-1,log10(50*pi))); % plot up to Nyquist frequency
 
 Cs = 2.5*(1+1.2*s/4+s^2/16)/s/(1+s/3.2);
 Cz = c2d(Cs,Ts,'matched');
+%%
 Cfr = qfr(Cz,w_nom);    % get open Qsyn frequency response element
 CHA = series(Cfr,HA);   % add the filter and the sampler
 
