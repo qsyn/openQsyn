@@ -4,7 +4,6 @@ function [num,den]=Local_ss2tf(a,b,c,d,type)
 %       state-space model (A,B,C,D) to transfer function
 % 		numerator and denominator, 'type' is for discrete
 % 		or continuous systems.
-%       Problem with gain correction! -- 09/12/29
 if isempty(a)
     num=d;
     den=1;
