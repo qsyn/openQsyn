@@ -4,9 +4,12 @@ classdef qsys
     %objects
     
     properties
-        blocks          % cell array containing all blocks
-        connections     % describe connections between blocks
-        nqplant         % number of qplant blocks
+        blocks                  % cell array containing all blocks
+        connections             % describe connections between blocks
+        nqplant                 % number of qplant blocks
+        pars            qpar    % parameters of all qplant blocks
+        templates       qtpl    % template (qtpl array)
+        nominal         qfr     % nominal case (qfr)
     end
     
     methods
@@ -27,11 +30,13 @@ classdef qsys
             end
             obj.connections = p.Results.connections;
             
+            parsVec = [];
             nq=0; %qplant counter
             for k=1:length(obj.blocks)
                 blk = obj.blocks{1};
                 if isa(blk,'qplant')
                     nq = nq+1;
+                    parsVec = [parsVec; blk.pars(:)];  
                 elseif isa(blk,'qsys')
                     nq = nq + blk.nqplant;
                 elseif ~any([isa(blk,'qfr') isa(blk,'lti') (isnumeric(blk) && isreal(blk))])
@@ -42,6 +47,7 @@ classdef qsys
                 error('qsys requires at least 1 block element to be a qplant object')
             end
             obj.nqplant = nq;
+            obj.pars = unique(parsVec);
         end
         function obj = series(A,B)
             %SERIES series connection of a qsys object
@@ -188,20 +194,20 @@ classdef qsys
             %  foramt for given parameters par, and frequencies w
             %
             %  Inputs:
-            %  par      array with each column a different parameter case;
-            %           default is the eniter grid. for multiple qplant
-            %           inset pars for each plant in cells: par={p1,p2,...}
-            %  w        vector of frequencies, def = logspace(-2,3,200)
+            %  par      Array with each column a different parameter case;
+            %           default is the eniter grid. 
+            %  w        Vector of frequencies, def = logspace(-2,3,200)
+            %
+            %  Note: in a case that more than 1 qplant is hold inside the
+            %  qsys object, par must be a unified grid of all qpar
+            %  elements, sorted according to the order in obj.pars.
             
             if nargin<3, w=[]; end
             if nargin<2, par=[]; end
             
             if isempty(w), w = logspace(-2,3,200); end
             w = reshape(w,[],1); % make sure w is a column vector.
-            
-            if isempty(par), par=cell(obj.nqplant,1);  end  % no par specified
-            if ~iscell(par), par={par}; end                 % force cell
-            
+                        
             N = length(obj.blocks); % number of blocks
             T = cell(obj.nqplant,1);
             kp=0;
@@ -209,11 +215,8 @@ classdef qsys
                 blk = obj.blocks{k};
                 if (isa(blk,'qplant') || isa(blk,'qsys'))
                     kp = kp+1;
-                    if isscalar(par)
-                        T{k} = n2c(blk.cases(par{1},w));
-                    else
-                        T{k} = n2c(blk.cases(par{kp},w));
-                    end
+                    I = ismember(obj.pars,blk.pars);
+                    T{k} = n2c(blk.cases(par(I,:),w));
                 else
                     T{k} = n2c(nicresp(blk,w)).';
                 end

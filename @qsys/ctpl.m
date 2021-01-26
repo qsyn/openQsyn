@@ -1,15 +1,15 @@
 function obj = ctpl(obj,method,w,varargin)
-%CTPL computes the templates for given qplant object
+%CTPL computes the templates for given qsys object
 %
-%   P = ctpl(P,method,w)    compute templates for plant P vai specified
+%   T = ctpl(T,method,w)    compute templates for qsys T via specified
 %   method at given frequecies.
 %
-%	P = ctpl(P,method,w,parameter,value)    specify additional options
+%	T = ctpl(T,method,w,parameter,value)    specify additional options
 %	using parameter/value pairs
 %
 %   Inputs (required):
 %
-%       obj     qplant object
+%       T       qsys object
 %
 %       method  template computation method. one of the following:
 %               'grid'      uniform grid over parameter
@@ -31,7 +31,7 @@ function obj = ctpl(obj,method,w,varargin)
 %       parameters  parameter set for cases method
 %       size        size of grid for methods 'grid', 'rngrid' and 'random' 
 %   
-%   See also: qplant/cnom
+%   See also: qplant/ctpl
 
 if nargin<4, options=[]; end
 
@@ -52,17 +52,6 @@ options.plot_on = p.Results.plotOn;
 options.Tacc = p.Results.accuracy;
 options.pars = p.Results.parameters;
 N = p.Results.size;
-
-if isempty(obj.pars) % no uncertain parameters! 
-    disp('no uncertain parameters in qplant object...');
-    f = qplant2func(obj);
-    pnom = [obj.pars.nominal];
-    C = num2cell(pnom);
-    C{end+1}=1j*w;
-    nyq = f(C{:});
-    obj.templates = c2n(nyq,'unwarp') ;
-    return
-end
 
 % compute based on given method:
 switch method
