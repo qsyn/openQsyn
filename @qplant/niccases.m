@@ -38,16 +38,16 @@ col = p.Results.color;
 shownom = p.Results.shownom;
 
 [res,w] = cases(obj,par,w);     % compute cases
-N = size(res,2);
+N = size(res,1);
 if isempty(col)                 % pick colors
-    col = lines(size(res,2));
+    col = lines(N);
 elseif size(col,1) < N
     col = repmat(col,ceil(N/size(col,1)),1);
 end
 
 
 linespec = struct('width',1,'style','-');
-nicholsplotter(res.',-w,col,linespec);  % plot the Bode for all cases.
+nicholsplotter(res,-w,col,linespec);  % plot the Bode for all cases.
                                         % the (-w) is to get the frequency
                                         % data tip dispalyed right.
 
@@ -57,7 +57,7 @@ if  shownom
     linespec.style = '--';
     nompar = obj.pars.nom;
     nomres = cases(obj,nompar,w);
-    nicholsplotter(nomres.',w,[0 0 0],linespec);   % plot the Nichols for nominal case  
+    nicholsplotter(nomres,w,[0 0 0],linespec);   % plot the Nichols for nominal case  
 end
 
 end
