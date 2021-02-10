@@ -39,6 +39,7 @@ classdef qsys
                     parsVec = [parsVec; blk.pars(:)];  
                 elseif isa(blk,'qsys')
                     nq = nq + blk.nqplant;
+                    parsVec = [parsVec; blk.pars(:)];  
                 elseif ~any([isa(blk,'qfr') isa(blk,'lti') isa(blk,'qctrl') (isnumeric(blk) && isreal(blk))])
                     error('qsys accepts only qplants, qctrl, qfr, lti, and real scalar blocks')
                 end
