@@ -9,12 +9,13 @@
 			<tocitem target="doc_bounds.html">Computing Bounds</tocitem>
         </tocitem>    
     <tocitem>Exmaples 
-            <tocitem target="example.html">Basic SISO Exmaple</tocitem>
-            <tocitem target="ex_unsunc.html">Unstructured Uncertainty</tocitem>
+            <tocitem target="example.html">Basic SISO exmaple</tocitem>
+            <tocitem target="ex_unsunc.html">Unstructured uncertainty</tocitem>
             <tocitem target="ex_rff.html">Real Factored Form</tocitem>
 			<tocitem target="ex_digital.html">Digital Control</tocitem>
             <tocitem target="doc_qctrl.html">Working without Control System Toolbox</tocitem>
-            <tocitem target="ex_blackBox.html">Black Box Plant</tocitem>
+            <tocitem target="ex_blackBox.html">Black box plant</tocitem>
+            <tocitem target="ex_gui.html">Design using GUI</tocitem>
         </tocitem>
 
     </tocitem>

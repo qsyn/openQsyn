@@ -145,6 +145,22 @@ classdef qdesign  < handle
             if nargout==1, varargout{1}=h; end
             
         end
+        function [] = gui(obj,G)
+           %GUI opens a loop-shaping design gui
+           % 
+           %Usage: 
+           %
+           %    GUI(DES,G)  opens a design gui for a qdesign object DES and an initial controlle G.
+           %                If G is not supplied default value is G=1. 
+           %
+           %    DES.GUI(G)  alternative OO call
+           
+           if ~exist('G','var'), G=qctrl(1); end
+           if isempty(G), G=qctrl(1); end
+           
+           loopShapingGUI(G,obj);
+           
+        end
     end
     
     methods(Static)
